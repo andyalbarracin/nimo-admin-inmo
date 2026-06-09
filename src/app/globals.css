@@ -1,0 +1,336 @@
+/*
+ * Archivo: globals.css
+ * Ruta: src/app/globals.css
+ * Creado: 2026-06-06
+ * Descripción: Estilos globales de NIMO. Contiene:
+ *   - Import de Tailwind CSS v4
+ *   - Tokens de diseño como CSS custom properties (:root)
+ *   - Mapeo @theme inline para que Tailwind los reconozca
+ *   - Estilos base (reset, tipografía, scrollbar)
+ *   - Animación shimmer para estados de carga
+ *
+ * IMPORTANTE: Los tokens de :root son la fuente de verdad del design
+ * system de la plataforma. Los tenants sobreescriben SOLO los tokens
+ * --tenant-* desde el layout de su slug (ver src/lib/theme/apply.ts).
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&family=DM+Serif+Display:ital@0;1&family=Syne:wght@700;800&display=swap');
+@import "tailwindcss";
+
+/* ================================================================
+   CAPA BASE: CSS Custom Properties (tokens del design system)
+   Fuente: .docs/10-design-system.md — sección 2.4
+   ================================================================ */
+
+@layer base {
+  :root {
+    /* --- Paleta de colores de la plataforma (marketing + superadmin) --- */
+
+    /* Coral: color primario. CTAs, badges activos, números clave. */
+    --color-primary: 255 107 107;
+    --color-primary-hover: 255 85 85;
+    --color-primary-soft: 255 228 228;
+
+    /* Verde: confirmaciones, "incluido" en tablas de planes. */
+    --color-secondary: 45 125 95;
+
+    /* Amarillo cálido: destacados ("Más elegido"). */
+    --color-accent: 245 194 66;
+
+    /* Naranja: estados intermedios, alertas no críticas. */
+    --color-warning: 232 128 74;
+
+    /* Rojo: errores, "perdido" en CRM. */
+    --color-danger: 231 76 60;
+
+    /* Azul: información neutra. */
+    --color-info: 74 144 226;
+
+    /* Violeta: plan Business, propuestas en CRM. */
+    --color-violet: 139 92 246;
+
+    /* Dorado: plan Enterprise, badges premium. */
+    --color-gold: 201 169 97;
+
+    /* --- Neutrales (escala cálida para superficies grandes) --- */
+    --bg: 250 250 248;            /* #FAFAF8 — fondo app principal */
+    --bg-elevated: 255 255 255;   /* #FFFFFF — cards y superficies elevadas */
+    --bg-muted: 244 242 238;      /* #F4F2EE — secciones secundarias, hovers */
+    --bg-dark: 15 15 15;          /* #0F0F0F — sidebar dashboard del tenant */
+    --bg-dark-elevated: 26 26 26; /* #1A1A1A — hover en sidebar oscuro */
+    --bg-black: 0 0 0;            /* #000000 — sidebar super-dashboard */
+
+    /* --- Textos --- */
+    --text-primary: 10 10 10;          /* #0A0A0A — texto principal en fondos claros */
+    --text-secondary: 82 82 82;        /* #525252 — subtítulos, labels */
+    --text-tertiary: 138 138 138;      /* #8A8A8A — captions, metadata, helper text */
+    --text-on-dark: 255 255 255;       /* #FFFFFF — texto sobre fondos oscuros */
+    --text-on-dark-muted: 161 161 161; /* #A1A1A1 — texto secundario sobre fondos oscuros */
+
+    /* --- Bordes --- */
+    --border: 229 226 221;        /* #E5E2DD — bordes sutiles */
+    --border-strong: 201 197 190; /* #C9C5BE — bordes con más presencia */
+
+    /* Ring de foco: coral con alpha (usado como box-shadow) */
+    --ring: 255 107 107;
+
+    /* --- Tokens de etapas del CRM (columnas del Kanban) --- */
+    --stage-new: 255 107 107;       /* Nuevo — coral */
+    --stage-contacted: 74 144 226;  /* Contactado — azul */
+    --stage-interested: 245 194 66; /* Interesado — amarillo */
+    --stage-visit: 232 128 74;      /* Visita — naranja */
+    --stage-proposal: 139 92 246;   /* Propuesta — violeta */
+    --stage-won: 45 125 95;         /* Cerrado (ganado) — verde */
+    --stage-lost: 158 158 158;      /* Perdido — gris */
+
+    /* --- Tipografía --- */
+    --font-sans: 'Archivo', system-ui, -apple-system, sans-serif;
+    --font-display: 'Archivo Black', 'Arial Black', sans-serif;
+    --font-serif: 'DM Serif Display', Georgia, serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+    /* --- Zaire DS tokens (superadmin + platform chrome) --- */
+    --zaire-black:   #111111;
+    --zaire-cream:   #F5F5F0;
+    --zaire-cream-2: #FFFFFF;
+    --zaire-cream-border: #DEDED4;
+    --zaire-ink-2:   #4A4A47;
+    --zaire-ink-3:   #8A8A83;
+    --zaire-orange:  #FF6A00;
+    --zaire-orange-hover: #E85F00;
+    --zaire-red:     #E71D0A;
+    --zaire-yellow:  #FFC107;
+    --zaire-stripe: linear-gradient(90deg, #E71D0A 0%, #E71D0A 33.3%, #FF6A00 33.3%, #FF6A00 66.6%, #FFC107 66.6%, #FFC107 100%);
+
+    /* --- Border radius (identidad Bento — generoso) --- */
+    --radius-sm: 0.5rem;   /* 8px  — inputs pequeños */
+    --radius-md: 0.75rem;  /* 12px — botones */
+    --radius-lg: 1rem;     /* 16px — cards chicos */
+    --radius-xl: 1.5rem;   /* 24px — cards medianos */
+    --radius-2xl: 2rem;    /* 32px — cards bento grandes */
+    --radius-full: 9999px; /* pills, avatars */
+
+    /* --- Sombras (suaves, sin negros saturados) --- */
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.08), 0 2px 6px -2px rgb(0 0 0 / 0.05);
+    --shadow-lg: 0 10px 30px -8px rgb(0 0 0 / 0.12), 0 4px 12px -4px rgb(0 0 0 / 0.06);
+    --shadow-xl: 0 24px 50px -12px rgb(0 0 0 / 0.18);
+    --shadow-glow: 0 0 0 4px rgb(255 107 107 / 0.15); /* foco coral */
+
+    /* --- Tokens del tenant (sobreescribibles por inmobiliaria) --- */
+    /* Valores default = paleta de la plataforma. Se pisan en el layout del tenant. */
+    --tenant-primary: #FF6B6B;
+    --tenant-secondary: #0F172A;
+    --tenant-accent: #FCA5A5;
+    --tenant-font-display: 'Inter', sans-serif;
+
+    /* --- shadcn/ui — mapeo para compatibilidad con sus componentes --- */
+    --background: rgb(var(--bg));
+    --foreground: rgb(var(--text-primary));
+    --card: rgb(var(--bg-elevated));
+    --card-foreground: rgb(var(--text-primary));
+    --popover: rgb(var(--bg-elevated));
+    --popover-foreground: rgb(var(--text-primary));
+    --primary: rgb(var(--color-primary));
+    --primary-foreground: #ffffff;
+    --secondary: rgb(var(--bg-muted));
+    --secondary-foreground: rgb(var(--text-primary));
+    --muted: rgb(var(--bg-muted));
+    --muted-foreground: rgb(var(--text-secondary));
+    --accent: rgb(var(--bg-muted));
+    --accent-foreground: rgb(var(--text-primary));
+    --destructive: rgb(var(--color-danger));
+    --input: rgb(var(--border));
+    --radius: var(--radius-md);
+  }
+}
+
+/* ================================================================
+   @THEME INLINE: Expone los tokens a las utilidades de Tailwind v4
+   Permite usar clases como bg-primary, text-secondary, etc.
+   ================================================================ */
+
+@theme inline {
+  /* Colores semánticos de la plataforma */
+  --color-primary: rgb(var(--color-primary) / <alpha-value>);
+  --color-primary-hover: rgb(var(--color-primary-hover) / <alpha-value>);
+  --color-primary-soft: rgb(var(--color-primary-soft) / <alpha-value>);
+  --color-nimo-secondary: rgb(var(--color-secondary) / <alpha-value>);
+  --color-nimo-accent: rgb(var(--color-accent) / <alpha-value>);
+  --color-warning: rgb(var(--color-warning) / <alpha-value>);
+  --color-danger: rgb(var(--color-danger) / <alpha-value>);
+  --color-info: rgb(var(--color-info) / <alpha-value>);
+  --color-violet: rgb(var(--color-violet) / <alpha-value>);
+  --color-gold: rgb(var(--color-gold) / <alpha-value>);
+
+  /* Fondos */
+  --color-bg: rgb(var(--bg) / <alpha-value>);
+  --color-bg-elevated: rgb(var(--bg-elevated) / <alpha-value>);
+  --color-bg-muted: rgb(var(--bg-muted) / <alpha-value>);
+  --color-bg-dark: rgb(var(--bg-dark) / <alpha-value>);
+  --color-bg-dark-elevated: rgb(var(--bg-dark-elevated) / <alpha-value>);
+  --color-bg-black: rgb(var(--bg-black) / <alpha-value>);
+
+  /* Textos */
+  --color-text-primary: rgb(var(--text-primary) / <alpha-value>);
+  --color-text-secondary: rgb(var(--text-secondary) / <alpha-value>);
+  --color-text-tertiary: rgb(var(--text-tertiary) / <alpha-value>);
+  --color-text-on-dark: rgb(var(--text-on-dark) / <alpha-value>);
+  --color-text-on-dark-muted: rgb(var(--text-on-dark-muted) / <alpha-value>);
+
+  /* Bordes */
+  --color-border: rgb(var(--border) / <alpha-value>);
+  --color-border-strong: rgb(var(--border-strong) / <alpha-value>);
+
+  /* Etapas CRM */
+  --color-stage-new: rgb(var(--stage-new) / <alpha-value>);
+  --color-stage-contacted: rgb(var(--stage-contacted) / <alpha-value>);
+  --color-stage-interested: rgb(var(--stage-interested) / <alpha-value>);
+  --color-stage-visit: rgb(var(--stage-visit) / <alpha-value>);
+  --color-stage-proposal: rgb(var(--stage-proposal) / <alpha-value>);
+  --color-stage-won: rgb(var(--stage-won) / <alpha-value>);
+  --color-stage-lost: rgb(var(--stage-lost) / <alpha-value>);
+
+  /* Border radius */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+
+  /* Sombras */
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-glow: var(--shadow-glow);
+
+  /* Fuentes */
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
+}
+
+/* ================================================================
+   ESTILOS BASE: reset fino y tipografía
+   ================================================================ */
+
+@layer base {
+  /* Color de borde heredado de los tokens en lugar del gris de Tailwind */
+  *,
+  *::before,
+  *::after {
+    border-color: rgb(var(--border));
+  }
+
+  html {
+    /* Scroll suave para navegación por anclas internas */
+    scroll-behavior: smooth;
+    background-color: rgb(var(--bg));
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.55;
+    color: rgb(var(--text-primary));
+    background-color: rgb(var(--bg));
+
+    /* Renderizado tipográfico suave en MacOS/iOS */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Skip link: accesibilidad para navegación por teclado */
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 1rem;
+    z-index: 9999;
+    background: rgb(var(--color-primary));
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .skip-link:focus {
+    left: 1rem;
+  }
+
+  /* Focus visible accesible en todos los elementos interactivos */
+  *:focus-visible {
+    outline: 2px solid rgb(var(--color-primary));
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Scrollbar sutil (Chrome, Edge, Safari) */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--border-strong));
+    border-radius: var(--radius-full);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--text-tertiary));
+  }
+
+  /* Respetar preferencia de usuario: reducir movimiento */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ================================================================
+   KEYFRAMES: animación shimmer para skeletons
+   ================================================================ */
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ================================================================
+   UTILITIES CUSTOMIZADAS
+   ================================================================ */
+
+@layer utilities {
+  /* Shimmer para skeletons de carga */
+  .bg-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgb(var(--bg-muted)) 25%,
+      rgb(var(--border)) 50%,
+      rgb(var(--bg-muted)) 75%
+    );
+    background-size: 200% 100%;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  /* Glassmorphism sutil para superficies elevadas */
+  .glass {
+    background: rgb(var(--bg-elevated) / 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgb(var(--border));
+  }
+}
