@@ -19,14 +19,14 @@ interface Props {
 }
 
 const themes = {
-  editorial: { bg: '#F7F3EE', ink: '#1E1A16', ink2: '#4D453C', ink3: '#9E9389', accent: '#7B4F3C', accentContrast: '#F7F3EE', surface: '#FFFFFF', border: '#DDD5C8', serif: true },
-  spatial:   { bg: '#F4F6FA', ink: '#0B1426', ink2: '#3A4A63', ink3: '#7A8BA8', accent: '#2B5FE8', accentContrast: '#FFFFFF', surface: '#FFFFFF', border: '#E0E5EF', serif: false },
-  loft:      { bg: '#141412', ink: '#EDE9E0', ink2: '#B0A898', ink3: '#6E6860', accent: '#C8A05E', accentContrast: '#141412', surface: '#222220', border: '#363633', serif: true },
+  editorial: { bg: '#FAF7F0', ink: '#1A1614', ink2: '#5C5247', ink3: '#9E9389', accent: '#B25431', accentContrast: '#FAF7F0', surface: '#FFFFFF', border: '#DBD2C2', serif: true },
+  spatial:   { bg: '#F2F4F8', ink: '#0A0A0A', ink2: '#3A4A63', ink3: '#7A8BA8', accent: '#1F4DD6', accentContrast: '#FFFFFF', surface: '#FFFFFF', border: '#E0E5EF', serif: false },
+  atelier:   { bg: '#F5F1EC', ink: '#2E2620', ink2: '#6E6258', ink3: '#9A8F82', accent: '#7A8264', accentContrast: '#F5F1EC', surface: '#FFFFFF', border: '#DDD5CA', serif: true },
 }
 
 export default function ContactPageContent({ slug, agency, agents }: Props) {
-  const themeId = agency?.theme ?? 'editorial'
-  const T = themes[themeId as keyof typeof themes] ?? themes.editorial
+  const themeId = (agency?.theme ?? 'editorial') as keyof typeof themes
+  const T = themes[themeId] ?? themes.editorial
 
   const [form, setForm] = useState({ name: '', email: '', phone: '', topic: '', message: '' })
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
