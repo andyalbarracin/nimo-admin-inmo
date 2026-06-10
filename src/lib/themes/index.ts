@@ -1,4 +1,4 @@
-export type ThemeId = 'editorial' | 'spatial' | 'loft'
+export type ThemeId = 'editorial' | 'spatial' | 'atelier'
 
 export interface SiteTheme {
   id: ThemeId
@@ -7,74 +7,87 @@ export interface SiteTheme {
   bg: string
   bg2: string
   surface: string
-  border: string
+  rule: string
   ink: string
   ink2: string
   ink3: string
   accent: string
+  accentDark: string
+  accentSoft: string
   accentContrast: string
   fontDisplay: string
   fontBody: string
+  fontMono: string
   radius: string
+  mapTiles: 'voyager' | 'positron'
   heroStyle: 'full-bleed' | 'split' | 'map'
 }
 
 export const THEMES: Record<ThemeId, SiteTheme> = {
-  // Warm parchment, Playfair Display serif, dusty terracotta accent
   editorial: {
     id: 'editorial',
     name: 'Editorial',
-    description: 'Tipografía serif, papel calido, acento terracota — estilo revista de arquitectura',
-    bg: '#F7F3EE',
-    bg2: '#EDE7DE',
+    description: 'Arquitectura de revista, serif Fraunces, terracota óxido — para inmobiliarias de trayectoria',
+    bg: '#FAF7F0',
+    bg2: '#F1ECE2',
     surface: '#FFFFFF',
-    border: '#DDD5C8',
-    ink: '#1E1A16',
-    ink2: '#4D453C',
-    ink3: '#9E9389',
-    accent: '#7B4F3C',
-    accentContrast: '#F7F3EE',
-    fontDisplay: "var(--font-serif), 'Georgia', serif",
+    rule: '#DBD2C2',
+    ink: '#1A1614',
+    ink2: '#5C5247',
+    ink3: '#8A8071',
+    accent: '#B25431',
+    accentDark: '#8C3F22',
+    accentSoft: '#E8D2C2',
+    accentContrast: '#FAF7F0',
+    fontDisplay: "var(--font-fraunces), 'Playfair Display', Georgia, serif",
     fontBody: "var(--font-sans), system-ui, sans-serif",
-    radius: '3px',
+    fontMono: "var(--font-mono), ui-monospace, monospace",
+    radius: '4px',
+    mapTiles: 'positron',
     heroStyle: 'split',
   },
-  // Pure white, geometric sans, electric blue — clean PropTech product feel
   spatial: {
     id: 'spatial',
     name: 'Spatial',
-    description: 'Fondo blanco, azul eléctrico, tipografía geométrica — producto PropTech moderno',
+    description: 'Swiss design map-forward, Inter Tight, azul electric — para boutiques tech-savvy',
     bg: '#FFFFFF',
-    bg2: '#F4F6FA',
+    bg2: '#F2F2F0',
     surface: '#FFFFFF',
-    border: '#E0E5EF',
-    ink: '#0B1426',
-    ink2: '#3A4A63',
-    ink3: '#7A8BA8',
-    accent: '#2B5FE8',
+    rule: '#D8D8D6',
+    ink: '#0A0A0A',
+    ink2: '#3D3D3D',
+    ink3: '#7A7A78',
+    accent: '#1F4DD6',
+    accentDark: '#163BA8',
+    accentSoft: '#E7ECFB',
     accentContrast: '#FFFFFF',
-    fontDisplay: "var(--font-sans), system-ui, sans-serif",
-    fontBody: "var(--font-sans), system-ui, sans-serif",
-    radius: '10px',
+    fontDisplay: "var(--font-inter-tight), 'Inter', system-ui, sans-serif",
+    fontBody: "var(--font-inter-tight), 'Inter', system-ui, sans-serif",
+    fontMono: "var(--font-mono), ui-monospace, monospace",
+    radius: '8px',
+    mapTiles: 'positron',
     heroStyle: 'map',
   },
-  // Near-black, Playfair Display serif, aged gold — ultra-luxury cinematic
-  loft: {
-    id: 'loft',
-    name: 'Loft',
-    description: 'Fondo casi negro, oro cálido, serif elegante — inmobiliaria de lujo',
-    bg: '#141412',
-    bg2: '#1C1C1A',
-    surface: '#222220',
-    border: '#363633',
-    ink: '#EDE9E0',
-    ink2: '#B0A898',
-    ink3: '#6E6860',
-    accent: '#C8A05E',
-    accentContrast: '#141412',
-    fontDisplay: "var(--font-serif), 'Georgia', serif",
+  atelier: {
+    id: 'atelier',
+    name: 'Atelier',
+    description: 'Boutique de lujo, Cormorant Garamond, verde salvia muted — para propiedades premium',
+    bg: '#F5F1EC',
+    bg2: '#EDE7DE',
+    surface: '#FFFFFF',
+    rule: '#DDD5CA',
+    ink: '#2E2620',
+    ink2: '#6B5D52',
+    ink3: '#9A8F82',
+    accent: '#7A8264',
+    accentDark: '#5E6B4E',
+    accentSoft: '#E4E7DC',
+    accentContrast: '#F5F1EC',
+    fontDisplay: "var(--font-cormorant), 'Cormorant Garamond', Georgia, serif",
     fontBody: "var(--font-sans), system-ui, sans-serif",
+    fontMono: "var(--font-mono), ui-monospace, monospace",
     radius: '2px',
+    mapTiles: 'positron',
     heroStyle: 'full-bleed',
   },
 }

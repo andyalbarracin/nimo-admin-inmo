@@ -1,169 +1,257 @@
 import Link from 'next/link'
 import { AGENCIES, PLATFORM_STATS } from '@/lib/dummy'
 
-const MONTHLY_MRR = [820, 940, 1020, 1080, 1140, 1196]
-const MONTHLY_LABELS = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun']
-const MAX_MRR = Math.max(...MONTHLY_MRR)
+/* ============================================================
+ * Universo B · ZAIRE · Dashboard superadmin — fidelidad B1.
+ * ============================================================ */
 
 const ZR = {
   black: '#111111',
   cream: '#F5F5F0',
   cream2: '#FFFFFF',
-  creamBorder: '#DEDED4',
   ink2: '#4A4A47',
   ink3: '#8A8A83',
   orange: '#FF6A00',
   red: '#E71D0A',
   yellow: '#FFC107',
-  stripe: 'linear-gradient(90deg, #E71D0A 0%, #E71D0A 33.3%, #FF6A00 33.3%, #FF6A00 66.6%, #FFC107 66.6%, #FFC107 100%)',
+  green: '#2D7D5F',
+  line: '#DEDED4',
+  display: "var(--font-archivo-black), 'Archivo Black', system-ui, sans-serif",
+  body: "var(--font-archivo), system-ui, sans-serif",
+  mono: "var(--font-mono), 'JetBrains Mono', ui-monospace, monospace",
 }
 
+const MRR_SPARK = [28, 42, 38, 65, 52, 78, 70, 88, 95, 80, 92, 100]
+const LEADS_SPARK = [40, 55, 48, 62, 58, 80, 72, 90, 84, 96, 88, 100]
+
+const PLAN_META: Record<string, { label: string; color: string; mrr: number }> = {
+  starter: { label: 'STARTER', color: ZR.ink3, mrr: 39 },
+  pro: { label: 'PRO', color: ZR.orange, mrr: 79 },
+  business: { label: 'BUSINESS', color: ZR.yellow, mrr: 149 },
+  enterprise: { label: 'ENTERPRISE', color: ZR.red, mrr: 299 },
+}
+const PLAN_ORDER = ['starter', 'pro', 'business', 'enterprise'] as const
+
+const SERVICES: [string, string, 'ok' | 'warn' | 'crit'][] = [
+  ['SUPABASE API', '45ms', 'ok'],
+  ['STORAGE', 'OK', 'ok'],
+  ['EMAILS · RESEND', 'OK', 'ok'],
+  ['OPENROUTER', '112ms', 'ok'],
+  ['WHATSAPP CLOUD', 'DEGRADED', 'warn'],
+  ['VERCEL', 'OK', 'ok'],
+  ['STRIPE', '218ms', 'ok'],
+]
+
+const EVENTS: [string, string][] = [
+  ['5MIN', 'AGENCIA REGISTRADA · CASTELAR CENTRO'],
+  ['1H', 'UPGRADE PRO→BUSINESS · BOUTIQUE DEL PLATA'],
+  ['3H', 'WHATSAPP WEBHOOK TIMEOUT · RETRY 3/3'],
+  ['5H', 'BACKUP COMPLETADO · TODAS LAS AGENCIAS'],
+  ['8H', 'PROMPT DEPLOYED · LEAD_SCORING_V3'],
+]
+
 export default function SuperadminDashboard() {
-  const recentAgencies = AGENCIES.slice(0, 5)
+  const total = AGENCIES.length
+  const counts = PLAN_ORDER.map(p => ({ plan: p, count: AGENCIES.filter(a => a.plan === p).length }))
+  const okServices = SERVICES.filter(s => s[2] === 'ok').length
+
+  // donut
+  const R = 40
+  const C = 2 * Math.PI * R
+  let acc = 0
+  const segments = counts
+    .filter(c => c.count > 0)
+    .map(c => {
+      const len = (c.count / total) * C
+      const seg = { color: PLAN_META[c.plan]!.color, dash: len, offset: -acc }
+      acc += len
+      return seg
+    })
+
+  const topAgencies = [...AGENCIES].sort((a, b) => b.mrr - a.mrr)
 
   return (
-    <div style={{ padding: '40px 48px', minHeight: '100vh', background: ZR.cream, fontFamily: "'Archivo', system-ui, sans-serif", color: ZR.black }}>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 44 }}>
+    <div style={{ padding: '36px 40px 64px', minHeight: '100vh', background: ZR.cream, fontFamily: ZR.body, color: ZR.black }}>
+      {/* HEADER */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 32 }}>
         <div>
-          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 8 }}>
-            // PANEL DE CONTROL
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontFamily: ZR.mono, fontSize: 11.5, letterSpacing: '.14em', textTransform: 'uppercase', color: ZR.ink3 }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 7, height: 7, background: ZR.green, borderRadius: 99, boxShadow: '0 0 0 3px rgba(45,125,95,.22)' }} />
+              // VISTA GLOBAL · ÚLTIMOS 30 DÍAS
+            </span>
           </div>
-          <h1 style={{ fontFamily: "'Archivo Black', sans-serif", fontSize: 36, fontWeight: 900, color: ZR.black, margin: 0, lineHeight: 0.96, textTransform: 'uppercase', letterSpacing: '-.01em' }}>
-            NIMO Platform
+          <h1 style={{ fontFamily: ZR.display, fontSize: 'clamp(48px, 6vw, 80px)', letterSpacing: '.01em', lineHeight: 0.92, textTransform: 'uppercase', margin: '14px 0 10px' }}>
+            OPER<span style={{ color: ZR.orange }}>A</span>CIONES
           </h1>
-          <p style={{ fontSize: 14, color: ZR.ink2, margin: '10px 0 0', fontWeight: 400 }}>Junio 2026 — Visión global</p>
+          <p style={{ fontFamily: ZR.mono, fontSize: 13, letterSpacing: '.04em', color: ZR.ink3, margin: 0, textTransform: 'uppercase' }}>
+            {PLATFORM_STATS.active_agencies} inmobiliarias activas · MRR USD {PLATFORM_STATS.mrr.toLocaleString('es-AR')} · {PLATFORM_STATS.total_leads} leads este mes
+          </p>
         </div>
-        <div style={{ display: 'flex', gap: 10 }}>
-          <Link href="/superadmin/agencias" style={{ fontSize: 13, color: ZR.ink2, textDecoration: 'none', padding: '10px 18px', background: ZR.cream2, border: `1px solid ${ZR.creamBorder}`, borderRadius: 8, fontWeight: 500 }}>
-            Ver agencias
-          </Link>
-          <Link href="/superadmin/planes" style={{ fontSize: 13, color: '#fff', textDecoration: 'none', padding: '10px 20px', background: ZR.black, borderRadius: 8, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8, fontFamily: "'Archivo Black', sans-serif", letterSpacing: '.02em' }}>
-            + NUEVA AGENCIA
-          </Link>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <span className="z-btn-bk">[ ÚLTIMOS 30 DÍAS ▾ ]</span>
+          <span className="z-btn-bk">[ EXPORT CSV ]</span>
+          <Link href="/superadmin/planes" className="z-btn-bk is-orange">[ + AGENCIA ]</Link>
         </div>
       </div>
 
-      {/* Zaire stripe accent rule */}
-      <div style={{ height: 4, background: ZR.stripe, borderRadius: 2, marginBottom: 36 }} />
+      {/* STRIPE */}
+      <div className="z-stripe-3" style={{ margin: '24px 0' }} />
 
-      {/* KPI Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
-        {[
-          { label: 'MRR MENSUAL',      value: `$${PLATFORM_STATS.mrr.toLocaleString()}`, sub: `ARR $${PLATFORM_STATS.arr.toLocaleString()}`, accent: ZR.orange },
-          { label: 'AGENCIAS ACTIVAS', value: PLATFORM_STATS.active_agencies,            sub: `${PLATFORM_STATS.total_agencies} en total`,   accent: ZR.black },
-          { label: 'PROPIEDADES',      value: PLATFORM_STATS.total_properties,           sub: 'en la plataforma',                            accent: ZR.black },
-          { label: 'CRECIMIENTO MoM',  value: `+${PLATFORM_STATS.monthly_growth}%`,      sub: 'vs mes anterior',                             accent: '#2D7D5F' },
-        ].map((kpi) => (
-          <div key={kpi.label} style={{ background: ZR.cream2, border: `1px solid ${ZR.creamBorder}`, borderRadius: 12, padding: '24px 24px 20px', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: ZR.ink3, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 12 }}>
-              // {kpi.label}
-            </div>
-            <div style={{ fontFamily: "'Archivo Black', sans-serif", fontSize: 40, fontWeight: 900, color: kpi.accent, lineHeight: 1, marginBottom: 6 }}>
-              {kpi.value}
-            </div>
-            <div style={{ fontSize: 12, color: ZR.ink3, fontWeight: 400 }}>{kpi.sub}</div>
-          </div>
-        ))}
+      {/* KPI BENTO */}
+      <div className="dash-kpis" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0, marginBottom: 16 }}>
+        <KpiCard label="MRR ESTIMADO" sup="USD" value={PLATFORM_STATS.mrr.toLocaleString('es-AR')} subDelta={`↑ +${PLATFORM_STATS.monthly_growth}%`} subRest="· META USD 5K" borderRight />
+        <KpiCard label="INMOBILIARIAS" value={String(PLATFORM_STATS.total_agencies)} bar={(PLATFORM_STATS.active_agencies / 50) * 100} barSub={`${PLATFORM_STATS.active_agencies} / 50 · LÍMITE PLAN`} borderRight />
+        <KpiCard label="LEADS PROCESADOS" value={PLATFORM_STATS.total_leads.toLocaleString('es-AR')} spark={LEADS_SPARK} subDelta="↑ +24%" subRest="· 30 DÍAS" borderRight />
+        <KpiCard label="MRR ANUAL (ARR)" sup="USD" value={PLATFORM_STATS.arr.toLocaleString('es-AR')} spark={MRR_SPARK} subRest="· PROYECTADO" />
       </div>
 
-      {/* Main grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20, marginBottom: 24 }}>
-        {/* MRR chart */}
-        <div style={{ background: ZR.cream2, border: `1px solid ${ZR.creamBorder}`, borderRadius: 12, padding: 28 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
-            <div>
-              <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: ZR.ink3, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 6 }}>
-                // EVOLUCIÓN MRR
-              </div>
-              <div style={{ fontFamily: "'Archivo Black', sans-serif", fontSize: 18, color: ZR.black }}>Últimos 6 meses</div>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontFamily: "'Archivo Black', sans-serif", fontSize: 28, color: ZR.orange }}>${PLATFORM_STATS.mrr}</div>
-              <div style={{ fontSize: 11, color: '#2D7D5F', fontWeight: 600 }}>+{PLATFORM_STATS.monthly_growth}% este mes</div>
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, height: 100 }}>
-            {MONTHLY_MRR.map((v, i) => {
-              const h = (v / MAX_MRR) * 100
-              const isLast = i === MONTHLY_MRR.length - 1
-              return (
-                <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
-                  <div style={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace", color: isLast ? ZR.orange : ZR.ink3 }}>${v}</div>
-                  <div style={{ width: '100%', height: `${h}%`, background: isLast ? ZR.orange : '#DEDED4', borderRadius: '3px 3px 0 0', minHeight: 6 }} />
-                  <div style={{ fontSize: 9, fontFamily: "'JetBrains Mono', monospace", color: ZR.ink3, textTransform: 'uppercase' }}>{MONTHLY_LABELS[i]}</div>
+      {/* BODY */}
+      <div className="dash-2col" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 14 }}>
+        {/* LEFT */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* DONUT */}
+          <section className="z-block" style={{ padding: 24 }}>
+            <BlockHead title="INMOBILIARIAS POR PLAN" right={`TOTAL ${total}`} />
+            <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 28, alignItems: 'center', marginTop: 16 }}>
+              <div style={{ position: 'relative', width: 200, height: 200 }}>
+                <svg viewBox="0 0 100 100" width="200" height="200" style={{ transform: 'rotate(-90deg)' }}>
+                  <circle cx="50" cy="50" r={R} fill="none" stroke={ZR.line} strokeWidth="18" />
+                  {segments.map((s, i) => (
+                    <circle key={i} cx="50" cy="50" r={R} fill="none" stroke={s.color} strokeWidth="18" strokeDasharray={`${s.dash} ${C}`} strokeDashoffset={s.offset} />
+                  ))}
+                </svg>
+                <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', textAlign: 'center' }}>
+                  <div>
+                    <div style={{ fontFamily: ZR.display, fontSize: 44, lineHeight: 1 }}>{total}</div>
+                    <div style={{ fontFamily: ZR.mono, fontSize: 9.5, letterSpacing: '.14em', color: ZR.ink3, textTransform: 'uppercase', marginTop: 4 }}>AGENCIAS</div>
+                  </div>
                 </div>
-              )
-            })}
-          </div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {counts.map(c => (
+                  <div key={c.plan} style={{ display: 'grid', gridTemplateColumns: '18px 1fr auto', gap: 12, alignItems: 'center', padding: '10px 14px', border: `1px solid ${ZR.black}` }}>
+                    <span style={{ width: 18, height: 18, background: c.count > 0 ? PLAN_META[c.plan]!.color : ZR.line }} />
+                    <span style={{ fontFamily: ZR.mono, fontSize: 12, letterSpacing: '.08em', fontWeight: 700, textTransform: 'uppercase' }}>// {PLAN_META[c.plan]!.label}</span>
+                    <span style={{ fontFamily: ZR.display, fontSize: 18 }}>{c.count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* TOP TABLE */}
+          <section className="z-block" style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ padding: '20px 24px 16px' }}>
+              <BlockHead title="TOP INMOBILIARIAS · POR MRR" rightHref={{ label: '[ VER TODAS → ]', href: '/superadmin/agencias' }} />
+            </div>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr>
+                  {['#', 'NOMBRE', 'PLAN', 'PROPS', 'LEADS', 'MRR', 'ESTADO'].map((h, i) => (
+                    <th key={h} style={{ fontFamily: ZR.mono, fontSize: 10.5, letterSpacing: '.12em', textTransform: 'uppercase', color: ZR.ink3, fontWeight: 700, padding: '12px 14px', textAlign: i > 2 && i < 6 ? 'right' : 'left', borderBottom: `2px solid ${ZR.black}` }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {topAgencies.map((a, i) => {
+                  const st = a.plan_status === 'active' ? { c: ZR.green, l: 'ACTIVA' } : a.plan_status === 'trial' ? { c: ZR.yellow, l: 'TRIAL' } : { c: ZR.red, l: 'SUSP.' }
+                  return (
+                    <tr key={a.id} className="z-row">
+                      <td style={{ fontFamily: ZR.display, fontSize: 16, padding: '13px 14px', borderBottom: `1px solid ${ZR.line}`, width: 32 }}>{String(i + 1).padStart(2, '0')}</td>
+                      <td style={{ fontFamily: ZR.body, fontWeight: 700, fontSize: 13.5, letterSpacing: '-.01em', textTransform: 'uppercase', padding: '13px 14px', borderBottom: `1px solid ${ZR.line}` }}>{a.name}</td>
+                      <td style={{ padding: '13px 14px', borderBottom: `1px solid ${ZR.line}` }}>
+                        <span className="z-pill-bordered" style={{ fontFamily: ZR.mono, fontSize: 9.5, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', border: `1px solid ${ZR.black}`, padding: '3px 8px' }}>{a.plan}</span>
+                      </td>
+                      <td className="z-row-mute" style={{ fontFamily: ZR.mono, fontSize: 12.5, fontWeight: 600, padding: '13px 14px', borderBottom: `1px solid ${ZR.line}`, textAlign: 'right' }}>{a.properties_count}</td>
+                      <td className="z-row-mute" style={{ fontFamily: ZR.mono, fontSize: 12.5, fontWeight: 600, padding: '13px 14px', borderBottom: `1px solid ${ZR.line}`, textAlign: 'right' }}>{a.leads_count}</td>
+                      <td style={{ fontFamily: ZR.mono, fontSize: 12.5, fontWeight: 700, color: a.mrr > 0 ? ZR.green : ZR.ink3, padding: '13px 14px', borderBottom: `1px solid ${ZR.line}`, textAlign: 'right' }}>{a.mrr > 0 ? `USD ${a.mrr}` : '—'}</td>
+                      <td style={{ padding: '13px 14px', borderBottom: `1px solid ${ZR.line}` }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: ZR.mono, fontSize: 11, letterSpacing: '.06em', textTransform: 'uppercase', fontWeight: 600 }}>
+                          <span style={{ width: 7, height: 7, borderRadius: 99, background: st.c }} />{st.l}
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </section>
         </div>
 
-        {/* Plan distribution */}
-        <div style={{ background: ZR.cream2, border: `1px solid ${ZR.creamBorder}`, borderRadius: 12, padding: 24 }}>
-          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: ZR.ink3, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 6 }}>
-            // PLANES
-          </div>
-          <div style={{ fontFamily: "'Archivo Black', sans-serif", fontSize: 16, color: ZR.black, marginBottom: 20 }}>Distribución</div>
-          {[
-            { plan: 'Enterprise', count: 0, color: ZR.orange, mrr: 0 },
-            { plan: 'Business',   count: 2, color: '#8B5CF6', mrr: 1198 },
-            { plan: 'Pro',        count: 2, color: '#4A90E2', mrr: 598 },
-            { plan: 'Starter',    count: 1, color: '#4ECDC4', mrr: 0 },
-            { plan: 'Trial',      count: 1, color: ZR.yellow, mrr: 0 },
-          ].map((p) => (
-            <div key={p.plan} style={{ marginBottom: 14 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  <div style={{ width: 7, height: 7, borderRadius: 9999, background: p.count > 0 ? p.color : ZR.creamBorder }} />
-                  <span style={{ fontSize: 12, color: p.count > 0 ? ZR.black : ZR.ink3, fontWeight: p.count > 0 ? 500 : 400 }}>{p.plan}</span>
-                  <span style={{ fontSize: 11, color: ZR.ink3 }}>{p.count}</span>
+        {/* RIGHT */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* SERVICES */}
+          <section className="z-block" style={{ padding: 24 }}>
+            <BlockHead title="SALUD DE SERVICIOS" right={`${okServices}/${SERVICES.length} OK`} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 16 }}>
+              {SERVICES.map(([name, lat, st]) => (
+                <div key={name} className={`z-svc ${st}`}>
+                  <span style={{ color: st === 'ok' ? ZR.green : st === 'warn' ? ZR.yellow : ZR.red }}>{st === 'warn' ? '[!]' : '[●]'}</span>
+                  <span>{name}</span>
+                  <span style={{ color: ZR.ink3 }}>{lat}</span>
                 </div>
-                <span style={{ fontSize: 12, fontWeight: 700, color: p.count > 0 ? p.color : ZR.creamBorder }}>{p.mrr > 0 ? `$${p.mrr}` : '—'}</span>
-              </div>
-              <div style={{ height: 3, background: '#EBEBDF', borderRadius: 9999 }}>
-                <div style={{ height: '100%', width: `${(p.count / PLATFORM_STATS.total_agencies) * 100}%`, background: p.count > 0 ? p.color : 'transparent', borderRadius: 9999 }} />
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+            <button className="z-btn-bk" style={{ width: '100%', justifyContent: 'center', marginTop: 16 }}>[ VERIFICAR AHORA → ]</button>
+          </section>
 
-      {/* Agencies table */}
-      <div style={{ background: ZR.cream2, border: `1px solid ${ZR.creamBorder}`, borderRadius: 12, overflow: 'hidden' }}>
-        <div style={{ padding: '20px 28px 16px', borderBottom: `1px solid ${ZR.creamBorder}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: ZR.ink3, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 4 }}>// AGENCIAS</div>
-            <div style={{ fontFamily: "'Archivo Black', sans-serif", fontSize: 16, color: ZR.black }}>Recientes</div>
-          </div>
-          <Link href="/superadmin/agencias" style={{ fontSize: 12, color: ZR.orange, textDecoration: 'none', fontWeight: 600 }}>Ver todas →</Link>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 100px', padding: '10px 28px', borderBottom: `1px solid ${ZR.creamBorder}`, fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: ZR.ink3, textTransform: 'uppercase', letterSpacing: '.1em' }}>
-          <div>Agencia</div><div>Plan</div><div>Props</div><div>MRR</div><div>Estado</div><div>Acción</div>
-        </div>
-        {recentAgencies.map((agency, i) => {
-          const sc = agency.plan_status === 'active' ? '#2D7D5F' : agency.plan_status === 'trial' ? '#9A7B0A' : ZR.red
-          const sl = agency.plan_status === 'active' ? 'Activo' : agency.plan_status === 'trial' ? 'Trial' : 'Suspendido'
-          return (
-            <div key={agency.id} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 100px', padding: '16px 28px', borderBottom: i < recentAgencies.length - 1 ? `1px solid #F2F0EB` : 'none', alignItems: 'center' }}>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: ZR.black }}>{agency.name}</div>
-                <div style={{ fontSize: 11, color: ZR.ink3, marginTop: 1 }}>{agency.owner_email}</div>
-              </div>
-              <div>
-                <span style={{ fontSize: 10, background: '#111111', color: '#F5F5F0', padding: '3px 9px', borderRadius: 4, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", textTransform: 'uppercase', letterSpacing: '.06em' }}>{agency.plan}</span>
-              </div>
-              <div style={{ fontSize: 14, color: ZR.black, fontWeight: 500 }}>{agency.properties_count}</div>
-              <div style={{ fontFamily: "'Archivo Black', sans-serif", fontSize: 15, color: agency.mrr > 0 ? ZR.orange : ZR.ink3 }}>{agency.mrr > 0 ? `$${agency.mrr}` : '—'}</div>
-              <div>
-                <span style={{ fontSize: 10, background: sc + '18', color: sc, padding: '3px 9px', borderRadius: 4, fontWeight: 600, border: `1px solid ${sc}33` }}>{sl}</span>
-              </div>
-              <Link href={`/superadmin/agencias/${agency.slug}`} style={{ fontSize: 12, color: ZR.orange, textDecoration: 'none', padding: '6px 12px', background: 'rgba(255,106,0,.08)', borderRadius: 6, fontWeight: 600 }}>
-                Detalle
-              </Link>
+          {/* EVENTS */}
+          <section className="z-block" style={{ padding: 24 }}>
+            <BlockHead title="EVENTOS RECIENTES" rightHref={{ label: '[ VER LOGS → ]', href: '/superadmin/crm' }} />
+            <div style={{ marginTop: 8 }}>
+              {EVENTS.map(([tm, msg], i) => (
+                <div key={i} style={{ display: 'grid', gridTemplateColumns: '64px 1fr', gap: 14, padding: '11px 0', borderTop: i === 0 ? 'none' : `1px solid ${ZR.line}`, fontFamily: ZR.mono, fontSize: 11.5, letterSpacing: '.04em', textTransform: 'uppercase', alignItems: 'center' }}>
+                  <span style={{ color: ZR.orange, fontWeight: 700 }}>[{tm}]</span>
+                  <span style={{ color: i === 2 ? ZR.red : ZR.black, fontWeight: i === 2 ? 700 : 400 }}>{msg}</span>
+                </div>
+              ))}
             </div>
-          )
-        })}
+          </section>
+        </div>
       </div>
+    </div>
+  )
+}
+
+/* ---- subcomponentes ---- */
+
+function KpiCard({ label, sup, value, subDelta, subRest, spark, bar, barSub, borderRight }: {
+  label: string; sup?: string; value: string; subDelta?: string; subRest?: string
+  spark?: number[]; bar?: number; barSub?: string; borderRight?: boolean
+}) {
+  return (
+    <div className="z-kpi" style={{ padding: '22px 24px 20px', marginRight: borderRight ? -2 : 0, minHeight: 200, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div className="z-kpi-label" style={{ fontFamily: ZR.mono, fontSize: 11, letterSpacing: '.14em', textTransform: 'uppercase', color: ZR.ink3, fontWeight: 700 }}>// {label}</div>
+      <div style={{ fontFamily: ZR.display, fontSize: 'clamp(40px, 4vw, 60px)', letterSpacing: '.01em', lineHeight: 0.9, textTransform: 'uppercase' }}>
+        {sup && <span style={{ fontSize: 20, verticalAlign: 'super', color: ZR.ink3, marginRight: 4 }}>{sup}</span>}{value}
+      </div>
+      {spark && (
+        <div style={{ display: 'flex', alignItems: 'end', gap: 2, height: 28 }}>
+          {spark.map((h, i) => <div key={i} style={{ flex: 1, height: `${h}%`, background: ZR.orange }} />)}
+        </div>
+      )}
+      {bar != null && (
+        <div style={{ marginTop: 'auto' }}>
+          <div style={{ height: 6, background: ZR.cream, border: `1px solid ${ZR.black}` }}>
+            <div style={{ height: '100%', width: `${bar}%`, background: ZR.orange }} />
+          </div>
+        </div>
+      )}
+      <div className="z-kpi-sub" style={{ fontFamily: ZR.mono, fontSize: 11, letterSpacing: '.06em', color: ZR.ink3, display: 'flex', alignItems: 'center', gap: 8, marginTop: spark || bar != null ? 0 : 'auto' }}>
+        {subDelta && <span style={{ display: 'inline-flex', padding: '3px 8px', fontSize: 10.5, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', background: ZR.green, color: ZR.cream }}>{subDelta}</span>}
+        {barSub ?? subRest}
+      </div>
+    </div>
+  )
+}
+
+function BlockHead({ title, right, rightHref }: { title: string; right?: string; rightHref?: { label: string; href: string } }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 14, borderBottom: `2px solid ${ZR.black}` }}>
+      <h4 style={{ fontFamily: ZR.display, fontSize: 15, letterSpacing: '.02em', textTransform: 'uppercase', margin: 0 }}>{title}</h4>
+      {right && <span style={{ fontFamily: ZR.mono, fontSize: 10.5, color: ZR.ink3, letterSpacing: '.06em', textTransform: 'uppercase', fontWeight: 700 }}>{right}</span>}
+      {rightHref && <Link href={rightHref.href} style={{ fontFamily: ZR.mono, fontSize: 10.5, color: ZR.orange, textDecoration: 'none', fontWeight: 700, letterSpacing: '.04em' }}>{rightHref.label}</Link>}
     </div>
   )
 }

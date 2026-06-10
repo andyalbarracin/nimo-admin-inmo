@@ -1,249 +1,435 @@
+import Image from 'next/image'
 import Link from 'next/link'
-import type { Property, Agency } from '@/lib/dummy'
+import type { Property, Agency, TeamMember } from '@/lib/dummy'
+import SiteNav from '@/components/site/primitives/SiteNav'
+import SiteFooter from '@/components/site/primitives/SiteFooter'
+import SearchBar from '@/components/site/primitives/SearchBar'
+import SiteMap from '@/components/site/primitives/SiteMap'
+import Reveal from '@/components/site/primitives/Reveal'
+import CountUp from '@/components/site/primitives/CountUp'
+
+/* ============================================================
+ * T1 · EDITORIAL  —  arquitectura de revista, serif Fraunces,
+ * terracota óxido. Réplica funcional del mockup C1.
+ * ============================================================ */
 
 const T = {
-  bg: '#F7F3EE', bg2: '#EDE7DE', white: '#FFFFFF',
-  border: '#DDD5C8', ink: '#1E1A16', ink2: '#4D453C', ink3: '#9E9389',
-  accent: '#7B4F3C',
-  serif: "var(--font-serif), Georgia, serif",
+  bg: '#FAF7F0',
+  bg2: '#F1ECE2',
+  paper: '#FFFFFF',
+  rule: '#DBD2C2',
+  ruleSoft: '#ECE5D5',
+  ink: '#1A1614',
+  ink2: '#5C5247',
+  ink3: '#8A8071',
+  rust: '#B25431',
+  rustDark: '#8C3F22',
+  rustSoft: '#E8D2C2',
+  serif: "var(--font-fraunces), 'Playfair Display', Georgia, serif",
   body: "var(--font-sans), system-ui, sans-serif",
+  mono: "var(--font-mono), ui-monospace, monospace",
 }
 
 interface Props {
   slug: string
   agency: Agency
   featured: Property[]
+  properties?: Property[]
+  opportunity?: Property | null
+  team?: TeamMember[]
   stats: { total_properties: number; conversion_rate: number; visits_this_month: number }
 }
 
-export default function EditorialHome({ slug, agency, featured, stats }: Props) {
+/* Imagen HD para el hero (arquitectura cálida, luz natural). */
+const HERO_IMG = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=2200&q=80&auto=format&fit=crop'
+
+const DIARIO = [
+  {
+    cat: 'Mercado',
+    title: 'Qué pasó con el valor del m² en los barrios del norte',
+    excerpt: 'Un repaso por la evolución de precios en los últimos doce meses y dónde quedaron las oportunidades.',
+    author: 'Sofía M.',
+    read: '6 min',
+  },
+  {
+    cat: 'Guía',
+    title: 'Comprar la primera propiedad: el orden que sí funciona',
+    excerpt: 'De la pre aprobación a la escritura, los pasos que conviene tener resueltos antes de enamorarse de una casa.',
+    author: 'Mateo S.',
+    read: '8 min',
+  },
+  {
+    cat: 'Barrios',
+    title: 'Núñez, de zona residencial a polo gastronómico',
+    excerpt: 'Cómo cambió la trama del barrio y por qué hoy concentra la demanda de familias jóvenes.',
+    author: 'Valentina P.',
+    read: '5 min',
+  },
+]
+
+export default function EditorialHome({ slug, agency, featured, properties = [], stats }: Props) {
+  const catalog = properties.length ? properties : featured
+  const mapMarkers = catalog.slice(0, 8).map(p => ({
+    lat: p.lat,
+    lng: p.lng,
+    title: p.title,
+    price: `${p.currency} ${p.price.toLocaleString('es-AR')}`,
+    id: p.id,
+  }))
+
+  const lead = featured[0]
+  const stack = featured.slice(1, 3)
+  const usedIds = new Set([lead?.id, ...stack.map(s => s.id)].filter(Boolean) as string[])
+  // Portfolio: siempre llena 2 filas de 3 (6) tomando del catálogo, sin repetir los de arriba.
+  const portfolio = catalog.filter(p => !usedIds.has(p.id)).slice(0, 6)
+  const heroImg = HERO_IMG
+  const agencyDesc =
+    agency.tagline ??
+    'Una selección de propiedades elegidas con criterio editorial en los barrios más buscados de Buenos Aires.'
+
   return (
-    <div style={{ fontFamily: T.body, background: T.bg, color: T.ink }}>
+    <div style={{ fontFamily: T.body, background: T.bg, color: T.ink, minHeight: '100vh' }}>
+      <SiteNav
+        slug={slug}
+        agencyName={agency.name}
+        links={[
+          { label: 'Propiedades', href: `/${slug}/propiedades` },
+          { label: 'Mapa', href: '#mapa' },
+          { label: 'Diario', href: '#diario' },
+          { label: 'Contacto', href: `/${slug}/contacto` },
+        ]}
+        ctaLabel="Tasar mi propiedad"
+        accent={T.rust}
+        accentContrast={T.bg}
+        bg={T.bg}
+        ink={T.ink}
+        ink2={T.ink2}
+        rule={T.rule}
+        fontDisplay={T.serif}
+      />
 
-      {/* NAV */}
-      <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(247,243,238,.95)', backdropFilter: 'blur(10px)', borderBottom: `1px solid ${T.border}`, padding: '0 56px', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Link href={`/${slug}`} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 6, height: 36, background: T.accent, borderRadius: 1 }} />
-          <span style={{ fontFamily: T.serif, fontSize: 20, color: T.ink, fontStyle: 'italic', letterSpacing: '-.01em' }}>{agency.name}</span>
-        </Link>
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
-          {[{ label: 'Propiedades', href: `/${slug}/propiedades` }, { label: 'Contacto', href: `/${slug}/contacto` }].map(n => (
-            <Link key={n.label} href={n.href} style={{ fontSize: 14, color: T.ink2, textDecoration: 'none', fontWeight: 400, letterSpacing: '.01em' }}>{n.label}</Link>
-          ))}
-          <Link href={`/${slug}/contacto`} style={{ fontSize: 13, color: T.bg, background: T.accent, padding: '9px 22px', borderRadius: T.border, textDecoration: 'none', letterSpacing: '.02em' }}>
-            Asesoramiento
-          </Link>
-        </nav>
-      </header>
+      {/* ═══════════ HERO editorial · foto HD full-bleed ═══════════ */}
+      <section className="ed-hero" style={{ position: 'relative', minHeight: '86vh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', overflow: 'hidden' }}>
+        <Image src={heroImg} alt="" fill priority style={{ objectFit: 'cover' }} sizes="100vw" />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(26,22,20,.5) 0%, rgba(26,22,20,.12) 32%, rgba(26,22,20,.2) 56%, rgba(26,22,20,.82) 100%)' }} />
 
-      {/* HERO — editorial split */}
-      <section style={{ display: 'grid', gridTemplateColumns: '55% 45%', minHeight: '86vh' }}>
-        {/* Left: text column */}
-        <div style={{ padding: '96px 64px 96px 56px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <div style={{ width: 48, height: 2, background: T.accent, marginBottom: 36 }} />
-          <h1 style={{ fontFamily: T.serif, fontSize: 'clamp(52px, 5vw, 80px)', color: T.ink, lineHeight: 1.05, margin: '0 0 28px', letterSpacing: '-.02em', fontWeight: 700 }}>
-            Encontrá el hogar<br /><em style={{ fontStyle: 'italic', color: T.accent }}>que siempre</em><br />imaginaste.
-          </h1>
-          <p style={{ fontSize: 17, color: T.ink2, lineHeight: 1.7, maxWidth: 420, marginBottom: 40, fontWeight: 300 }}>
-            {agency.tagline ?? 'Propiedades seleccionadas con criterio editorial. Cada detalle importa.'}
-          </p>
-          <div style={{ display: 'flex', gap: 14 }}>
-            <Link href={`/${slug}/propiedades`} style={{ fontSize: 14, color: T.bg, background: T.accent, padding: '14px 30px', borderRadius: 2, textDecoration: 'none', letterSpacing: '.02em' }}>
-              Ver propiedades
-            </Link>
-            <Link href={`/${slug}/contacto`} style={{ fontSize: 14, color: T.ink, border: `1.5px solid ${T.border}`, padding: '13px 26px', borderRadius: 2, textDecoration: 'none' }}>
-              Contactar
-            </Link>
-          </div>
-
-          {/* Stats row */}
-          <div style={{ display: 'flex', gap: 48, marginTop: 64, paddingTop: 40, borderTop: `1px solid ${T.border}` }}>
-            {[
-              { v: stats.total_properties, l: 'Propiedades' },
-              { v: `${stats.conversion_rate}%`, l: 'Tasa de cierre' },
-              { v: '+15', l: 'Años en el mercado' },
-            ].map(s => (
-              <div key={s.l}>
-                <div style={{ fontFamily: T.serif, fontSize: 40, color: T.accent, lineHeight: 1, fontWeight: 700 }}>{s.v}</div>
-                <div style={{ fontSize: 11, color: T.ink3, marginTop: 6, letterSpacing: '.06em', textTransform: 'uppercase' }}>{s.l}</div>
-              </div>
-            ))}
-          </div>
+        {/* Barra de edición (arriba, sobre la foto) */}
+        <div className="ed-hero-edition" style={{ position: 'absolute', top: 0, left: 0, right: 0, padding: '28px 64px', display: 'flex', alignItems: 'center', gap: 16 }}>
+          <span style={{ fontFamily: T.mono, fontSize: 11, color: '#E8A880', letterSpacing: '.08em', textTransform: 'uppercase' }}>
+            Edición {new Date().getFullYear()}
+          </span>
+          <span style={{ width: 6, height: 6, borderRadius: 99, background: '#E8A880' }} />
+          <span style={{ fontFamily: T.mono, fontSize: 11, color: 'rgba(250,247,240,.7)', letterSpacing: '.08em', textTransform: 'uppercase' }}>
+            {stats.total_properties} propiedades en cartera
+          </span>
+          <div style={{ flex: 1, height: 1, background: 'rgba(250,247,240,.28)' }} />
+          <span style={{ fontFamily: T.mono, fontSize: 11, color: 'rgba(250,247,240,.7)', letterSpacing: '.08em', textTransform: 'uppercase' }}>
+            {agency.address?.split('—').pop()?.trim() ?? 'Buenos Aires'}
+          </span>
         </div>
 
-        {/* Right: stacked images */}
-        <div style={{ position: 'relative', overflow: 'hidden', background: T.bg2 }}>
-          <img
-            src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1000"
-            alt="Propiedad destacada"
-            style={{ width: '100%', height: '60%', objectFit: 'cover', display: 'block' }}
-          />
-          <div style={{ height: '40%', padding: '28px 32px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            {featured[0] && (
-              <Link href={`/${slug}/propiedades/${featured[0].id}`} style={{ textDecoration: 'none' }}>
-                <div style={{ fontSize: 12, color: T.ink3, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 8 }}>Propiedad destacada</div>
-                <div style={{ fontFamily: T.serif, fontSize: 20, color: T.ink, fontWeight: 600, marginBottom: 6, lineHeight: 1.2 }}>{featured[0].title}</div>
-                <div style={{ fontSize: 14, color: T.ink2, marginBottom: 10 }}>{featured[0].neighborhood} · {featured[0].city}</div>
-                <div style={{ fontFamily: T.serif, fontSize: 22, color: T.accent, fontWeight: 700 }}>{featured[0].currency} {featured[0].price.toLocaleString('es-AR')}</div>
+        {/* Contenido (abajo) */}
+        <div className="ed-hero-body" style={{ position: 'relative', padding: '0 64px 60px', maxWidth: 1360 }}>
+          <h1
+            className="ed-hero-title"
+            style={{
+              fontFamily: T.serif,
+              fontSize: 'clamp(48px, 6.4vw, 100px)',
+              fontWeight: 400,
+              lineHeight: 0.98,
+              letterSpacing: '-.025em',
+              color: T.bg,
+              margin: '0 0 28px',
+              maxWidth: 1040,
+            }}
+          >
+            El espacio correcto{' '}
+            <em style={{ fontStyle: 'italic', color: '#E8A880' }}>cambia</em> la forma
+            en que se vive.
+          </h1>
+
+          <div className="ed-hero-grid" style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 48, alignItems: 'end' }}>
+            <p style={{ fontFamily: T.serif, fontSize: 21, color: 'rgba(250,247,240,.86)', lineHeight: 1.5, margin: 0, maxWidth: 460 }}>
+              {agencyDesc}
+            </p>
+            <div className="ed-hero-search" style={{ justifySelf: 'end', width: 'min(560px, 100%)' }}>
+              <SearchBar
+                slug={slug}
+                accent={T.rust}
+                accentContrast={T.bg}
+                surface={T.paper}
+                border={T.rule}
+                ink={T.ink}
+                ink2={T.ink2}
+                ink3={T.ink3}
+                radius="14px"
+                variant="hairline"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ FEATURED · grid asimétrico ═══════════ */}
+      <Reveal variant="fadeUp">
+        <section style={{ padding: '40px 64px 88px' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 36, paddingBottom: 20, borderBottom: `1px solid ${T.ink}` }}>
+            <h2 style={{ fontFamily: T.serif, fontSize: 'clamp(30px, 3vw, 46px)', color: T.ink, margin: 0, fontWeight: 400, letterSpacing: '-.02em' }}>
+              Selección <em style={{ fontStyle: 'italic', color: T.rust }}>destacada</em>
+            </h2>
+            <Link href={`/${slug}/propiedades`} style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: 18, color: T.ink, textDecoration: 'none' }}>
+              Ver toda la cartera →
+            </Link>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 24 }}>
+            {/* Lead card grande */}
+            {lead && (
+              <Link href={`/${slug}/propiedades/${lead.id}`} style={{ textDecoration: 'none' }}>
+                <article style={{ position: 'relative', height: '100%', minHeight: 560, overflow: 'hidden', borderRadius: 4 }}>
+                  <Image src={lead.images[0] ?? ''} alt={lead.title} fill style={{ objectFit: 'cover' }} sizes="(max-width:768px) 100vw, 58vw" priority />
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(26,22,20,.86) 0%, transparent 58%)' }} />
+                  <span style={{ position: 'absolute', top: 20, left: 20, fontFamily: T.mono, fontSize: 10, letterSpacing: '.1em', textTransform: 'uppercase', background: T.bg, color: T.rust, padding: '6px 12px', borderRadius: 99 }}>
+                    {lead.operation} · {lead.neighborhood}
+                  </span>
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '36px 32px' }}>
+                    <div style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: 32, color: T.bg, fontWeight: 400, lineHeight: 1.12, marginBottom: 12, maxWidth: 460 }}>
+                      {lead.title}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+                      <span style={{ fontFamily: T.serif, fontSize: 30, color: '#E8A880', fontWeight: 500 }}>
+                        {lead.currency} {lead.price.toLocaleString('es-AR')}
+                      </span>
+                      <span style={{ fontSize: 13, color: 'rgba(250,247,240,.7)' }}>
+                        {[lead.rooms && `${lead.rooms} amb`, lead.covered_area && `${lead.covered_area} m²`].filter(Boolean).join(' · ')}
+                      </span>
+                    </div>
+                  </div>
+                </article>
               </Link>
             )}
-          </div>
-        </div>
-      </section>
 
-      {/* Ruled divider */}
-      <div style={{ display: 'flex', alignItems: 'center', padding: '0 56px' }}>
-        <div style={{ flex: 1, height: 1, background: T.border }} />
-        <div style={{ padding: '0 24px', fontSize: 10, color: T.ink3, textTransform: 'uppercase', letterSpacing: '.2em' }}>Selección</div>
-        <div style={{ flex: 1, height: 1, background: T.border }} />
-      </div>
-
-      {/* FEATURED PROPERTIES — editorial magazine layout */}
-      <section style={{ padding: '72px 56px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 48 }}>
-          <h2 style={{ fontFamily: T.serif, fontSize: 'clamp(36px, 3.5vw, 56px)', color: T.ink, margin: 0, lineHeight: 1, fontWeight: 700, fontStyle: 'italic' }}>
-            Propiedades<br />seleccionadas.
-          </h2>
-          <Link href={`/${slug}/propiedades`} style={{ fontSize: 13, color: T.accent, textDecoration: 'none', borderBottom: `1px solid ${T.accent}`, paddingBottom: 2 }}>
-            Ver todas →
-          </Link>
-        </div>
-
-        {/* Big lead card + 2 smaller */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-          {/* Lead card */}
-          {featured[0] && (
-            <Link href={`/${slug}/propiedades/${featured[0].id}`} style={{ textDecoration: 'none', gridRow: 'span 2' }}>
-              <div style={{ position: 'relative', height: '100%', minHeight: 560, overflow: 'hidden', borderRadius: T.border }}>
-                <img src={featured[0].images[0]} alt={featured[0].title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(30,26,22,.88) 0%, transparent 55%)' }} />
-                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '32px 28px' }}>
-                  <div style={{ fontSize: 10, color: 'rgba(237,233,224,.6)', textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 8 }}>{featured[0].operation}</div>
-                  <div style={{ fontFamily: T.serif, fontSize: 24, color: '#EDE9E0', fontWeight: 600, lineHeight: 1.2, marginBottom: 8 }}>{featured[0].title}</div>
-                  <div style={{ fontSize: 13, color: 'rgba(237,233,224,.7)', marginBottom: 12 }}>{featured[0].neighborhood}</div>
-                  <div style={{ fontFamily: T.serif, fontSize: 28, color: '#C8A05E', fontWeight: 700 }}>{featured[0].currency} {featured[0].price.toLocaleString('es-AR')}</div>
-                </div>
-              </div>
-            </Link>
-          )}
-
-          {/* Two smaller cards stacked */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {featured.slice(1, 3).map(prop => (
-              <Link key={prop.id} href={`/${slug}/propiedades/${prop.id}`} style={{ textDecoration: 'none', flex: 1 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', background: T.white, border: `1px solid ${T.border}`, borderRadius: T.border, overflow: 'hidden', height: '100%', minHeight: 180 }}>
-                  <img src={prop.images[0]} alt={prop.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                  <div style={{ padding: '24px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <div>
-                      <div style={{ fontSize: 10, color: T.ink3, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 8 }}>{prop.operation}</div>
-                      <div style={{ fontFamily: T.serif, fontSize: 17, color: T.ink, fontWeight: 600, lineHeight: 1.3, marginBottom: 6 }}>{prop.title}</div>
-                      <div style={{ fontSize: 13, color: T.ink2 }}>{prop.neighborhood} · {prop.city}</div>
+            {/* Stack de 2 */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              {stack.map(prop => (
+                <Link key={prop.id} href={`/${slug}/propiedades/${prop.id}`} style={{ textDecoration: 'none', flex: 1 }}>
+                  <article style={{ display: 'grid', gridTemplateColumns: '160px 1fr', background: T.paper, border: `1px solid ${T.rule}`, overflow: 'hidden', height: '100%', minHeight: 200, borderRadius: 4 }}>
+                    <div style={{ position: 'relative' }}>
+                      <Image src={prop.images[0] ?? ''} alt={prop.title} fill style={{ objectFit: 'cover' }} sizes="160px" />
                     </div>
-                    <div>
-                      <div style={{ display: 'flex', gap: 14, marginBottom: 12 }}>
-                        {prop.rooms && <span style={{ fontSize: 12, color: T.ink2 }}>{prop.rooms} amb.</span>}
-                        {prop.covered_area && <span style={{ fontSize: 12, color: T.ink2 }}>{prop.covered_area}m²</span>}
+                    <div style={{ padding: '24px 26px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                      <div>
+                        <div style={{ fontFamily: T.mono, fontSize: 9.5, color: T.ink3, textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 10 }}>
+                          {prop.operation} · {prop.neighborhood}
+                        </div>
+                        <div style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: 19, color: T.ink, fontWeight: 400, lineHeight: 1.25 }}>
+                          {prop.title}
+                        </div>
                       </div>
-                      <div style={{ fontFamily: T.serif, fontSize: 20, color: T.accent, fontWeight: 700 }}>{prop.currency} {prop.price.toLocaleString('es-AR')}</div>
+                      <div style={{ fontFamily: T.serif, fontSize: 22, color: T.rust, fontWeight: 500, marginTop: 12 }}>
+                        {prop.currency} {prop.price.toLocaleString('es-AR')}
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Secondary grid — remaining properties */}
-        {featured.length > 3 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, marginTop: 2 }}>
-            {featured.slice(3).map(prop => (
-              <Link key={prop.id} href={`/${slug}/propiedades/${prop.id}`} style={{ textDecoration: 'none' }}>
-                <div style={{ background: T.white, border: `1px solid ${T.border}`, borderRadius: T.border, overflow: 'hidden' }}>
-                  <div style={{ height: 200, overflow: 'hidden' }}>
-                    <img src={prop.images[0]} alt={prop.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                  </div>
-                  <div style={{ padding: '20px 20px 22px' }}>
-                    <div style={{ fontSize: 10, color: T.ink3, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 6 }}>{prop.operation}</div>
-                    <div style={{ fontFamily: T.serif, fontSize: 16, color: T.ink, fontWeight: 600, marginBottom: 4 }}>{prop.title}</div>
-                    <div style={{ fontSize: 12, color: T.ink3, marginBottom: 12 }}>{prop.neighborhood}</div>
-                    <div style={{ fontFamily: T.serif, fontSize: 19, color: T.accent, fontWeight: 700 }}>{prop.currency} {prop.price.toLocaleString('es-AR')}</div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* OPERATIONS — editorial category cards */}
-      <section style={{ background: T.bg2, padding: '80px 56px', borderTop: `1px solid ${T.border}` }}>
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 48 }}>
-          <h2 style={{ fontFamily: T.serif, fontSize: 'clamp(32px, 3vw, 48px)', color: T.ink, margin: 0, fontStyle: 'italic', fontWeight: 700 }}>¿Qué buscás?</h2>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
-          {[
-            { label: 'Comprar', desc: 'Encontrá el departamento, casa o PH que imaginaste.', href: `/${slug}/propiedades?op=venta`, img: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=700' },
-            { label: 'Alquilar', desc: 'Alquileres con contratos claros y asesoría completa.', href: `/${slug}/propiedades?op=alquiler`, img: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=700' },
-            { label: 'Invertir', desc: 'Oportunidades con alta rentabilidad en los mejores barrios.', href: `/${slug}/contacto`, img: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=700' },
-          ].map(op => (
-            <Link key={op.label} href={op.href} style={{ textDecoration: 'none', display: 'block', position: 'relative', height: 340, overflow: 'hidden', borderRadius: T.border }}>
-              <img src={op.img} alt={op.label} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(30,26,22,.82) 0%, rgba(30,26,22,.1) 60%, transparent 100%)' }} />
-              <div style={{ position: 'absolute', bottom: 0, padding: '28px 24px' }}>
-                <div style={{ fontFamily: T.serif, fontSize: 28, color: '#EDE9E0', fontWeight: 700, marginBottom: 8, fontStyle: 'italic' }}>{op.label}</div>
-                <div style={{ fontSize: 13, color: 'rgba(237,233,224,.72)', lineHeight: 1.5 }}>{op.desc}</div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section style={{ padding: '80px 56px', background: T.accent, textAlign: 'center' }}>
-        <h2 style={{ fontFamily: T.serif, fontSize: 'clamp(36px, 4vw, 60px)', color: '#F7F3EE', margin: '0 0 20px', fontStyle: 'italic', fontWeight: 700, lineHeight: 1 }}>
-          Hablemos de tu próxima propiedad.
-        </h2>
-        <p style={{ fontSize: 16, color: 'rgba(247,243,238,.75)', marginBottom: 36, maxWidth: 480, margin: '0 auto 36px' }}>
-          Nuestro equipo está disponible para asesorarte sin compromiso.
-        </p>
-        <div style={{ display: 'flex', gap: 14, justifyContent: 'center' }}>
-          <Link href={`/${slug}/contacto`} style={{ fontSize: 14, color: T.accent, background: '#F7F3EE', padding: '14px 32px', borderRadius: 2, textDecoration: 'none', fontWeight: 600 }}>
-            Contactar ahora
-          </Link>
-          {agency.phone && (
-            <a href={`https://wa.me/${agency.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" style={{ fontSize: 14, color: '#F7F3EE', border: '1.5px solid rgba(247,243,238,.35)', padding: '13px 28px', borderRadius: 2, textDecoration: 'none' }}>
-              WhatsApp
-            </a>
-          )}
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer style={{ background: T.ink, padding: '48px 56px 32px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 40, paddingBottom: 32, borderBottom: '1px solid rgba(237,233,224,.1)' }}>
-          <div>
-            <div style={{ fontFamily: T.serif, fontSize: 22, color: '#EDE9E0', fontStyle: 'italic', marginBottom: 6 }}>{agency.name}</div>
-            {agency.address && <p style={{ fontSize: 12, color: 'rgba(237,233,224,.5)', maxWidth: 280, lineHeight: 1.6, margin: 0 }}>{agency.address}</p>}
-          </div>
-          <div style={{ display: 'flex', gap: 60 }}>
-            <div>
-              <div style={{ fontSize: 10, color: 'rgba(237,233,224,.35)', textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 14 }}>Navegar</div>
-              {([['Propiedades', `/${slug}/propiedades`], ['Contacto', `/${slug}/contacto`]] as [string, string][]).map(([l, h]) => (
-                <Link key={l} href={h} style={{ display: 'block', fontSize: 13, color: 'rgba(237,233,224,.6)', textDecoration: 'none', marginBottom: 8 }}>{l}</Link>
+                  </article>
+                </Link>
               ))}
             </div>
+          </div>
+        </section>
+      </Reveal>
+
+      {/* ═══════════ POR QUÉ · drop cap + stats 72px ═══════════ */}
+      <Reveal variant="fadeUp">
+        <section style={{ background: T.bg2, borderTop: `1px solid ${T.rule}`, borderBottom: `1px solid ${T.rule}`, padding: '96px 64px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 88, alignItems: 'center' }}>
             <div>
-              <div style={{ fontSize: 10, color: 'rgba(237,233,224,.35)', textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 14 }}>Contacto</div>
-              {agency.phone && <div style={{ fontSize: 12, color: 'rgba(237,233,224,.5)', marginBottom: 6 }}>{agency.phone}</div>}
-              {agency.email && <div style={{ fontSize: 12, color: 'rgba(237,233,224,.5)' }}>{agency.email}</div>}
+              <span style={{ fontFamily: T.mono, fontSize: 11, color: T.rust, letterSpacing: '.14em', textTransform: 'uppercase' }}>
+                Por qué {agency.name}
+              </span>
+              <p style={{ fontFamily: T.serif, fontSize: 25, color: T.ink, lineHeight: 1.5, margin: '28px 0 0', fontWeight: 400 }}>
+                <span style={{ float: 'left', fontFamily: T.serif, fontSize: 88, lineHeight: 0.78, paddingRight: 16, paddingTop: 6, color: T.rust, fontWeight: 400 }}>
+                  N
+                </span>
+                o trabajamos con catálogos infinitos. Cada propiedad que publicamos pasó por una visita, una conversación con sus dueños y una decisión editorial. Preferimos mostrar menos y conocer cada metro cuadrado que ofrecemos.
+              </p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 28 }}>
+              {[
+                { v: stats.total_properties, suffix: '', l: 'En cartera' },
+                { v: 15, suffix: '+', l: 'Años en CABA' },
+                { v: Math.round(stats.conversion_rate * 10) / 10, suffix: '%', l: 'Cierre' },
+              ].map((s, i) => (
+                <div key={i} style={{ borderLeft: i === 0 ? 'none' : `1px solid ${T.rule}`, paddingLeft: i === 0 ? 0 : 24 }}>
+                  <div style={{ fontFamily: T.serif, fontSize: 'clamp(48px, 5vw, 72px)', color: T.ink, lineHeight: 0.9, fontWeight: 400, letterSpacing: '-.03em' }}>
+                    <CountUp value={s.v} suffix={s.suffix} />
+                  </div>
+                  <div style={{ fontFamily: T.mono, fontSize: 10, color: T.ink3, marginTop: 12, letterSpacing: '.1em', textTransform: 'uppercase' }}>
+                    {s.l}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ fontSize: 11, color: 'rgba(237,233,224,.25)', textTransform: 'uppercase', letterSpacing: '.1em' }}>© 2026 {agency.name}</div>
-          <div style={{ fontSize: 11, color: 'rgba(237,233,224,.25)', textTransform: 'uppercase', letterSpacing: '.1em' }}>Powered by NIMO</div>
-        </div>
-      </footer>
+        </section>
+      </Reveal>
+
+      {/* ═══════════ MAPA ═══════════ */}
+      <Reveal variant="fadeUp">
+        <section id="mapa" style={{ display: 'grid', gridTemplateColumns: '380px 1fr', minHeight: 520, borderBottom: `1px solid ${T.rule}` }}>
+          <div style={{ padding: '72px 56px', display: 'flex', flexDirection: 'column', justifyContent: 'center', borderRight: `1px solid ${T.rule}` }}>
+            <span style={{ fontFamily: T.mono, fontSize: 11, color: T.rust, letterSpacing: '.14em', textTransform: 'uppercase' }}>
+              Dónde estamos
+            </span>
+            <h2 style={{ fontFamily: T.serif, fontSize: 'clamp(32px, 3vw, 48px)', color: T.ink, margin: '20px 0 24px', fontWeight: 400, lineHeight: 1.05, letterSpacing: '-.02em' }}>
+              Cada propiedad, <em style={{ fontStyle: 'italic', color: T.rust }}>en su contexto.</em>
+            </h2>
+            <p style={{ fontSize: 15, color: T.ink2, lineHeight: 1.7, marginBottom: 28, maxWidth: 300 }}>
+              La cuadra, los servicios cercanos, el ritmo del barrio. El mapa también forma parte de la decisión.
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {Array.from(new Set(featured.map(p => p.neighborhood))).slice(0, 6).map(n => (
+                <span key={n} style={{ fontFamily: T.mono, fontSize: 10.5, color: T.ink2, border: `1px solid ${T.rule}`, padding: '6px 12px', borderRadius: 99, textTransform: 'uppercase', letterSpacing: '.06em' }}>
+                  {n}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div style={{ position: 'relative' }}>
+            <SiteMap markers={mapMarkers} zoom={12} height="100%" accentColor={T.rust} tiles="positron" />
+          </div>
+        </section>
+      </Reveal>
+
+      {/* ═══════════ PORTFOLIO 3-col ═══════════ */}
+      {portfolio.length > 0 && (
+        <Reveal variant="fadeUp">
+          <section style={{ padding: '88px 64px' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 36 }}>
+              <h2 style={{ fontFamily: T.serif, fontSize: 'clamp(28px, 2.6vw, 40px)', color: T.ink, margin: 0, fontWeight: 400 }}>
+                Más del <em style={{ fontStyle: 'italic', color: T.rust }}>portfolio</em>
+              </h2>
+              <Link href={`/${slug}/propiedades`} style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: 17, color: T.ink, textDecoration: 'none' }}>
+                Ver todas →
+              </Link>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+              {portfolio.map((prop, i) => (
+                <Reveal key={prop.id} variant="fadeUp" delay={i * 0.07}>
+                  <Link href={`/${slug}/propiedades/${prop.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+                    <article>
+                      <div style={{ position: 'relative', height: 280, overflow: 'hidden', borderRadius: 4, marginBottom: 16 }}>
+                        <Image src={prop.images[0] ?? ''} alt={prop.title} fill style={{ objectFit: 'cover' }} sizes="33vw" />
+                      </div>
+                      <div style={{ fontFamily: T.mono, fontSize: 9.5, color: T.ink3, textTransform: 'uppercase', letterSpacing: '.12em', marginBottom: 8 }}>
+                        {prop.operation} · {prop.neighborhood}
+                      </div>
+                      <div style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: 21, color: T.ink, fontWeight: 400, lineHeight: 1.25, marginBottom: 10 }}>
+                        {prop.title}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', paddingTop: 12, borderTop: `1px solid ${T.rule}` }}>
+                        <span style={{ fontFamily: T.serif, fontSize: 20, color: T.rust, fontWeight: 500 }}>
+                          {prop.currency} {prop.price.toLocaleString('es-AR')}
+                        </span>
+                        <span style={{ fontSize: 12, color: T.ink3 }}>
+                          {[prop.rooms && `${prop.rooms} amb`, prop.covered_area && `${prop.covered_area} m²`].filter(Boolean).join(' · ')}
+                        </span>
+                      </div>
+                    </article>
+                  </Link>
+                </Reveal>
+              ))}
+            </div>
+          </section>
+        </Reveal>
+      )}
+
+      {/* ═══════════ TASACIÓN · CTA full-rust + stat card ═══════════ */}
+      <Reveal variant="fadeUp">
+        <section style={{ background: T.rust, color: T.bg, padding: '96px 64px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 72, alignItems: 'center' }}>
+            <div>
+              <span style={{ fontFamily: T.mono, fontSize: 11, color: 'rgba(250,247,240,.7)', letterSpacing: '.14em', textTransform: 'uppercase' }}>
+                Tasación sin cargo
+              </span>
+              <h2 style={{ fontFamily: T.serif, fontSize: 'clamp(40px, 4.4vw, 76px)', color: T.bg, margin: '20px 0 24px', fontWeight: 400, lineHeight: 0.98, letterSpacing: '-.02em' }}>
+                ¿Cuánto vale <em style={{ fontStyle: 'italic' }}>tu</em> propiedad hoy?
+              </h2>
+              <p style={{ fontSize: 17, color: 'rgba(250,247,240,.82)', lineHeight: 1.6, marginBottom: 36, maxWidth: 440 }}>
+                Una tasación honesta, hecha por alguien que conoce el barrio. Sin compromiso y con un informe que podés usar como quieras.
+              </p>
+              <Link href={`/${slug}/contacto`} style={{ display: 'inline-flex', fontFamily: T.mono, fontSize: 13, letterSpacing: '.1em', textTransform: 'uppercase', color: T.rust, background: T.bg, padding: '16px 32px', borderRadius: 99, textDecoration: 'none', fontWeight: 600 }}>
+                Pedir tasación →
+              </Link>
+            </div>
+            {/* Frosted stat card */}
+            <div style={{ background: 'rgba(250,247,240,.12)', border: '1px solid rgba(250,247,240,.28)', borderRadius: 8, padding: '40px 40px 36px', backdropFilter: 'blur(6px)' }}>
+              <div style={{ fontFamily: T.mono, fontSize: 10.5, color: 'rgba(250,247,240,.7)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 28 }}>
+                Promedio de gestión
+              </div>
+              {[
+                { v: '21', u: 'días', l: 'hasta la primera oferta' },
+                { v: '94', u: '%', l: 'de respuesta a consultas' },
+                { v: stats.visits_this_month.toLocaleString('es-AR'), u: '', l: 'visitas al sitio este mes' },
+              ].map((s, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '16px 0', borderTop: i === 0 ? 'none' : '1px solid rgba(250,247,240,.18)' }}>
+                  <span style={{ fontFamily: T.serif, fontSize: 38, color: T.bg, fontWeight: 500, lineHeight: 1 }}>
+                    {s.v}<span style={{ fontSize: 16, marginLeft: 4 }}>{s.u}</span>
+                  </span>
+                  <span style={{ fontSize: 12.5, color: 'rgba(250,247,240,.72)', textAlign: 'right', maxWidth: 150 }}>{s.l}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </Reveal>
+
+      {/* ═══════════ DIARIO ═══════════ */}
+      <Reveal variant="fadeUp">
+        <section id="diario" style={{ padding: '88px 64px' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 40, paddingBottom: 20, borderBottom: `1px solid ${T.ink}` }}>
+            <h2 style={{ fontFamily: T.serif, fontSize: 'clamp(30px, 3vw, 46px)', color: T.ink, margin: 0, fontWeight: 400 }}>
+              El <em style={{ fontStyle: 'italic', color: T.rust }}>diario</em>
+            </h2>
+            <span style={{ fontFamily: T.mono, fontSize: 11, color: T.ink3, letterSpacing: '.1em', textTransform: 'uppercase' }}>
+              Notas y mercado
+            </span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 48 }}>
+            {DIARIO.map((post, i) => (
+              <Reveal key={i} variant="fadeUp" delay={i * 0.07}>
+                <article style={{ paddingRight: i < 2 ? 24 : 0, borderRight: i < 2 ? `1px solid ${T.rule}` : 'none' }}>
+                  <span style={{ fontFamily: T.mono, fontSize: 10, color: T.rust, letterSpacing: '.12em', textTransform: 'uppercase' }}>
+                    {post.cat}
+                  </span>
+                  <h3 style={{ fontFamily: T.serif, fontSize: 24, color: T.ink, fontWeight: 400, lineHeight: 1.2, margin: '14px 0 14px' }}>
+                    {post.title}
+                  </h3>
+                  <p style={{ fontSize: 14.5, color: T.ink2, lineHeight: 1.65, margin: '0 0 20px' }}>
+                    {post.excerpt}
+                  </p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontFamily: T.mono, fontSize: 10.5, color: T.ink3, letterSpacing: '.06em', textTransform: 'uppercase' }}>
+                    <span style={{ color: T.ink2 }}>{post.author}</span>
+                    <span>·</span>
+                    <span>{post.read} de lectura</span>
+                  </div>
+                </article>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+      </Reveal>
+
+      <SiteFooter
+        slug={slug}
+        agency={agency}
+        accent={T.rust}
+        bg={T.ink}
+        ink="#FAF7F0"
+        ink2="rgba(250,247,240,.6)"
+        ink3="rgba(250,247,240,.35)"
+        rule="rgba(250,247,240,.1)"
+        fontDisplay={T.serif}
+      />
     </div>
   )
 }

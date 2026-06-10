@@ -334,3 +334,103 @@
     border: 1px solid rgb(var(--border));
   }
 }
+
+/* ================================================================
+   ZAIRE · utilidades del superadmin (Universo B)
+   Brutalista-industrial: bordes 2px negros, hover-invert.
+   ================================================================ */
+
+.z-block {
+  background: var(--zaire-cream-2);
+  border: 2px solid var(--zaire-black);
+}
+
+/* KPI bento: invierte a negro en hover */
+.z-kpi {
+  background: var(--zaire-cream-2);
+  border: 2px solid var(--zaire-black);
+  transition: background .15s ease, color .15s ease;
+}
+.z-kpi:hover {
+  background: var(--zaire-black);
+  color: var(--zaire-cream);
+}
+.z-kpi:hover .z-kpi-label { color: var(--zaire-orange); }
+.z-kpi:hover .z-kpi-sub { color: var(--zaire-ink-3); }
+
+/* Filas de tabla: invierten a negro en hover */
+.z-row { transition: background .12s ease, color .12s ease; }
+.z-row:hover { background: var(--zaire-black); color: var(--zaire-cream); }
+.z-row:hover .z-row-mute { color: var(--zaire-ink-3); }
+.z-row:hover .z-pill-bordered { border-color: var(--zaire-cream); color: var(--zaire-cream); }
+
+/* Botón bracket */
+.z-btn-bk {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  border: 2px solid var(--zaire-black); background: var(--zaire-cream-2);
+  color: var(--zaire-black); padding: 9px 14px; cursor: pointer;
+  text-decoration: none; transition: background .15s ease, color .15s ease;
+}
+.z-btn-bk:hover { background: var(--zaire-black); color: var(--zaire-cream); }
+.z-btn-bk.is-orange { background: var(--zaire-orange); border-color: var(--zaire-orange); color: #fff; }
+.z-btn-bk.is-orange:hover { background: var(--zaire-orange-hover); border-color: var(--zaire-orange-hover); }
+
+/* Stripe de 3 bandas */
+.z-stripe-3 {
+  height: 8px;
+  background: linear-gradient(90deg,
+    var(--zaire-red) 0 33.33%,
+    var(--zaire-orange) 33.33% 66.66%,
+    var(--zaire-yellow) 66.66% 100%);
+}
+
+/* Servicios: estado */
+.z-svc { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 10px 14px; border: 1px solid var(--zaire-black); font-family: 'JetBrains Mono', monospace; font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; }
+.z-svc.ok { background: var(--zaire-cream); }
+.z-svc.warn { background: #FFF7E0; }
+.z-svc.crit { background: #FDE8E6; }
+
+@keyframes z-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.z-fade-up { animation: z-fade-up .42s cubic-bezier(.2,.7,.2,1) both; }
+
+/* ================================================================
+   CORAL & CREAM · utilidades del admin (Universo A)
+   ================================================================ */
+
+.coral-card { transition: transform .2s cubic-bezier(.2,.7,.2,1), box-shadow .2s ease; }
+.coral-card:hover { transform: translateY(-3px); box-shadow: 0 14px 34px -16px rgba(26,26,26,.18); }
+.coral-row { transition: background .15s ease; border-radius: 12px; }
+.coral-row:hover { background: #F4F0E8; }
+
+/* ================================================================
+   RESPONSIVE baseline (públicos + dashboards)
+   ================================================================ */
+
+/* Atelier — hover-zoom del slow-reveal + ocultar card flotante en pantallas chicas */
+.atelier-slow-img:hover { transform: scale(1.04); }
+@media (max-width: 1280px) { .atelier-float { display: none !important; } }
+
+/* Editorial hero full-bleed */
+@media (max-width: 900px) {
+  .ed-hero { min-height: 72vh; }
+  .ed-hero-edition { padding: 18px 24px !important; gap: 10px !important; flex-wrap: wrap; }
+  .ed-hero-body { padding: 0 24px 36px !important; }
+  .ed-hero-title { font-size: clamp(40px, 10vw, 64px) !important; }
+  .ed-hero-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+  .ed-hero-search { width: 100% !important; }
+}
+
+/* Dashboards (admin Coral + superadmin Zaire) — colapsan grids en pantallas chicas.
+   Usamos !important para ganarle al gridTemplateColumns inline del desktop. */
+@media (max-width: 1100px) {
+  .dash-kpis { grid-template-columns: repeat(2, 1fr) !important; }
+  .dash-2col { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 600px) {
+  .dash-kpis { grid-template-columns: 1fr !important; }
+}
