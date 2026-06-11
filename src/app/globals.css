@@ -434,3 +434,56 @@
 @media (max-width: 600px) {
   .dash-kpis { grid-template-columns: 1fr !important; }
 }
+
+/* ================================================================
+   RESPONSIVE — utilidades para los themes públicos (inline-styled).
+   Las clases rwd-* / site-theme se agregan a los grids y secciones;
+   acá colapsan en mobile. !important para ganarle al estilo inline.
+   ================================================================ */
+
+/* Padding lateral de las secciones de cada theme + contenedores marcados */
+@media (max-width: 768px) {
+  .site-theme section { padding-left: 22px !important; padding-right: 22px !important; }
+  .rwd-pad { padding-left: 22px !important; padding-right: 22px !important; }
+}
+@media (max-width: 560px) {
+  .site-theme section { padding-left: 16px !important; padding-right: 16px !important; }
+  .rwd-pad { padding-left: 16px !important; padding-right: 16px !important; }
+}
+
+/* Colapso de grids (desktop define las columnas inline; acá se reducen) */
+@media (max-width: 980px) {
+  .rwd-3col { grid-template-columns: repeat(2, 1fr) !important; }
+  .rwd-4col { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 768px) {
+  .rwd-stack, .rwd-2col { grid-template-columns: 1fr !important; }
+  .rwd-2col { gap: 24px !important; }
+  .rwd-stack { gap: 28px !important; }
+  /* sticky/fixed sidebars vuelven a flujo normal al apilar */
+  .rwd-unsticky { position: static !important; }
+  /* contenedores con alto fijo (split lista+mapa) → fluyen */
+  .rwd-autoh { height: auto !important; min-height: 0 !important; }
+  /* el panel del mapa necesita alto explícito al apilar (si no, colapsa a 0) */
+  .rwd-maph { height: 60vh !important; min-height: 320px !important; }
+}
+@media (max-width: 560px) {
+  .rwd-3col, .rwd-4col { grid-template-columns: 1fr !important; }
+}
+
+/* Ocultar elementos (ej. navs centrales que no entran) en mobile */
+@media (max-width: 768px) {
+  .rwd-hide-mobile { display: none !important; }
+}
+
+/* Galerías con <Image fill>: al colapsar a 1 columna las celdas necesitan
+   alto explícito (si no, se aplastan a 0). */
+@media (max-width: 768px) {
+  .rwd-gallery {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: none !important;
+    grid-auto-rows: 220px !important;
+    height: auto !important;
+  }
+  .rwd-gallery > * { grid-row: auto !important; grid-column: auto !important; }
+}

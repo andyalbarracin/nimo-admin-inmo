@@ -88,7 +88,7 @@ export default function EditorialHome({ slug, agency, featured, properties = [],
     'Una selección de propiedades elegidas con criterio editorial en los barrios más buscados de Buenos Aires.'
 
   return (
-    <div style={{ fontFamily: T.body, background: T.bg, color: T.ink, minHeight: '100vh' }}>
+    <div className="site-theme" style={{ fontFamily: T.body, background: T.bg, color: T.ink, minHeight: '100vh' }}>
       <SiteNav
         slug={slug}
         agencyName={agency.name}
@@ -183,7 +183,7 @@ export default function EditorialHome({ slug, agency, featured, properties = [],
             </Link>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 24 }}>
+          <div className="rwd-stack" style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 24 }}>
             {/* Lead card grande */}
             {lead && (
               <Link href={`/${slug}/propiedades/${lead.id}`} style={{ textDecoration: 'none' }}>
@@ -242,7 +242,7 @@ export default function EditorialHome({ slug, agency, featured, properties = [],
       {/* ═══════════ POR QUÉ · drop cap + stats 72px ═══════════ */}
       <Reveal variant="fadeUp">
         <section style={{ background: T.bg2, borderTop: `1px solid ${T.rule}`, borderBottom: `1px solid ${T.rule}`, padding: '96px 64px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 88, alignItems: 'center' }}>
+          <div className="rwd-stack" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 88, alignItems: 'center' }}>
             <div>
               <span style={{ fontFamily: T.mono, fontSize: 11, color: T.rust, letterSpacing: '.14em', textTransform: 'uppercase' }}>
                 Por qué {agency.name}
@@ -254,7 +254,7 @@ export default function EditorialHome({ slug, agency, featured, properties = [],
                 o trabajamos con catálogos infinitos. Cada propiedad que publicamos pasó por una visita, una conversación con sus dueños y una decisión editorial. Preferimos mostrar menos y conocer cada metro cuadrado que ofrecemos.
               </p>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 28 }}>
+            <div className="rwd-3col" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 28 }}>
               {[
                 { v: stats.total_properties, suffix: '', l: 'En cartera' },
                 { v: 15, suffix: '+', l: 'Años en CABA' },
@@ -276,7 +276,7 @@ export default function EditorialHome({ slug, agency, featured, properties = [],
 
       {/* ═══════════ MAPA ═══════════ */}
       <Reveal variant="fadeUp">
-        <section id="mapa" style={{ display: 'grid', gridTemplateColumns: '380px 1fr', minHeight: 520, borderBottom: `1px solid ${T.rule}` }}>
+        <section id="mapa" className="rwd-stack" style={{ display: 'grid', gridTemplateColumns: '380px 1fr', minHeight: 520, borderBottom: `1px solid ${T.rule}` }}>
           <div style={{ padding: '72px 56px', display: 'flex', flexDirection: 'column', justifyContent: 'center', borderRight: `1px solid ${T.rule}` }}>
             <span style={{ fontFamily: T.mono, fontSize: 11, color: T.rust, letterSpacing: '.14em', textTransform: 'uppercase' }}>
               Dónde estamos
@@ -313,7 +313,7 @@ export default function EditorialHome({ slug, agency, featured, properties = [],
                 Ver todas →
               </Link>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+            <div className="rwd-3col" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
               {portfolio.map((prop, i) => (
                 <Reveal key={prop.id} variant="fadeUp" delay={i * 0.07}>
                   <Link href={`/${slug}/propiedades/${prop.id}`} style={{ textDecoration: 'none', display: 'block' }}>
@@ -347,7 +347,7 @@ export default function EditorialHome({ slug, agency, featured, properties = [],
       {/* ═══════════ TASACIÓN · CTA full-rust + stat card ═══════════ */}
       <Reveal variant="fadeUp">
         <section style={{ background: T.rust, color: T.bg, padding: '96px 64px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 72, alignItems: 'center' }}>
+          <div className="rwd-stack" style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 72, alignItems: 'center' }}>
             <div>
               <span style={{ fontFamily: T.mono, fontSize: 11, color: 'rgba(250,247,240,.7)', letterSpacing: '.14em', textTransform: 'uppercase' }}>
                 Tasación sin cargo
@@ -395,7 +395,7 @@ export default function EditorialHome({ slug, agency, featured, properties = [],
               Notas y mercado
             </span>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 48 }}>
+          <div className="rwd-3col" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 48 }}>
             {DIARIO.map((post, i) => (
               <Reveal key={i} variant="fadeUp" delay={i * 0.07}>
                 <article style={{ paddingRight: i < 2 ? 24 : 0, borderRight: i < 2 ? `1px solid ${T.rule}` : 'none' }}>
