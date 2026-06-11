@@ -99,6 +99,7 @@ export default function EditorialHome({ slug, agency, featured, properties = [],
           { label: 'Contacto', href: `/${slug}/contacto` },
         ]}
         ctaLabel="Tasar mi propiedad"
+        ctaHref={`/${slug}/tasacion`}
         accent={T.rust}
         accentContrast={T.bg}
         bg={T.bg}
@@ -148,11 +149,11 @@ export default function EditorialHome({ slug, agency, featured, properties = [],
             en que se vive.
           </h1>
 
-          <div className="ed-hero-grid" style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 48, alignItems: 'end' }}>
+          <div className="ed-hero-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 540px', gap: 48, alignItems: 'end' }}>
             <p style={{ fontFamily: T.serif, fontSize: 21, color: 'rgba(250,247,240,.86)', lineHeight: 1.5, margin: 0, maxWidth: 460 }}>
               {agencyDesc}
             </p>
-            <div className="ed-hero-search" style={{ justifySelf: 'end', width: 'min(560px, 100%)' }}>
+            <div className="ed-hero-search" style={{ justifySelf: 'end', width: '100%' }}>
               <SearchBar
                 slug={slug}
                 accent={T.rust}
@@ -357,7 +358,7 @@ export default function EditorialHome({ slug, agency, featured, properties = [],
               <p style={{ fontSize: 17, color: 'rgba(250,247,240,.82)', lineHeight: 1.6, marginBottom: 36, maxWidth: 440 }}>
                 Una tasación honesta, hecha por alguien que conoce el barrio. Sin compromiso y con un informe que podés usar como quieras.
               </p>
-              <Link href={`/${slug}/contacto`} style={{ display: 'inline-flex', fontFamily: T.mono, fontSize: 13, letterSpacing: '.1em', textTransform: 'uppercase', color: T.rust, background: T.bg, padding: '16px 32px', borderRadius: 99, textDecoration: 'none', fontWeight: 600 }}>
+              <Link href={`/${slug}/tasacion`} style={{ display: 'inline-flex', fontFamily: T.mono, fontSize: 13, letterSpacing: '.1em', textTransform: 'uppercase', color: T.rust, background: T.bg, padding: '16px 32px', borderRadius: 99, textDecoration: 'none', fontWeight: 600 }}>
                 Pedir tasación →
               </Link>
             </div>

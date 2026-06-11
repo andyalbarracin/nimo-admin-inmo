@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { Property, Agency, TeamMember } from '@/lib/dummy'
 import SiteFooter from '@/components/site/primitives/SiteFooter'
+import SpatialSearch from '@/components/site/themes/spatial-search'
 import SiteMap from '@/components/site/primitives/SiteMap'
 import Reveal from '@/components/site/primitives/Reveal'
 import CountUp from '@/components/site/primitives/CountUp'
@@ -85,7 +86,7 @@ export default function SpatialHome({ slug, agency, featured, properties = [], o
             </Link>
           ))}
         </nav>
-        <Link href={`/${slug}/contacto`} style={{ fontFamily: T.mono, fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: T.white, background: T.electric, padding: '11px 18px', borderRadius: 6, textDecoration: 'none' }}>
+        <Link href={`/${slug}/tasacion`} style={{ fontFamily: T.mono, fontSize: 11, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: T.white, background: T.electric, padding: '11px 18px', borderRadius: 6, textDecoration: 'none' }}>
           TASAR MI PROPIEDAD →
         </Link>
       </header>
@@ -123,6 +124,9 @@ export default function SpatialHome({ slug, agency, featured, properties = [], o
           </div>
         </div>
       </section>
+
+      {/* ═══ SEARCH (bajo el mapa del hero) ═══ */}
+      <SpatialSearch slug={slug} />
 
       {/* ═══ TICKER ═══ */}
       <div style={{ background: T.graphite, color: T.white, overflow: 'hidden', borderBottom: `1.5px solid ${T.graphite}` }}>
@@ -257,7 +261,7 @@ export default function SpatialHome({ slug, agency, featured, properties = [], o
           <p style={{ fontSize: 16, color: 'rgba(255,255,255,.82)', marginBottom: 32, maxWidth: 460, margin: '0 auto 32px', lineHeight: 1.55 }}>
             Publicá con datos de mercado de tu cuadra y llegá a compradores que buscan exactamente tu zona.
           </p>
-          <Link href={`/${slug}/contacto`} style={{ fontFamily: T.mono, fontSize: 12, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: T.electric, background: T.white, padding: '15px 30px', borderRadius: 6, textDecoration: 'none', display: 'inline-block' }}>
+          <Link href={`/${slug}/tasacion`} style={{ fontFamily: T.mono, fontSize: 12, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: T.electric, background: T.white, padding: '15px 30px', borderRadius: 6, textDecoration: 'none', display: 'inline-block' }}>
             [ TASAR MI PROPIEDAD → ]
           </Link>
         </section>

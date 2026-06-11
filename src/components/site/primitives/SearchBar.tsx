@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import CityAutocomplete from '@/components/site/city-autocomplete'
 
 interface SearchBarProps {
   slug: string
@@ -16,7 +17,6 @@ interface SearchBarProps {
   variant?: 'floating' | 'hairline' | 'minimal'
 }
 
-const BARRIOS = ['Palermo', 'Belgrano', 'Recoleta', 'Caballito', 'Villa Crespo', 'Núñez', 'Colegiales', 'San Telmo', 'Flores', 'Once']
 const TIPOS = ['departamento', 'casa', 'ph', 'local', 'terreno']
 const PRECIOS_VENTA = ['USD 80.000', 'USD 150.000', 'USD 250.000', 'USD 400.000', 'USD 600.000+']
 const PRECIOS_ALQ = ['USD 500/mes', 'USD 800/mes', 'USD 1.200/mes', 'USD 2.000/mes+']
@@ -26,17 +26,20 @@ export default function SearchBar({ slug, accent, accentContrast, surface, borde
   const [op, setOp] = useState<'venta' | 'alquiler'>('venta')
   const [tipo, setTipo] = useState('')
   const [barrio, setBarrio] = useState('')
+  const [cp, setCp] = useState('')
 
   const handleSearch = () => {
     const params = new URLSearchParams()
     if (op) params.set('op', op)
     if (tipo) params.set('tipo', tipo)
     if (barrio) params.set('barrio', barrio)
+    if (cp) params.set('cp', cp)
     router.push(`/${slug}/propiedades?${params.toString()}`)
   }
 
   const selectStyle: React.CSSProperties = {
     flex: 1,
+    width: '100%',
     background: 'transparent',
     border: 'none',
     outline: 'none',
@@ -46,6 +49,7 @@ export default function SearchBar({ slug, accent, accentContrast, surface, borde
     appearance: 'none',
     WebkitAppearance: 'none',
     minWidth: 0,
+    textOverflow: 'ellipsis',
     fontFamily: 'inherit',
   }
 
@@ -96,13 +100,16 @@ export default function SearchBar({ slug, accent, accentContrast, surface, borde
       </div>
       {/* Inputs */}
       <div style={{ display: 'flex', borderBottom: `1px solid ${border}` }}>
-        {/* Barrio */}
+        {/* Ciudad / barrio / CP — autocomplete híbrido */}
         <div style={{ flex: 1, padding: '14px 18px', borderRight: `1px solid ${border}` }}>
-          <div style={{ fontSize: 9, fontWeight: 700, color: ink3, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 4 }}>Barrio</div>
-          <select value={barrio} onChange={e => setBarrio(e.target.value)} style={selectStyle}>
-            <option value="">Todos los barrios</option>
-            {BARRIOS.map(b => <option key={b} value={b}>{b}</option>)}
-          </select>
+          <div style={{ fontSize: 9, fontWeight: 700, color: ink3, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 4 }}>Ciudad / barrio / CP</div>
+          <CityAutocomplete
+            value={barrio}
+            onSelect={l => { setBarrio(l.city); setCp(l.cp) }}
+            placeholder="Buscá ciudad o CP…"
+            inputStyle={{ ...selectStyle, fontSize: 14 }}
+            accent={accent} surface={surface} ink={ink} ink3={ink3} rule={border} fontMono="var(--font-mono), monospace" radius={8}
+          />
         </div>
         {/* Tipo */}
         <div style={{ flex: 1, padding: '14px 18px', borderRight: `1px solid ${border}` }}>

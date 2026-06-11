@@ -112,8 +112,9 @@ export default function AtelierDetail({ slug, agency, prop, related }: Props) {
             <Figure src={book[3]} ratio="3 / 4" caption="El ambiente, mediodía." alt={prop.title} />
           </div>
         </div>
-        <div style={{ textAlign: 'center', paddingTop: 28 }}>
+        <div style={{ textAlign: 'center', paddingTop: 28, display: 'flex', justifyContent: 'center', gap: 32, alignItems: 'baseline' }}>
           <span style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: 18, color: T.sageDark }}>Ver todas las fotografías →</span>
+          <a href={`/api/pdf/propiedad/${prop.id}?slug=${slug}`} target="_blank" rel="noreferrer" style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: 18, color: T.sageDark, textDecoration: 'none' }}>Descargar ficha PDF →</a>
         </div>
       </section>
 

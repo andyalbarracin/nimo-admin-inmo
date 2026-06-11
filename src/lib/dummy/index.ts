@@ -26,12 +26,15 @@ export type Property = {
   created_at: string
 }
 
+export type LeadStage = 'new' | 'contacted' | 'interested' | 'visit' | 'proposal' | 'won' | 'lost'
+export type ClientType = 'comprador' | 'inquilino' | 'vendedor' | 'propietario' | 'inversor'
+
 export type Lead = {
   id: string
   name: string
   email: string
   phone: string
-  stage: 'new' | 'contacted' | 'interested' | 'visit' | 'proposal' | 'won' | 'lost'
+  stage: LeadStage
   source: string
   property_interest: string
   budget: string
@@ -39,6 +42,11 @@ export type Lead = {
   agent: string
   created_at: string
   last_contact: string
+  // — Campos extendidos (CRM) —
+  client_type?: ClientType
+  operation_interest?: 'venta' | 'alquiler'
+  contact2_name?: string
+  contact2_phone?: string
 }
 
 export type TeamMember = {
@@ -378,6 +386,10 @@ export const LEADS: Lead[] = [
     agent: 'Carla Méndez',
     created_at: '2026-06-05',
     last_contact: '2026-06-05',
+    client_type: 'inquilino',
+    operation_interest: 'alquiler',
+    contact2_name: 'Jorge García (esposo)',
+    contact2_phone: '+54 11 4523-8902',
   },
   {
     id: 'lead-002',
@@ -392,6 +404,8 @@ export const LEADS: Lead[] = [
     agent: 'Federico Ruiz',
     created_at: '2026-05-28',
     last_contact: '2026-06-04',
+    client_type: 'comprador',
+    operation_interest: 'venta',
   },
   {
     id: 'lead-003',

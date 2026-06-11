@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { Property, Agency, TeamMember } from '@/lib/dummy'
 import SiteMap from '@/components/site/primitives/SiteMap'
+import AtelierSearch from '@/components/site/themes/atelier-search'
 import Reveal from '@/components/site/primitives/Reveal'
 
 /* ============================================================
@@ -78,8 +79,11 @@ export default function AtelierHome({ slug, agency, featured, properties = [], s
         </div>
       </header>
 
+      {/* ═══ SEARCH elegante (flota bajo el hero) ═══ */}
+      <AtelierSearch slug={slug} />
+
       {/* ═══ SLOW REVEAL ═══ */}
-      <section style={{ padding: '120px 0 0' }}>
+      <section style={{ padding: '90px 0 0' }}>
         <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 48px' }}>
           {slow.map((p, i) => {
             const flip = i % 2 === 1

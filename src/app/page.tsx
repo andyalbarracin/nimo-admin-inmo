@@ -1,4 +1,7 @@
 import './landing.css'
+import { planMap } from '@/lib/plans/server'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata = {
   title: 'NIMO · Tu inmobiliaria, en una sola plataforma',
@@ -34,7 +37,16 @@ function CompareCell({ type, text, nimo }: { type: 'yes' | 'no' | 'mid'; text: s
   )
 }
 
-export default function LandingPage() {
+const THEMES_DATA = [
+  { id: 'editorial', name: 'Editorial', desc: 'Magazine, serif Fraunces, terracota. Para inmobiliarias de trayectoria.', href: '/lopez-asociados', bg: '#FAF7F0', ink: '#1A1614', accent: '#B25431', line: '#DBD2C2', font: 'var(--font-fraunces), Georgia, serif', sample: 'Norte Propiedades', palette: ['#FAF7F0', '#B25431', '#1A1614'] },
+  { id: 'spatial', name: 'Spatial', desc: 'Swiss, map-forward, azul electric. Para boutiques tech-savvy.', href: '/norte-propiedades', bg: '#FFFFFF', ink: '#0A0A0A', accent: '#1F4DD6', line: '#D8D8D6', font: 'var(--font-inter-tight), Inter, sans-serif', sample: 'GRID PROPIEDADES', palette: ['#FFFFFF', '#1F4DD6', '#0A0A0A'] },
+  { id: 'atelier', name: 'Atelier', desc: 'Boutique de lujo, Cormorant, verde salvia. Para propiedades premium.', href: '/distrito-atelier', bg: '#F5F1EC', ink: '#2E2620', accent: '#7A8264', line: '#DDD5CA', font: 'var(--font-cormorant), Georgia, serif', sample: 'Plaza Mayor', palette: ['#F5F1EC', '#7A8264', '#2E2620'] },
+]
+
+export default async function LandingPage() {
+  const plans = await planMap()
+  const price = (code: string) => plans[code]?.monthly ?? 0
+  const setup = (code: string) => plans[code]?.setup ?? 0
   return (
     <div className="lp-wrap">
 
@@ -47,6 +59,7 @@ export default function LandingPage() {
           </a>
           <nav className="menu">
             <a href="#features">Características</a>
+            <a href="#themes">Themes</a>
             <a href="#pricing">Precios</a>
             <a href="#recursos">Recursos</a>
           </nav>
@@ -194,7 +207,7 @@ export default function LandingPage() {
             {/* LARGE: Sitio web */}
             <div className="card large">
               <div className="card-tag">/ 01 — Sitio web</div>
-              <h3 className="card-h">Sitio web con tu marca, listo en una tarde.</h3>
+              <h3 className="card-h">Sitio web con tu marca, listo en tiempo récord.</h3>
               <p className="card-p">Tres layouts probados: classic-cta, visual-showcase y magazine. Elegís uno y lo personalizás con tu logo, colores y propiedades. SEO impecable, métricas de Google y carga &lt; 1 segundo.</p>
               <div className="layouts-art">
                 <div className="mini-site ms-classic">
@@ -326,6 +339,43 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ===== THEMES ===== */}
+      <section className="themes-sec" id="themes">
+        <div className="container">
+          <div className="sec-head">
+            <div>
+              <span className="eyebrow">// 3 estilos, un solo motor</span>
+              <h2>Una web que se ve <em>cara.</em></h2>
+              <p className="sec-sub">Elegí el estilo que va con tu marca. Los tres comparten el mismo motor: propiedades, mapa, CRM y carga desde un panel. Cambiás de tema sin perder nada.</p>
+            </div>
+          </div>
+          <div className="themes-grid">
+            {THEMES_DATA.map(t => (
+              <a className="theme-card" href={t.href} target="_blank" rel="noreferrer" key={t.id}>
+                <div className="theme-prev" style={{ background: t.bg }}>
+                  <div className="theme-prev-bar"><span /><span /><span /></div>
+                  <div className="theme-prev-body">
+                    <div className="theme-prev-h" style={{ fontFamily: t.font, color: t.ink }}>{t.sample}</div>
+                    <div className="theme-prev-accent" style={{ background: t.accent }} />
+                    <div className="theme-prev-cards">
+                      <span style={{ borderColor: t.line }} /><span style={{ borderColor: t.line }} /><span style={{ borderColor: t.line }} />
+                    </div>
+                  </div>
+                </div>
+                <div className="theme-meta">
+                  <div className="theme-name">
+                    <b>{t.name}</b>
+                    <div className="theme-dots">{t.palette.map((c, i) => <span key={i} style={{ background: c }} />)}</div>
+                  </div>
+                  <p>{t.desc}</p>
+                  <span className="theme-link">Ver demo en vivo <ArrowRight /></span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ===== COMPARATIVA ===== */}
       <section className="compare-sec">
         <div className="container">
@@ -377,7 +427,7 @@ export default function LandingPage() {
               <h2 className="sec-title">Un plan para cada tamaño. <em>Sin sorpresas.</em></h2>
             </div>
             <p className="sec-sub">
-              Pagás en USD, facturamos en pesos al cambio oficial. Cambiá de plan cuando quieras, sin penalidades.
+              Sin permanencia, cancelás cuando quieras. A cada plan se suma una implementación inicial (única vez): dejamos tu sitio, tu CRM y tus propiedades cargados y listos para vender.
             </p>
           </div>
           <div className="price-grid">
@@ -387,7 +437,8 @@ export default function LandingPage() {
                 <h3>Empezando</h3>
                 <p>Inmobiliaria de 1 persona. Empezás con sitio web + hasta 30 propiedades.</p>
               </div>
-              <div className="price-amount"><sup>USD</sup>29<span className="per">por mes · facturación mensual</span></div>
+              <div className="price-amount"><sup>USD</sup>{price('starter')}<span className="per">por mes · facturación mensual</span></div>
+              <div className="price-setup">+ USD {setup('starter')} de implementación · pago único</div>
               <ul className="price-feat">
                 <li><CheckIcon /> Sitio web (1 layout)</li>
                 <li><CheckIcon /> Hasta 30 propiedades</li>
@@ -404,7 +455,8 @@ export default function LandingPage() {
                 <h3>El estándar NIMO</h3>
                 <p>Inmobiliaria con 2–4 agentes. CRM, WhatsApp y propiedades ilimitadas.</p>
               </div>
-              <div className="price-amount"><sup>USD</sup>59<span className="per">por mes · facturación mensual</span></div>
+              <div className="price-amount"><sup>USD</sup>{price('pro')}<span className="per">por mes · facturación mensual</span></div>
+              <div className="price-setup">+ USD {setup('pro')} de implementación · pago único</div>
               <ul className="price-feat">
                 <li><CheckIcon /> <b>Todo lo de Starter, más:</b></li>
                 <li><CheckIcon /> Los 3 layouts premium</li>
@@ -421,7 +473,8 @@ export default function LandingPage() {
                 <h3>Equipo en crecimiento</h3>
                 <p>5+ agentes, reportes, integraciones avanzadas y dominio propio.</p>
               </div>
-              <div className="price-amount"><sup>USD</sup>119<span className="per">por mes · facturación mensual</span></div>
+              <div className="price-amount"><sup>USD</sup>{price('business')}<span className="per">por mes · facturación mensual</span></div>
+              <div className="price-setup">+ USD {setup('business')} de implementación · pago único</div>
               <ul className="price-feat">
                 <li><CheckIcon /> <b>Todo lo de Pro, más:</b></li>
                 <li><CheckIcon /> Hasta 10 agentes</li>
@@ -440,6 +493,7 @@ export default function LandingPage() {
               <div className="price-amount" style={{ color: 'white' }}>
                 A medida<span className="per" style={{ color: 'rgba(255,255,255,.5)' }}>Hablemos de tu operación</span>
               </div>
+              <div className="price-setup" style={{ color: 'rgba(255,255,255,.55)' }}>Implementación a medida · incluida en la propuesta</div>
               <ul className="price-feat">
                 <li style={{ color: 'rgba(255,255,255,.8)' }}><CheckIconYellow /> Agentes ilimitados</li>
                 <li style={{ color: 'rgba(255,255,255,.8)' }}><CheckIconYellow /> Multi-sucursal</li>

@@ -7,6 +7,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  useDroppable,
   closestCorners,
   type DragStartEvent,
   type DragEndEvent,
@@ -100,7 +101,7 @@ function CardBody({
 }) {
   return (
     <div
-      style={{ background: P.white, border: `1px solid ${P.border}`, borderRadius: 6, padding: '12px 12px 10px', cursor: 'default', userSelect: 'none' }}
+      style={{ background: P.white, border: `1px solid ${P.border}`, borderRadius: 8, padding: '16px 16px 14px', cursor: 'default', userSelect: 'none' }}
     >
       {/* Drag + header row */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 10 }}>
@@ -119,7 +120,7 @@ function CardBody({
         </button>
 
         {/* Avatar */}
-        <div style={{ width: 28, height: 28, borderRadius: 9999, background: colColor + '1A', border: `1.5px solid ${colColor}44`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Archivo Black', sans-serif", fontSize: 9, color: colColor, flexShrink: 0 }}>
+        <div style={{ width: 34, height: 34, borderRadius: 9999, background: colColor + '1A', border: `1.5px solid ${colColor}44`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "var(--font-sans), sans-serif", fontWeight: 800, fontSize: 11, color: colColor, flexShrink: 0 }}>
           {card.title.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()}
         </div>
 
@@ -129,9 +130,9 @@ function CardBody({
             onClick={() => onCardOpen(card)}
             style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left', width: '100%' }}
           >
-            <div style={{ fontSize: 12, fontWeight: 600, color: P.ink, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{card.title}</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: P.ink, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{card.title}</div>
           </button>
-          {card.subtitle && <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: P.ink3, textTransform: 'uppercase', letterSpacing: '.06em', marginTop: 2 }}>{card.subtitle}</div>}
+          {card.subtitle && <div style={{ fontFamily: "var(--font-mono), monospace", fontSize: 9.5, color: P.ink3, textTransform: 'uppercase', letterSpacing: '.05em', marginTop: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{card.subtitle}</div>}
         </div>
 
         {/* 3-dot menu */}
@@ -151,7 +152,7 @@ function CardBody({
 
       {/* Meta */}
       {card.meta && (
-        <div style={{ fontSize: 11, color: P.ink2, marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{card.meta}</div>
+        <div style={{ fontSize: 12.5, color: P.ink2, marginBottom: 10, lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{card.meta}</div>
       )}
 
       {/* Footer */}
@@ -314,18 +315,34 @@ function ContextMenu({
   )
 }
 
+// ─── Droppable column (permite soltar en columnas vacías y volver a estados anteriores) ──
+
+function DroppableColumn({ id, children }: { id: string; children: React.ReactNode }) {
+  const { setNodeRef, isOver } = useDroppable({ id })
+  return (
+    <div ref={setNodeRef} style={{ background: isOver ? 'rgba(0,0,0,.035)' : 'transparent', borderRadius: 8, transition: 'background .12s ease', minHeight: 60 }}>
+      {children}
+    </div>
+  )
+}
+
 // ─── Main KanbanBoard Component ───────────────────────────────────────────────
 
 interface KanbanBoardProps {
   columns: KanbanColumn[]
-  initialCards: KanbanCard[]
+  cards: KanbanCard[]
+  onCardsChange: (cards: KanbanCard[]) => void
   onCardMove?: (cardId: string, newColumn: string) => void
+  onAddCard?: (column: string) => void
+  onCardOpen?: (card: KanbanCard) => void
   emptyLabel?: string
   addLabel?: string
 }
 
-export default function KanbanBoard({ columns, initialCards, onCardMove, addLabel = '+ Agregar' }: KanbanBoardProps) {
-  const [cards, setCards] = useState<KanbanCard[]>(initialCards)
+export default function KanbanBoard({ columns, cards, onCardsChange, onCardMove, onAddCard, onCardOpen, addLabel = '+ Agregar' }: KanbanBoardProps) {
+  const setCards = (updater: KanbanCard[] | ((prev: KanbanCard[]) => KanbanCard[])) => {
+    onCardsChange(typeof updater === 'function' ? (updater as (p: KanbanCard[]) => KanbanCard[])(cards) : updater)
+  }
   const [activeId, setActiveId] = useState<string | null>(null)
   const [menu, setMenu] = useState<{ cardId: string; anchor: DOMRect } | null>(null)
   const [sidePanel, setSidePanel] = useState<KanbanCard | null>(null)
@@ -398,7 +415,7 @@ export default function KanbanBoard({ columns, initialCards, onCardMove, addLabe
         {columns.map(col => {
           const colCards = cards.filter(c => c.column === col.id)
           return (
-            <div key={col.id} style={{ minWidth: 230, maxWidth: 250, flexShrink: 0 }}>
+            <div key={col.id} style={{ minWidth: 272, maxWidth: 288, flexShrink: 0 }}>
               {/* Column header */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10, padding: '0 2px' }}>
                 <div style={{ width: 6, height: 6, borderRadius: 9999, background: col.color }} />
@@ -407,7 +424,8 @@ export default function KanbanBoard({ columns, initialCards, onCardMove, addLabe
               </div>
 
               {/* Drop zone */}
-              <SortableContext items={colCards.map(c => c.id)} strategy={verticalListSortingStrategy}>
+              <DroppableColumn id={col.id}>
+                <SortableContext items={colCards.map(c => c.id)} strategy={verticalListSortingStrategy}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minHeight: 48 }}>
                   {colCards.map(card => (
                     <SortableCard
@@ -415,22 +433,26 @@ export default function KanbanBoard({ columns, initialCards, onCardMove, addLabe
                       card={card}
                       colColor={col.color}
                       onMenuOpen={(cardId, anchor) => setMenu({ cardId, anchor })}
-                      onCardOpen={c => setSidePanel(c)}
+                      onCardOpen={c => (onCardOpen ? onCardOpen(c) : setSidePanel(c))}
                       isDragging={activeId === card.id}
                     />
                   ))}
 
                   {colCards.length === 0 && (
                     <div style={{ border: `1.5px dashed ${P.border}`, borderRadius: 6, padding: '16px', textAlign: 'center' }}>
-                      <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: P.ink3, textTransform: 'uppercase', letterSpacing: '.1em' }}>Sin leads</div>
+                      <div style={{ fontFamily: "var(--font-mono), 'JetBrains Mono', monospace", fontSize: 8, color: P.ink3, textTransform: 'uppercase', letterSpacing: '.1em' }}>Soltá un lead acá</div>
                     </div>
                   )}
 
-                  <button style={{ width: '100%', background: 'transparent', border: `1px dashed ${P.border}`, borderRadius: 4, padding: '9px', color: P.ink3, fontSize: 11, cursor: 'pointer', fontFamily: "'Archivo', sans-serif" }}>
+                  <button
+                    onClick={() => onAddCard?.(col.id)}
+                    style={{ width: '100%', background: 'transparent', border: `1px dashed ${P.border}`, borderRadius: 4, padding: '9px', color: P.ink3, fontSize: 11, cursor: 'pointer', fontFamily: "var(--font-sans), 'Archivo', sans-serif" }}
+                  >
                     {addLabel}
                   </button>
                 </div>
-              </SortableContext>
+                </SortableContext>
+              </DroppableColumn>
             </div>
           )
         })}
@@ -455,7 +477,7 @@ export default function KanbanBoard({ columns, initialCards, onCardMove, addLabe
         <ContextMenu
           cardId={menu.cardId}
           anchor={menu.anchor}
-          onEdit={id => { setSidePanel(cards.find(c => c.id === id) ?? null); setMenu(null) }}
+          onEdit={id => { const c = cards.find(x => x.id === id) ?? null; if (c) { if (onCardOpen) onCardOpen(c); else setSidePanel(c) } setMenu(null) }}
           onDelete={id => { handleDelete(id); setMenu(null) }}
           onClose={() => setMenu(null)}
         />
