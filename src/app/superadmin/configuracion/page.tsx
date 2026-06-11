@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import { PLATFORM_STATS } from '@/lib/dummy'
 
 const ZR = {
@@ -13,7 +16,7 @@ const inputStyle: React.CSSProperties = {
 }
 
 const labelStyle: React.CSSProperties = {
-  display: 'block', fontFamily: "'JetBrains Mono', monospace",
+  display: 'block', fontFamily: "var(--font-mono), 'JetBrains Mono', monospace",
   fontSize: 9, color: ZR.ink3, textTransform: 'uppercase',
   letterSpacing: '.12em', marginBottom: 8,
 }
@@ -23,19 +26,27 @@ const sectionStyle: React.CSSProperties = {
 }
 
 export default function SuperadminConfiguracion() {
+  const [saved, setSaved] = useState(false)
+  const save = () => { setSaved(true); setTimeout(() => setSaved(false), 2500) }
   return (
-    <div style={{ padding: '36px 40px', minHeight: '100vh', background: ZR.cream, fontFamily: 'var(--font-sans)' }}>
+    <div style={{ padding: '36px 40px', minHeight: '100vh', background: ZR.cream, fontFamily: 'var(--font-archivo), system-ui, sans-serif' }}>
       <div style={{ maxWidth: 760, margin: '0 auto' }}>
-        <div style={{ marginBottom: 36 }}>
-          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 6 }}>// SUPERADMIN</div>
-          <h1 style={{ fontFamily: "'Archivo Black', sans-serif", fontSize: 28, color: ZR.black, margin: 0, textTransform: 'uppercase', letterSpacing: '-.01em' }}>CONFIGURACIÓN GLOBAL</h1>
-          <p style={{ fontSize: 13, color: ZR.ink3, margin: '4px 0 0' }}>Ajustes globales de la plataforma NIMO.</p>
+        <div style={{ marginBottom: 36, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 16 }}>
+          <div>
+            <div style={{ fontFamily: "var(--font-mono), var(--font-mono), 'JetBrains Mono', monospace", fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 6 }}>// SUPERADMIN</div>
+            <h1 style={{ fontFamily: "var(--font-archivo-black), var(--font-archivo-black), 'Archivo Black', sans-serif", fontSize: 28, color: ZR.black, margin: 0, textTransform: 'uppercase', letterSpacing: '-.01em' }}>CONFIGURACIÓN GLOBAL</h1>
+            <p style={{ fontSize: 13, color: ZR.ink3, margin: '4px 0 0' }}>Ajustes globales de la plataforma NIMO.</p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {saved && <span style={{ fontSize: 13, color: '#2D7D5F', fontWeight: 600 }}>✓ Guardado</span>}
+            <button onClick={save} className="z-btn-bk is-orange">[ GUARDAR CAMBIOS ]</button>
+          </div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {/* Platform identity */}
           <div style={sectionStyle}>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 20 }}>// IDENTIDAD DE LA PLATAFORMA</div>
+            <div style={{ fontFamily: "var(--font-mono), 'JetBrains Mono', monospace", fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 20 }}>// IDENTIDAD DE LA PLATAFORMA</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                 <div>
@@ -60,7 +71,7 @@ export default function SuperadminConfiguracion() {
 
           {/* Platform stats snapshot */}
           <div style={sectionStyle}>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 20 }}>// MÉTRICAS DE LA PLATAFORMA</div>
+            <div style={{ fontFamily: "var(--font-mono), 'JetBrains Mono', monospace", fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 20 }}>// MÉTRICAS DE LA PLATAFORMA</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
               {[
                 { label: 'Total agencias',  value: PLATFORM_STATS.total_agencies,  accent: ZR.orange },
@@ -69,8 +80,8 @@ export default function SuperadminConfiguracion() {
                 { label: 'Propiedades',     value: PLATFORM_STATS.total_properties, accent: '#4A90E2' },
               ].map((s) => (
                 <div key={s.label} style={{ background: ZR.cream, border: `1px solid ${ZR.border}`, borderRadius: 4, padding: 16, textAlign: 'center' }}>
-                  <div style={{ fontFamily: "'Archivo Black', sans-serif", fontSize: 28, color: s.accent, lineHeight: 1 }}>{s.value}</div>
-                  <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: ZR.ink3, textTransform: 'uppercase', letterSpacing: '.1em', marginTop: 6 }}>{s.label}</div>
+                  <div style={{ fontFamily: "var(--font-archivo-black), 'Archivo Black', sans-serif", fontSize: 28, color: s.accent, lineHeight: 1 }}>{s.value}</div>
+                  <div style={{ fontFamily: "var(--font-mono), 'JetBrains Mono', monospace", fontSize: 9, color: ZR.ink3, textTransform: 'uppercase', letterSpacing: '.1em', marginTop: 6 }}>{s.label}</div>
                 </div>
               ))}
             </div>
@@ -78,7 +89,7 @@ export default function SuperadminConfiguracion() {
 
           {/* Feature flags */}
           <div style={sectionStyle}>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 20 }}>// FEATURE FLAGS</div>
+            <div style={{ fontFamily: "var(--font-mono), 'JetBrains Mono', monospace", fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 20 }}>// FEATURE FLAGS</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {[
                 { label: 'Registro de nuevas agencias', desc: 'Permite que nuevas inmobiliarias se registren en la plataforma.', enabled: true },
@@ -102,7 +113,7 @@ export default function SuperadminConfiguracion() {
 
           {/* Webhooks & API */}
           <div style={sectionStyle}>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 20 }}>// WEBHOOKS & INTEGRACIONES</div>
+            <div style={{ fontFamily: "var(--font-mono), 'JetBrains Mono', monospace", fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 20 }}>// WEBHOOKS & INTEGRACIONES</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
                 { label: 'Webhook — Nuevo lead CRM', endpoint: '/api/webhooks/crm', method: 'POST' },
@@ -112,9 +123,9 @@ export default function SuperadminConfiguracion() {
                 <div key={wh.endpoint} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px', background: ZR.cream, border: `1px solid ${ZR.border}`, borderRadius: 4 }}>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 600, color: ZR.black }}>{wh.label}</div>
-                    <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: ZR.orange, marginTop: 3 }}>{wh.method} {wh.endpoint}</div>
+                    <div style={{ fontFamily: "var(--font-mono), 'JetBrains Mono', monospace", fontSize: 9, color: ZR.orange, marginTop: 3 }}>{wh.method} {wh.endpoint}</div>
                   </div>
-                  <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, background: 'rgba(45,125,95,.1)', color: '#2D7D5F', padding: '3px 10px', borderRadius: 2, textTransform: 'uppercase', letterSpacing: '.08em' }}>ACTIVO</span>
+                  <span style={{ fontFamily: "var(--font-mono), 'JetBrains Mono', monospace", fontSize: 9, background: 'rgba(45,125,95,.1)', color: '#2D7D5F', padding: '3px 10px', borderRadius: 2, textTransform: 'uppercase', letterSpacing: '.08em' }}>ACTIVO</span>
                 </div>
               ))}
             </div>
@@ -122,13 +133,13 @@ export default function SuperadminConfiguracion() {
 
           {/* Danger zone */}
           <div style={{ background: ZR.white, border: '1px solid rgba(231,29,10,.2)', borderRadius: 4, padding: 28 }}>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: '#E71D0A', textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 8 }}>// ZONA DE RIESGO</div>
+            <div style={{ fontFamily: "var(--font-mono), 'JetBrains Mono', monospace", fontSize: 10, color: '#E71D0A', textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 8 }}>// ZONA DE RIESGO</div>
             <p style={{ fontSize: 12, color: ZR.ink3, marginBottom: 20 }}>Estas acciones son irreversibles. Proceder con extremo cuidado.</p>
             <div style={{ display: 'flex', gap: 12 }}>
-              <button style={{ padding: '10px 18px', background: 'transparent', border: '1px solid rgba(231,29,10,.3)', borderRadius: 3, color: '#E71D0A', fontFamily: "'JetBrains Mono', monospace", fontSize: 11, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '.08em' }}>
+              <button style={{ padding: '10px 18px', background: 'transparent', border: '1px solid rgba(231,29,10,.3)', borderRadius: 3, color: '#E71D0A', fontFamily: "var(--font-mono), 'JetBrains Mono', monospace", fontSize: 11, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '.08em' }}>
                 Vaciar datos demo
               </button>
-              <button style={{ padding: '10px 18px', background: 'transparent', border: '1px solid rgba(231,29,10,.3)', borderRadius: 3, color: '#E71D0A', fontFamily: "'JetBrains Mono', monospace", fontSize: 11, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '.08em' }}>
+              <button style={{ padding: '10px 18px', background: 'transparent', border: '1px solid rgba(231,29,10,.3)', borderRadius: 3, color: '#E71D0A', fontFamily: "var(--font-mono), 'JetBrains Mono', monospace", fontSize: 11, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '.08em' }}>
                 Exportar backup completo
               </button>
             </div>
@@ -139,7 +150,7 @@ export default function SuperadminConfiguracion() {
             <button style={{ padding: '12px 22px', borderRadius: 3, border: `1px solid ${ZR.border}`, color: ZR.ink3, fontSize: 13, background: 'transparent', cursor: 'pointer', fontFamily: 'inherit' }}>
               Cancelar
             </button>
-            <button style={{ padding: '12px 28px', borderRadius: 3, background: ZR.black, color: ZR.cream, fontFamily: "'Archivo Black', sans-serif", fontSize: 11, border: 'none', cursor: 'pointer', letterSpacing: '.06em', textTransform: 'uppercase' }}>
+            <button style={{ padding: '12px 28px', borderRadius: 3, background: ZR.black, color: ZR.cream, fontFamily: "var(--font-archivo-black), 'Archivo Black', sans-serif", fontSize: 11, border: 'none', cursor: 'pointer', letterSpacing: '.06em', textTransform: 'uppercase' }}>
               GUARDAR CONFIGURACIÓN →
             </button>
           </div>

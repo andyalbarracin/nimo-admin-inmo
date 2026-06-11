@@ -154,10 +154,10 @@ export default async function TemaAdmin({ params }: { params: Promise<{ slug: st
         <p style={{ fontSize: 13, color: LA.ink2, margin: 0 }}>El tema activo es <strong>{currentTheme}</strong>. Para cambiarlo, contactá al equipo NIMO.</p>
       </div>
 
-      <div style={{ background: LA.coralLight, border: `1px solid rgba(255,107,107,.25)`, borderRadius: 10, padding: '12px 18px', marginBottom: 28, display: 'flex', gap: 12, alignItems: 'center' }}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={LA.coral} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div style={{ background: 'color-mix(in srgb, var(--admin-accent, #FF6B6B) 9%, transparent)', border: `1px solid rgba(255,107,107,.25)`, borderRadius: 10, padding: '12px 18px', marginBottom: 28, display: 'flex', gap: 12, alignItems: 'center' }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={'var(--admin-accent, #FF6B6B)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <div style={{ fontSize: 13, color: LA.ink2 }}>
-          Tema actual: <strong style={{ color: LA.coral }}>{currentTheme.charAt(0).toUpperCase() + currentTheme.slice(1)}</strong>. Los cambios son aplicados por el superadministrador.
+          Tema actual: <strong style={{ color: 'var(--admin-accent, #FF6B6B)' }}>{currentTheme.charAt(0).toUpperCase() + currentTheme.slice(1)}</strong>. Los cambios son aplicados por el superadministrador.
         </div>
       </div>
 
@@ -165,7 +165,7 @@ export default async function TemaAdmin({ params }: { params: Promise<{ slug: st
         {THEMES.map((theme) => {
           const isActive = theme.id === currentTheme
           return (
-            <div key={theme.id} style={{ background: LA.white, border: `2px solid ${isActive ? LA.coral : LA.border}`, borderRadius: 12, overflow: 'hidden', boxShadow: isActive ? '0 4px 20px rgba(255,107,107,.15)' : '0 2px 8px rgba(0,0,0,.04)' }}>
+            <div key={theme.id} style={{ background: LA.white, border: `2px solid ${isActive ? 'var(--admin-accent, #FF6B6B)' : LA.border}`, borderRadius: 12, overflow: 'hidden', boxShadow: isActive ? '0 4px 20px rgba(255,107,107,.15)' : '0 2px 8px rgba(0,0,0,.04)' }}>
               <div style={{ background: '#F0EEE9', padding: '8px 12px', display: 'flex', gap: 5, alignItems: 'center', borderBottom: '1px solid #E0DDD8' }}>
                 <div style={{ width: 8, height: 8, borderRadius: 9999, background: '#E74C3C', opacity: .7 }}/>
                 <div style={{ width: 8, height: 8, borderRadius: 9999, background: '#F39C12', opacity: .7 }}/>
@@ -179,7 +179,7 @@ export default async function TemaAdmin({ params }: { params: Promise<{ slug: st
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
                   <div style={{ fontSize: 15, fontWeight: 700, color: LA.ink }}>{theme.name}</div>
                   {isActive && (
-                    <span style={{ fontSize: 10, fontWeight: 700, background: LA.coralLight, color: LA.coral, padding: '3px 8px', borderRadius: 999 }}>Activo</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, background: 'color-mix(in srgb, var(--admin-accent, #FF6B6B) 9%, transparent)', color: 'var(--admin-accent, #FF6B6B)', padding: '3px 8px', borderRadius: 999 }}>Activo</span>
                   )}
                 </div>
                 <div style={{ fontSize: 12, color: LA.ink3, lineHeight: 1.5, marginBottom: 12 }}>{theme.tagline}</div>
@@ -198,7 +198,7 @@ export default async function TemaAdmin({ params }: { params: Promise<{ slug: st
                   href={`/${slug}?preview=${theme.id}`}
                   target="_blank"
                   rel="noreferrer"
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, width: '100%', fontSize: 12.5, fontWeight: 700, color: isActive ? LA.white : LA.coral, background: isActive ? LA.coral : LA.coralLight, border: `1px solid ${isActive ? LA.coral : 'rgba(255,107,107,.3)'}`, padding: '10px', borderRadius: 8, textDecoration: 'none' }}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, width: '100%', fontSize: 12.5, fontWeight: 700, color: isActive ? LA.white : 'var(--admin-accent, #FF6B6B)', background: isActive ? 'var(--admin-accent, #FF6B6B)' : 'color-mix(in srgb, var(--admin-accent, #FF6B6B) 9%, transparent)', border: `1px solid ${isActive ? 'var(--admin-accent, #FF6B6B)' : 'rgba(255,107,107,.3)'}`, padding: '10px', borderRadius: 8, textDecoration: 'none' }}
                 >
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   Vista previa{isActive ? ' (tu tema)' : ''}
@@ -216,7 +216,7 @@ export default async function TemaAdmin({ params }: { params: Promise<{ slug: st
             Cada tema tiene una estética radicalmente diferente. Nuestro equipo puede aplicar el cambio en 24 horas.
           </p>
         </div>
-        <a href={`mailto:soporte@nimo.app?subject=Cambio de tema — ${slug}`} style={{ fontSize: 13, color: LA.white, background: LA.coral, padding: '12px 24px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, whiteSpace: 'nowrap', flexShrink: 0, marginLeft: 24 }}>
+        <a href={`mailto:soporte@nimo.app?subject=Cambio de tema — ${slug}`} style={{ fontSize: 13, color: LA.white, background: 'var(--admin-accent, #FF6B6B)', padding: '12px 24px', borderRadius: 8, textDecoration: 'none', fontWeight: 700, whiteSpace: 'nowrap', flexShrink: 0, marginLeft: 24 }}>
           Solicitar cambio →
         </a>
       </div>

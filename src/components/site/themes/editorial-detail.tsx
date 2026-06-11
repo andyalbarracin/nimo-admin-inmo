@@ -252,7 +252,10 @@ export default function EditorialDetail({ slug, agency, prop, related }: Props) 
           {/* Quick actions + QR */}
           <div style={{ background: T.paper, border: `1px solid ${T.rule}`, borderRadius: 4, padding: 28, display: 'grid', gridTemplateColumns: '1fr auto', gap: 20, alignItems: 'center' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {['Descargar ficha PDF', 'Guardar propiedad', 'Compartir'].map(a => (
+              <a href={`/api/pdf/propiedad/${prop.id}?slug=${slug}`} target="_blank" rel="noreferrer" style={{ textAlign: 'left', fontFamily: T.body, fontSize: 13.5, color: T.rust, fontWeight: 600, textDecoration: 'none' }}>
+                Descargar ficha PDF →
+              </a>
+              {['Guardar propiedad', 'Compartir'].map(a => (
                 <button key={a} style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0, fontFamily: T.body, fontSize: 13.5, color: T.ink2 }}>
                   {a} →
                 </button>

@@ -1,8 +1,11 @@
 import { notFound } from 'next/navigation'
-import { PROPERTIES, AGENCIES } from '@/lib/dummy'
+import { AGENCIES } from '@/lib/dummy'
+import { getPublicProperties } from '@/lib/properties/public'
 import EditorialDetail from '@/components/site/themes/editorial-detail'
 import SpatialDetail from '@/components/site/themes/spatial-detail'
 import AtelierDetail from '@/components/site/themes/atelier-detail'
+
+export const dynamic = 'force-dynamic'
 
 export default async function PropertyDetail({
   params,
@@ -11,11 +14,12 @@ export default async function PropertyDetail({
 }) {
   const { slug, id } = await params
   const agency = AGENCIES.find(a => a.slug === slug)
-  const prop = PROPERTIES.find(p => p.id === id)
+  const all = await getPublicProperties(slug)
+  const prop = all.find(p => p.id === id)
   if (!prop || !agency) notFound()
 
-  const related = PROPERTIES
-    .filter(p => p.id !== id && (p.neighborhood === prop.neighborhood || p.type === prop.type) && p.status !== 'sold')
+  const related = all
+    .filter(p => p.id !== id && (p.neighborhood === prop.neighborhood || p.type === prop.type))
     .slice(0, 3)
 
   if (agency.theme === 'spatial') {

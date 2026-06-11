@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { PROPERTIES, LEADS, AGENCY_STATS, AGENCIES, TEAM } from '@/lib/dummy'
+import { THEMES } from '@/lib/themes'
 
 /* ============================================================
  * Universo A · CORAL & CREAM · Dashboard del Panel — A4.
@@ -35,6 +36,8 @@ const PLAN_LIMIT: Record<string, number> = { starter: 50, pro: 200, business: 60
 export default async function AdminDashboard({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const agency = AGENCIES.find(a => a.slug === slug)
+  const accent = THEMES[agency?.theme ?? 'editorial'].accent
+  const accentSoft = accent + '24'
   const owner = TEAM.find(m => m.role === 'owner')
   const ownerFirst = owner?.name.split(' ')[0] ?? 'equipo'
   const recentLeads = LEADS.slice(0, 5)
@@ -78,7 +81,7 @@ export default async function AdminDashboard({ params }: { params: Promise<{ slu
           <Link href={`/${slug}`} target="_blank" style={{ fontSize: 13, color: LA.ink2, textDecoration: 'none', padding: '9px 16px', background: LA.white, border: `1px solid ${LA.border}`, borderRadius: 12, fontWeight: 500 }}>
             Ver sitio público
           </Link>
-          <Link href={`/${slug}/admin/propiedades/nueva`} style={{ fontSize: 13, color: LA.white, textDecoration: 'none', padding: '10px 18px', background: LA.coral, borderRadius: 12, fontWeight: 700 }}>
+          <Link href={`/${slug}/admin/propiedades?new=1`} style={{ fontSize: 13, color: LA.white, textDecoration: 'none', padding: '10px 18px', background: accent, borderRadius: 12, fontWeight: 700 }}>
             + Nueva propiedad
           </Link>
         </div>
@@ -102,12 +105,12 @@ export default async function AdminDashboard({ params }: { params: Promise<{ slu
                 )}
                 {kpi.spark && (
                   <div style={{ display: 'flex', alignItems: 'end', gap: 2, height: 28 }}>
-                    {kpi.spark.map((h, i) => <div key={i} style={{ flex: 1, background: LA.coral, borderRadius: '2px 2px 0 0', height: `${h}%`, opacity: .9 }} />)}
+                    {kpi.spark.map((h, i) => <div key={i} style={{ flex: 1, background: accent, borderRadius: '2px 2px 0 0', height: `${h}%`, opacity: .9 }} />)}
                   </div>
                 )}
                 {kpi.progress != null && (
                   <div style={{ height: 6, background: LA.cream, borderRadius: 99, overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${kpi.progress}%`, background: LA.coral, borderRadius: 99 }} />
+                    <div style={{ height: '100%', width: `${kpi.progress}%`, background: accent, borderRadius: 99 }} />
                   </div>
                 )}
               </div>
@@ -126,7 +129,7 @@ export default async function AdminDashboard({ params }: { params: Promise<{ slu
                   <h3 style={{ fontSize: 17, fontWeight: 700, margin: 0 }}>Propiedades destacadas</h3>
                   <p style={{ fontSize: 12.5, color: LA.ink3, margin: '3px 0 0' }}>Las que aparecen primero en tu sitio público.</p>
                 </div>
-                <Link href={`/${slug}/admin/propiedades`} style={{ fontSize: 13, color: LA.coral, textDecoration: 'none', fontWeight: 600 }}>Gestionar →</Link>
+                <Link href={`/${slug}/admin/propiedades`} style={{ fontSize: 13, color: accent, textDecoration: 'none', fontWeight: 600 }}>Gestionar →</Link>
               </div>
               <div>
                 {featured.map((prop, i) => (
@@ -140,7 +143,7 @@ export default async function AdminDashboard({ params }: { params: Promise<{ slu
                     <span style={{ fontSize: 11.5, fontWeight: 600, padding: '4px 10px', borderRadius: 99, background: prop.operation === 'venta' ? LA.coralSoft : 'rgba(214,160,60,.14)', color: prop.operation === 'venta' ? '#C0392B' : LA.mustard, textTransform: 'capitalize' }}>{prop.operation}</span>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontFamily: LA.mono, fontSize: 9.5, color: LA.ink3, textTransform: 'uppercase', letterSpacing: '.06em' }}>{prop.currency}</div>
-                      <div style={{ fontSize: 18, fontWeight: 800, color: prop.operation === 'venta' ? LA.coral : LA.ink, letterSpacing: '-.02em' }}>{prop.price.toLocaleString('es-AR')}</div>
+                      <div style={{ fontSize: 18, fontWeight: 800, color: prop.operation === 'venta' ? accent : LA.ink, letterSpacing: '-.02em' }}>{prop.price.toLocaleString('es-AR')}</div>
                     </div>
                   </Link>
                 ))}
@@ -151,7 +154,7 @@ export default async function AdminDashboard({ params }: { params: Promise<{ slu
             <div className="coral-card" style={{ background: LA.white, border: `1px solid ${LA.border}`, borderRadius: 24, padding: '22px 24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                 <h3 style={{ fontSize: 17, fontWeight: 700, margin: 0 }}>Actividad reciente</h3>
-                <Link href={`/${slug}/admin/leads`} style={{ fontSize: 13, color: LA.coral, textDecoration: 'none', fontWeight: 600 }}>Ver todo →</Link>
+                <Link href={`/${slug}/admin/leads`} style={{ fontSize: 13, color: accent, textDecoration: 'none', fontWeight: 600 }}>Ver todo →</Link>
               </div>
               {activity.map((ev, i) => (
                 <div key={i} style={{ display: 'grid', gridTemplateColumns: '36px 1fr auto', gap: 14, alignItems: 'center', padding: '12px 0', borderTop: i > 0 ? `1px solid ${LA.border}` : 'none' }}>
@@ -171,7 +174,7 @@ export default async function AdminDashboard({ params }: { params: Promise<{ slu
             <div className="coral-card" style={{ background: LA.white, border: `1px solid ${LA.border}`, borderRadius: 24, padding: '22px 24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                 <h3 style={{ fontSize: 17, fontWeight: 700, margin: 0 }}>Próximas visitas</h3>
-                <Link href={`/${slug}/admin/leads`} style={{ fontSize: 13, color: LA.coral, textDecoration: 'none', fontWeight: 600 }}>Agenda →</Link>
+                <Link href={`/${slug}/admin/leads`} style={{ fontSize: 13, color: accent, textDecoration: 'none', fontWeight: 600 }}>Agenda →</Link>
               </div>
               {visits.map((v, i) => (
                 <div key={i} style={{ display: 'grid', gridTemplateColumns: '56px 1fr 28px', gap: 12, alignItems: 'center', padding: '12px 0', borderTop: i > 0 ? `1px solid ${LA.border}` : 'none' }}>
@@ -193,18 +196,18 @@ export default async function AdminDashboard({ params }: { params: Promise<{ slu
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 18 }}>
                 <div>
                   <span style={{ fontFamily: LA.mono, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: LA.ink3, display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ width: 6, height: 6, borderRadius: 99, background: LA.coral }} /> Tu plan
+                    <span style={{ width: 6, height: 6, borderRadius: 99, background: accent }} /> Tu plan
                   </span>
                   <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-.02em', marginTop: 6 }}>
                     <span style={{ fontSize: 13, color: LA.ink3, verticalAlign: 'super' }}>USD </span>{planPrice}
                     <span style={{ fontSize: 13, color: LA.ink3, fontWeight: 500 }}> /mes · {plan}</span>
                   </div>
                 </div>
-                <Link href={`/${slug}/admin/configuracion`} style={{ fontSize: 13, color: LA.coral, textDecoration: 'none', fontWeight: 600 }}>Cambiar →</Link>
+                <Link href={`/${slug}/admin/configuracion`} style={{ fontSize: 13, color: accent, textDecoration: 'none', fontWeight: 600 }}>Cambiar →</Link>
               </div>
               {[
-                { label: 'Propiedades', val: `${AGENCY_STATS.total_properties} / ${planLimit}`, pct: (AGENCY_STATS.total_properties / planLimit) * 100, color: LA.coral },
-                { label: 'Usuarios', val: `${agency?.members_count ?? 3} / ${plan === 'starter' ? 1 : plan === 'pro' ? 3 : 10}`, pct: 66, color: LA.coral },
+                { label: 'Propiedades', val: `${AGENCY_STATS.total_properties} / ${planLimit}`, pct: (AGENCY_STATS.total_properties / planLimit) * 100, color: accent },
+                { label: 'Usuarios', val: `${agency?.members_count ?? 3} / ${plan === 'starter' ? 1 : plan === 'pro' ? 3 : 10}`, pct: 66, color: accent },
                 { label: 'Leads gestionados (mes)', val: `${AGENCY_STATS.leads_this_month} · sin límite`, pct: 100, color: LA.green },
               ].map(u => (
                 <div key={u.label} style={{ marginBottom: 12 }}>

@@ -3,11 +3,13 @@
 import { useState } from 'react'
 import { usePathname, useParams } from 'next/navigation'
 import Link from 'next/link'
+import { AGENCIES } from '@/lib/dummy'
+import { THEMES } from '@/lib/themes'
 
 const LA = {
   bg: '#FAF7F2', white: '#FFFFFF', border: '#EDEBE6',
   ink: '#1A1A1A', ink2: '#4A4845', ink3: '#9A9590',
-  coral: '#FF6B6B', coralLight: 'rgba(255,107,107,.08)',
+  coral: '#FF6B6B',
 }
 
 type NavItem = { href: string; label: string; icon: string }
@@ -50,24 +52,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (pathname.endsWith('/login')) return <>{children}</>
 
+  // Personalización por agencia: el panel toma el acento + nombre del theme elegido.
+  const agency = AGENCIES.find(a => a.slug === slug)
+  const accent = agency ? THEMES[agency.theme].accent : LA.coral
+  const accentSoft = accent + '14'
+  const agencyName = agency?.name ?? slug
   const W = collapsed ? 68 : 224
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: LA.bg, fontFamily: 'var(--font-sans)' }}>
+    <div style={{ '--admin-accent': accent, display: 'flex', minHeight: '100vh', background: LA.bg, fontFamily: 'var(--font-sans)' } as React.CSSProperties}>
       {/* Sidebar */}
       <aside style={{ width: W, minWidth: W, background: LA.white, borderRight: `1px solid ${LA.border}`, display: 'flex', flexDirection: 'column', position: 'sticky', top: 0, height: '100vh', overflowY: 'auto', transition: 'width .2s cubic-bezier(.2,.7,.2,1)' }}>
-        <div style={{ height: 3, background: LA.coral, flexShrink: 0 }} />
+        <div style={{ height: 3, background: accent, flexShrink: 0 }} />
 
         {/* Logo */}
         <div style={{ padding: collapsed ? '16px 0' : '18px 18px 14px', borderBottom: `1px solid ${LA.border}`, display: 'flex', justifyContent: 'center' }}>
           <Link href={`/${slug}/admin`} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 34, height: 34, borderRadius: 10, background: LA.coral, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 16, color: LA.white, flexShrink: 0 }}>
-              {slug.charAt(0).toUpperCase()}
+            <div style={{ width: 34, height: 34, borderRadius: 10, background: accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 16, color: LA.white, flexShrink: 0 }}>
+              {agencyName.charAt(0).toUpperCase()}
             </div>
             {!collapsed && (
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: LA.ink, lineHeight: 1.2 }}>Panel de Control</div>
-                <div style={{ fontSize: 10, color: LA.ink3, marginTop: 1 }}>{slug}</div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: LA.ink, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140 }}>{agencyName}</div>
+                <div style={{ fontSize: 10, color: LA.ink3, marginTop: 1 }}>Panel de Control</div>
               </div>
             )}
           </Link>
@@ -95,8 +102,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       justifyContent: collapsed ? 'center' : 'flex-start',
                       textDecoration: 'none', fontSize: 13,
                       fontWeight: active ? 600 : 400,
-                      color: active ? LA.coral : LA.ink2,
-                      background: active ? LA.coralLight : 'transparent',
+                      color: active ? accent : LA.ink2,
+                      background: active ? accentSoft : 'transparent',
                     }}
                   >
                     <Icon name={item.icon} />

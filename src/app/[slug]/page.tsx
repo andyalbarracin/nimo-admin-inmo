@@ -1,10 +1,13 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { PROPERTIES, AGENCIES, AGENCY_STATS, TEAM } from '@/lib/dummy'
+import { AGENCIES, AGENCY_STATS, TEAM } from '@/lib/dummy'
+import { getPublicProperties } from '@/lib/properties/public'
 import type { ThemeId } from '@/lib/themes'
 import EditorialHome from '@/components/site/themes/editorial-home'
 import SpatialHome from '@/components/site/themes/spatial-home'
 import AtelierHome from '@/components/site/themes/atelier-home'
+
+export const dynamic = 'force-dynamic'
 
 const VALID_THEMES: ThemeId[] = ['editorial', 'spatial', 'atelier']
 const THEME_LABEL: Record<ThemeId, string> = { editorial: 'Editorial', spatial: 'Spatial', atelier: 'Atelier' }
@@ -26,7 +29,7 @@ export default async function AgencyHome({
   const previewTheme = preview && VALID_THEMES.includes(preview as ThemeId) ? (preview as ThemeId) : null
   const activeTheme: ThemeId = previewTheme ?? agency.theme
 
-  const available = PROPERTIES.filter(p => p.status === 'available')
+  const available = await getPublicProperties(slug)
   const featured = available.filter(p => p.is_featured).slice(0, 6)
   const opportunity = available.find(p => p.is_opportunity) ?? null
   const stats = AGENCY_STATS

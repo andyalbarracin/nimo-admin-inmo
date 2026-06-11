@@ -227,7 +227,8 @@ export default function SpatialDetail({ slug, agency, prop, related }: Props) {
           <div style={{ padding: 32, borderBottom: `1.5px solid ${T.graphite}` }}>
             <span style={{ fontFamily: T.mono, fontSize: 10, letterSpacing: '.1em', color: T.electric, fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: 16 }}>// Documentos</span>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              {['FICHA PDF ↓', 'PLANO ↓', 'REGLAMENTO ↓', 'EXPENSAS ↓'].map(d => (
+              <a href={`/api/pdf/propiedad/${prop.id}?slug=${slug}`} target="_blank" rel="noreferrer" style={{ border: `1.5px solid ${T.electric}`, background: T.electricSoft, color: T.electricDark, padding: '10px', borderRadius: 5, fontFamily: T.mono, fontSize: 10, fontWeight: 700, letterSpacing: '.04em', textAlign: 'center', textDecoration: 'none' }}>FICHA PDF ↓</a>
+              {['PLANO ↓', 'REGLAMENTO ↓', 'EXPENSAS ↓'].map(d => (
                 <button key={d} style={{ border: `1.5px solid ${T.graphite}`, background: T.white, color: T.graphite, padding: '10px', borderRadius: 5, fontFamily: T.mono, fontSize: 10, fontWeight: 700, letterSpacing: '.04em', cursor: 'pointer' }}>{d}</button>
               ))}
             </div>

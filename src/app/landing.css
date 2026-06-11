@@ -370,3 +370,29 @@
   .lp-wrap .bento .card:nth-child(4) { animation-delay: .35s; }
 }
 @keyframes lp-fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ===== THEMES SHOWCASE ===== */
+.lp-wrap .themes-sec { padding: 96px 0; }
+.lp-wrap .themes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
+.lp-wrap .theme-card { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; text-decoration: none; color: var(--ink); transition: transform .2s cubic-bezier(.2,.7,.2,1), box-shadow .2s ease; box-shadow: var(--lp-shadow-sm); }
+.lp-wrap .theme-card:hover { transform: translateY(-4px); box-shadow: var(--lp-shadow-lg); }
+.lp-wrap .theme-prev { padding: 16px; aspect-ratio: 16 / 10; display: flex; flex-direction: column; gap: 12px; }
+.lp-wrap .theme-prev-bar { display: flex; gap: 5px; }
+.lp-wrap .theme-prev-bar span { width: 8px; height: 8px; border-radius: 99px; background: rgba(0,0,0,.16); }
+.lp-wrap .theme-prev-body { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+.lp-wrap .theme-prev-h { font-size: 26px; font-weight: 600; letter-spacing: -.01em; line-height: 1.05; }
+.lp-wrap .theme-prev-accent { height: 8px; width: 56px; border-radius: 99px; }
+.lp-wrap .theme-prev-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 4px; }
+.lp-wrap .theme-prev-cards span { aspect-ratio: 1 / 1; border: 1px solid; border-radius: 6px; background: rgba(255,255,255,.45); }
+.lp-wrap .theme-meta { padding: 20px 22px 22px; border-top: 1px solid var(--line); }
+.lp-wrap .theme-name { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.lp-wrap .theme-name b { font-size: 18px; font-weight: 700; letter-spacing: -.01em; }
+.lp-wrap .theme-dots { display: flex; gap: 4px; }
+.lp-wrap .theme-dots span { width: 12px; height: 12px; border-radius: 99px; border: 1px solid var(--line); }
+.lp-wrap .theme-meta p { font-size: 13.5px; color: #6b6b6b; line-height: 1.55; margin: 0 0 14px; }
+.lp-wrap .theme-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--coral); transition: gap .15s ease; }
+.lp-wrap .theme-card:hover .theme-link { gap: 9px; }
+@media (max-width: 860px) { .lp-wrap .themes-grid { grid-template-columns: 1fr; } }
+
+/* Setup fee bajo el precio */
+.lp-wrap .price-setup { font-size: 12px; font-weight: 600; color: var(--coral); margin: -8px 0 18px; letter-spacing: -.005em; }

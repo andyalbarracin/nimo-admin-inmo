@@ -2,31 +2,28 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import type { Agency } from '@/lib/dummy'
+import dynamic from 'next/dynamic'
+import type { Agency, ClientType, LeadStage } from '@/lib/dummy'
+import { THEMES, type ThemeId } from '@/lib/themes'
+import { createLead } from '@/lib/leads/actions'
 
-interface TeamMember {
-  id: string
-  name: string
-  email: string
-  role: string
-  avatar: string
-}
+const SiteMap = dynamic(() => import('@/components/site/primitives/SiteMap'), { ssr: false })
 
-interface Props {
-  slug: string
-  agency: Agency | null
-  agents: TeamMember[]
-}
+interface TeamMember { id: string; name: string; email: string; role: string; avatar: string }
+interface Props { slug: string; agency: Agency | null; agents: TeamMember[] }
 
-const themes = {
-  editorial: { bg: '#FAF7F0', ink: '#1A1614', ink2: '#5C5247', ink3: '#9E9389', accent: '#B25431', accentContrast: '#FAF7F0', surface: '#FFFFFF', border: '#DBD2C2', serif: true },
-  spatial:   { bg: '#F2F4F8', ink: '#0A0A0A', ink2: '#3A4A63', ink3: '#7A8BA8', accent: '#1F4DD6', accentContrast: '#FFFFFF', surface: '#FFFFFF', border: '#E0E5EF', serif: false },
-  atelier:   { bg: '#F5F1EC', ink: '#2E2620', ink2: '#6E6258', ink3: '#9A8F82', accent: '#7A8264', accentContrast: '#F5F1EC', surface: '#FFFFFF', border: '#DDD5CA', serif: true },
+const TOPIC_MAP: Record<string, { ct?: ClientType; op?: 'venta' | 'alquiler' }> = {
+  comprar: { ct: 'comprador', op: 'venta' },
+  alquilar: { ct: 'inquilino', op: 'alquiler' },
+  vender: { ct: 'vendedor', op: 'venta' },
+  tasacion: { ct: 'propietario', op: 'venta' },
+  otro: {},
 }
 
 export default function ContactPageContent({ slug, agency, agents }: Props) {
-  const themeId = (agency?.theme ?? 'editorial') as keyof typeof themes
-  const T = themes[themeId] ?? themes.editorial
+  const themeId = (agency?.theme ?? 'editorial') as ThemeId
+  const T = THEMES[themeId]
+  const r = T.radius // editorial 4px · spatial 8px · atelier 2px
 
   const [form, setForm] = useState({ name: '', email: '', phone: '', topic: '', message: '' })
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
@@ -35,92 +32,113 @@ export default function ContactPageContent({ slug, agency, agents }: Props) {
     e.preventDefault()
     if (!form.name || !form.email) return
     setStatus('loading')
-    try {
-      const res = await fetch('/api/webhooks/lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          agency_slug: slug,
-          name: form.name,
-          email: form.email,
-          phone: form.phone,
-          message: `[${form.topic}] ${form.message}`,
-          source: 'form',
-        }),
-      })
-      if (!res.ok) throw new Error('Error')
-      setStatus('success')
-    } catch {
-      setStatus('error')
-    }
+    const t = TOPIC_MAP[form.topic] ?? {}
+    const res = await createLead(slug, {
+      name: form.name, email: form.email, phone: form.phone,
+      stage: 'new' as LeadStage, source: 'Formulario web',
+      property_interest: form.topic ? form.topic : '', budget: '', notes: form.message,
+      client_type: t.ct, operation_interest: t.op,
+    })
+    // Agencias del demo que solo viven en dummy no tienen CRM en DB → éxito de demo igual.
+    const ok = res.ok || (res.error ?? '').toLowerCase().includes('no encontrada')
+    setStatus(ok ? 'success' : 'error')
   }
 
   const inputStyle: React.CSSProperties = {
-    width: '100%', background: T.bg, border: `1px solid ${T.border}`, borderRadius: 8,
+    width: '100%', background: T.bg, border: `1px solid ${T.rule}`, borderRadius: r,
     padding: '12px 14px', color: T.ink, fontSize: 14, outline: 'none', boxSizing: 'border-box',
-    fontFamily: 'var(--font-sans)',
+    fontFamily: T.fontBody,
   }
   const labelStyle: React.CSSProperties = {
-    display: 'block', fontSize: 11, fontWeight: 700, color: T.ink3,
-    marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.07em',
+    display: 'block', fontFamily: T.fontMono, fontSize: 10, fontWeight: 600, color: T.ink3,
+    marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.1em',
+  }
+
+  // Nav por theme
+  const nameParts = (agency?.name ?? slug).split(' ')
+  const Nav = () => {
+    if (themeId === 'spatial') {
+      return (
+        <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255,255,255,.94)', backdropFilter: 'blur(10px)', borderBottom: `1.5px solid ${T.ink}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64, padding: '0 40px' }}>
+          <Link href={`/${slug}`} style={{ textDecoration: 'none', display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <span style={{ fontFamily: T.fontDisplay, fontWeight: 800, fontSize: 19, letterSpacing: '-.03em', textTransform: 'uppercase', color: T.ink }}>{nameParts[0]}</span>
+            <span style={{ fontFamily: T.fontMono, fontSize: 11, color: T.accent }}>/ {nameParts.slice(1).join(' ') || 'PROPIEDADES'}</span>
+          </Link>
+          <nav style={{ display: 'flex', gap: 4 }}>
+            <Link href={`/${slug}/propiedades`} style={{ fontFamily: T.fontMono, fontSize: 11, letterSpacing: '.1em', fontWeight: 600, color: T.ink, textDecoration: 'none', padding: '8px 12px' }}>[ PROPIEDADES ]</Link>
+            <Link href={`/${slug}/contacto`} style={{ fontFamily: T.fontMono, fontSize: 11, letterSpacing: '.1em', fontWeight: 600, color: T.accentContrast, background: T.ink, textDecoration: 'none', padding: '8px 12px' }}>[ CONTACTO ]</Link>
+          </nav>
+        </header>
+      )
+    }
+    if (themeId === 'atelier') {
+      return (
+        <nav style={{ padding: '36px 0 28px', textAlign: 'center', borderBottom: `1px solid ${T.rule}` }}>
+          <Link href={`/${slug}`} style={{ fontFamily: T.fontBody, fontSize: 14, fontWeight: 600, letterSpacing: '.26em', textTransform: 'uppercase', color: T.ink, textDecoration: 'none' }}>
+            {nameParts[0]} <span style={{ color: T.accentDark }}>{nameParts.slice(1).join(' ')}</span>
+          </Link>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 40, marginTop: 20 }}>
+            <Link href={`/${slug}/propiedades`} style={{ fontFamily: T.fontBody, fontSize: 11, letterSpacing: '.18em', textTransform: 'uppercase', color: T.ink2, textDecoration: 'none' }}>Propiedades</Link>
+            <Link href={`/${slug}/contacto`} style={{ fontFamily: T.fontBody, fontSize: 11, letterSpacing: '.18em', textTransform: 'uppercase', color: T.accentDark, textDecoration: 'none' }}>Contacto</Link>
+          </div>
+        </nav>
+      )
+    }
+    // editorial
+    return (
+      <header style={{ position: 'sticky', top: 0, zIndex: 50, background: T.bg + 'F2', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${T.ink}`, padding: '0 48px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Link href={`/${slug}`} style={{ fontFamily: T.fontDisplay, fontWeight: 600, fontSize: 22, color: T.ink, textDecoration: 'none' }}>
+          {nameParts[0]} <em style={{ fontStyle: 'italic', color: T.accent }}>{nameParts.slice(1).join(' ') || 'Propiedades'}</em>
+        </Link>
+        <nav style={{ display: 'flex', gap: 28, alignItems: 'center' }}>
+          <Link href={`/${slug}/propiedades`} style={{ fontFamily: T.fontMono, fontSize: 11, letterSpacing: '.06em', textTransform: 'uppercase', color: T.ink2, textDecoration: 'none' }}>Propiedades</Link>
+          <Link href={`/${slug}/contacto`} style={{ fontFamily: T.fontMono, fontSize: 11, letterSpacing: '.08em', textTransform: 'uppercase', color: T.bg, background: T.accent, padding: '9px 18px', borderRadius: 99, textDecoration: 'none' }}>Contacto</Link>
+        </nav>
+      </header>
+    )
+  }
+
+  // Título por theme
+  const Title = () => {
+    if (themeId === 'spatial') return <h1 style={{ fontFamily: T.fontDisplay, fontSize: 'clamp(40px,5vw,64px)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '-.04em', lineHeight: .95, margin: '0 0 12px' }}>Hablemos.</h1>
+    if (themeId === 'atelier') return <h1 style={{ fontFamily: T.fontDisplay, fontWeight: 300, fontSize: 'clamp(56px,7vw,96px)', letterSpacing: '-.02em', lineHeight: .95, margin: '0 0 16px' }}>Conversemos.</h1>
+    return <h1 style={{ fontFamily: T.fontDisplay, fontSize: 'clamp(44px,5vw,72px)', fontWeight: 400, letterSpacing: '-.02em', margin: '0 0 12px' }}>Hablemos<em style={{ fontStyle: 'italic', color: T.accent }}>.</em></h1>
   }
 
   return (
-    <div style={{ fontFamily: 'var(--font-sans)', background: T.bg, color: T.ink, minHeight: '100vh' }}>
-      {/* NAV */}
-      <header style={{ position: 'sticky', top: 0, zIndex: 50, background: T.bg + 'F0', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${T.border}`, padding: '0 48px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Link href={`/${slug}`} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 30, height: 30, borderRadius: 8, background: T.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: T.accentContrast, fontSize: 15 }}>
-            {(agency?.name ?? slug).charAt(0).toUpperCase()}
-          </div>
-          <span style={{ fontWeight: 700, fontSize: 15, color: T.ink }}>{agency?.name ?? slug}</span>
-        </Link>
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-          <Link href={`/${slug}/propiedades`} style={{ color: T.ink2, fontSize: 14, textDecoration: 'none' }}>Propiedades</Link>
-          <Link href={`/${slug}/contacto`} style={{ color: T.accent, fontSize: 14, textDecoration: 'none', fontWeight: 600 }}>Contacto</Link>
-        </nav>
-      </header>
+    <div style={{ fontFamily: T.fontBody, background: T.bg, color: T.ink, minHeight: '100vh' }}>
+      <Nav />
 
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '56px 48px 80px' }}>
-        {/* Title */}
+      <div style={{ maxWidth: 1180, margin: '0 auto', padding: themeId === 'atelier' ? '72px 48px 90px' : '56px 48px 80px', textAlign: themeId === 'atelier' ? 'center' : 'left' }}>
         <div style={{ marginBottom: 48 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: T.accent, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 12 }}>Contacto</div>
-          <h1 style={{ fontFamily: T.serif ? 'var(--font-serif)' : 'inherit', fontSize: 48, fontWeight: T.serif ? 700 : 800, color: T.ink, margin: '0 0 12px', letterSpacing: '-.02em', fontStyle: T.serif ? 'italic' : 'normal' }}>Hablemos.</h1>
-          <p style={{ fontSize: 16, color: T.ink2, maxWidth: 460, lineHeight: 1.6 }}>Respondemos en menos de 24 horas. Sin presión, sin compromiso.</p>
+          <span style={{ fontFamily: T.fontMono, fontSize: 11, fontWeight: 600, color: T.accent, letterSpacing: '.14em', textTransform: 'uppercase' }}>Contacto</span>
+          <div style={{ marginTop: 14 }}><Title /></div>
+          <p style={{ fontFamily: themeId === 'atelier' ? T.fontDisplay : T.fontBody, fontStyle: themeId === 'atelier' ? 'italic' : 'normal', fontSize: themeId === 'atelier' ? 21 : 16, color: T.ink2, maxWidth: 480, lineHeight: 1.6, margin: themeId === 'atelier' ? '0 auto' : 0 }}>
+            Respondemos en menos de 24 horas. Sin presión, sin compromiso.
+          </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 48 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 40, textAlign: 'left' }}>
           {/* Form */}
-          <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 16, padding: 36 }}>
+          <div style={{ background: T.surface, border: `1px solid ${T.rule}`, borderRadius: r, padding: 36 }}>
             {status === 'success' ? (
               <div style={{ textAlign: 'center', padding: '48px 24px' }}>
-                <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
-                <div style={{ fontSize: 20, fontWeight: 700, color: T.ink, marginBottom: 8 }}>¡Mensaje enviado!</div>
-                <p style={{ fontSize: 14, color: T.ink2 }}>Te respondemos en menos de 24 horas.</p>
-                <button onClick={() => setStatus('idle')} style={{ marginTop: 20, background: T.accent, color: T.accentContrast, border: 'none', padding: '10px 24px', borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                <div style={{ fontFamily: T.fontDisplay, fontSize: 26, color: T.accent, marginBottom: 10 }}>¡Mensaje enviado!</div>
+                <p style={{ fontSize: 14, color: T.ink2 }}>Quedó registrado en el CRM de {agency?.name ?? 'la inmobiliaria'}. Te respondemos en menos de 24 horas.</p>
+                <button onClick={() => { setForm({ name: '', email: '', phone: '', topic: '', message: '' }); setStatus('idle') }} style={{ marginTop: 20, background: T.accent, color: T.accentContrast, border: 'none', padding: '11px 24px', borderRadius: r, fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
                   Enviar otra consulta
                 </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit}>
-                <h2 style={{ fontSize: 18, fontWeight: 700, color: T.ink, marginBottom: 24, marginTop: 0 }}>Envianos un mensaje</h2>
+                <h2 style={{ fontFamily: T.fontDisplay, fontSize: 22, color: T.ink, margin: '0 0 24px', fontWeight: themeId === 'atelier' ? 400 : themeId === 'spatial' ? 800 : 400, textTransform: themeId === 'spatial' ? 'uppercase' : 'none' }}>Envianos un mensaje</h2>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                    <div>
-                      <label style={labelStyle}>Nombre *</label>
-                      <input required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Tu nombre" style={inputStyle} />
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Email *</label>
-                      <input required type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="tu@email.com" style={inputStyle} />
-                    </div>
+                    <div><label style={labelStyle}>Nombre *</label><input required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Tu nombre" style={inputStyle} /></div>
+                    <div><label style={labelStyle}>Email *</label><input required type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="tu@email.com" style={inputStyle} /></div>
                   </div>
-                  <div>
-                    <label style={labelStyle}>Teléfono</label>
-                    <input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+54 11 ..." style={inputStyle} />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>¿En qué podemos ayudarte?</label>
+                  <div><label style={labelStyle}>Teléfono</label><input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+54 11 ..." style={inputStyle} /></div>
+                  <div><label style={labelStyle}>¿En qué podemos ayudarte?</label>
                     <select value={form.topic} onChange={e => setForm(f => ({ ...f, topic: e.target.value }))} style={{ ...inputStyle, cursor: 'pointer' }}>
                       <option value="">Seleccioná una opción</option>
                       <option value="comprar">Quiero comprar una propiedad</option>
@@ -130,21 +148,11 @@ export default function ContactPageContent({ slug, agency, agents }: Props) {
                       <option value="otro">Otra consulta</option>
                     </select>
                   </div>
-                  <div>
-                    <label style={labelStyle}>Mensaje</label>
-                    <textarea value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} placeholder="Contanos qué buscás, tu presupuesto, zona preferida..." rows={4} style={{ ...inputStyle, resize: 'vertical' }} />
-                  </div>
-                  {status === 'error' && (
-                    <div style={{ fontSize: 13, color: '#E74C3C', background: 'rgba(231,76,60,.08)', border: '1px solid rgba(231,76,60,.2)', padding: '10px 14px', borderRadius: 8 }}>
-                      Hubo un error al enviar. Intentá de nuevo.
-                    </div>
-                  )}
-                  <button type="submit" disabled={status === 'loading'} style={{ background: status === 'loading' ? T.border : T.accent, color: status === 'loading' ? T.ink3 : T.accentContrast, border: 'none', padding: '14px', borderRadius: 10, fontWeight: 700, fontSize: 15, cursor: status === 'loading' ? 'not-allowed' : 'pointer', marginTop: 4 }}>
+                  <div><label style={labelStyle}>Mensaje</label><textarea value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} placeholder="Contanos qué buscás, tu presupuesto, zona preferida..." rows={4} style={{ ...inputStyle, resize: 'vertical' }} /></div>
+                  {status === 'error' && <div style={{ fontSize: 13, color: '#C0392B', background: 'rgba(192,57,43,.08)', border: '1px solid rgba(192,57,43,.2)', padding: '10px 14px', borderRadius: r }}>Hubo un error al enviar. Intentá de nuevo.</div>}
+                  <button type="submit" disabled={status === 'loading'} style={{ background: status === 'loading' ? T.rule : T.accent, color: status === 'loading' ? T.ink3 : T.accentContrast, border: 'none', padding: '14px', borderRadius: r, fontFamily: themeId === 'spatial' ? T.fontMono : T.fontBody, fontWeight: 700, fontSize: 15, letterSpacing: themeId === 'spatial' ? '.06em' : 0, textTransform: themeId === 'spatial' ? 'uppercase' : 'none', cursor: status === 'loading' ? 'not-allowed' : 'pointer', marginTop: 4 }}>
                     {status === 'loading' ? 'Enviando…' : 'Enviar consulta →'}
                   </button>
-                  <p style={{ fontSize: 11, color: T.ink3, textAlign: 'center', margin: 0 }}>
-                    Al enviar aceptás nuestra política de privacidad. No compartimos tus datos.
-                  </p>
                 </div>
               </form>
             )}
@@ -152,65 +160,47 @@ export default function ContactPageContent({ slug, agency, agents }: Props) {
 
           {/* Right column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            {/* Contact info */}
-            <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 14, padding: 28 }}>
-              <h3 style={{ fontSize: 15, fontWeight: 700, color: T.ink, marginBottom: 20, marginTop: 0 }}>Datos de contacto</h3>
+            <div style={{ background: T.surface, border: `1px solid ${T.rule}`, borderRadius: r, padding: 28 }}>
+              <h3 style={{ fontFamily: T.fontDisplay, fontSize: 16, color: T.ink, margin: '0 0 20px', fontWeight: themeId === 'spatial' ? 800 : 400 }}>Datos de contacto</h3>
               {[
-                { icon: '📍', label: 'Dirección', value: agency?.address ?? 'Buenos Aires, Argentina' },
-                { icon: '📞', label: 'Teléfono', value: agency?.phone ?? '', sub: 'Lun–Vie 9–18hs' },
-                { icon: '✉️', label: 'Email', value: agency?.email ?? '', sub: 'Respondemos en 24hs' },
-              ].filter(i => i.value).map((item) => (
-                <div key={item.label} style={{ display: 'flex', gap: 14, marginBottom: 18 }}>
-                  <div style={{ fontSize: 20, marginTop: 2 }}>{item.icon}</div>
-                  <div>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: T.ink3, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 3 }}>{item.label}</div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>{item.value}</div>
-                    {item.sub && <div style={{ fontSize: 12, color: T.ink3 }}>{item.sub}</div>}
-                  </div>
+                { label: 'Dirección', value: agency?.address ?? 'Buenos Aires, Argentina' },
+                { label: 'Teléfono', value: agency?.phone ?? '', sub: 'Lun–Vie 9–18hs' },
+                { label: 'Email', value: agency?.email ?? '', sub: 'Respondemos en 24hs' },
+              ].filter(i => i.value).map(item => (
+                <div key={item.label} style={{ marginBottom: 16 }}>
+                  <div style={{ fontFamily: T.fontMono, fontSize: 9.5, fontWeight: 600, color: T.ink3, textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 3 }}>{item.label}</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>{item.value}</div>
+                  {item.sub && <div style={{ fontSize: 12, color: T.ink3 }}>{item.sub}</div>}
                 </div>
               ))}
               {agency?.phone && (
-                <a href={`https://wa.me/${agency.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#25D366', color: 'white', padding: '12px', borderRadius: 10, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
-                  💬 WhatsApp directo
+                <a href={`https://wa.me/${agency.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: T.accent, color: T.accentContrast, padding: '12px', borderRadius: r, fontWeight: 700, fontSize: 14, textDecoration: 'none', marginTop: 6 }}>
+                  WhatsApp directo →
                 </a>
               )}
             </div>
 
-            {/* Team */}
+            <div style={{ background: T.surface, border: `1px solid ${T.rule}`, borderRadius: r, padding: 0, overflow: 'hidden' }}>
+              <div style={{ height: 200 }}>
+                <SiteMap markers={[{ lat: -34.6037, lng: -58.3816, title: agency?.name ?? 'Oficina', id: 'office' }]} center={{ lat: -34.6037, lng: -58.3816 }} zoom={14} height="100%" accentColor={T.accent} tiles="positron" />
+              </div>
+            </div>
+
             {agents.length > 0 && (
-              <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 14, padding: 28 }}>
-                <h3 style={{ fontSize: 15, fontWeight: 700, color: T.ink, marginBottom: 20, marginTop: 0 }}>Nuestro equipo</h3>
-                {agents.map((member) => (
+              <div style={{ background: T.surface, border: `1px solid ${T.rule}`, borderRadius: r, padding: 28 }}>
+                <h3 style={{ fontFamily: T.fontDisplay, fontSize: 16, color: T.ink, margin: '0 0 18px', fontWeight: themeId === 'spatial' ? 800 : 400 }}>Nuestro equipo</h3>
+                {agents.map(member => (
                   <div key={member.id} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-                    <div style={{ width: 42, height: 42, borderRadius: 9999, background: T.accent + '20', border: `2px solid ${T.accent}44`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: T.accent, fontSize: 16, flexShrink: 0 }}>
-                      {member.avatar}
-                    </div>
+                    <div style={{ width: 42, height: 42, borderRadius: 9999, background: T.accent + '20', border: `2px solid ${T.accent}44`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: T.accent, fontSize: 15, flexShrink: 0 }}>{member.avatar}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: T.ink }}>{member.name}</div>
+                      <div style={{ fontSize: 13.5, fontWeight: 600, color: T.ink }}>{member.name}</div>
                       <div style={{ fontSize: 11, color: T.ink3 }}>{member.email}</div>
                     </div>
-                    <span style={{ fontSize: 10, fontWeight: 700, background: T.accent + '15', color: T.accent, padding: '3px 8px', borderRadius: 999, textTransform: 'uppercase', letterSpacing: '.04em' }}>
-                      {member.role === 'owner' ? 'Director' : 'Asesor'}
-                    </span>
+                    <span style={{ fontFamily: T.fontMono, fontSize: 9, fontWeight: 600, background: T.accent + '15', color: T.accent, padding: '3px 8px', borderRadius: r, textTransform: 'uppercase', letterSpacing: '.04em' }}>{member.role === 'owner' ? 'Director' : 'Asesor'}</span>
                   </div>
                 ))}
               </div>
             )}
-
-            {/* Hours */}
-            <div style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: 14, padding: 28 }}>
-              <h3 style={{ fontSize: 15, fontWeight: 700, color: T.ink, marginBottom: 16, marginTop: 0 }}>Horario de atención</h3>
-              {[
-                { day: 'Lunes – Viernes', hours: '9:00 – 18:00' },
-                { day: 'Sábados', hours: '10:00 – 13:00' },
-                { day: 'Domingos', hours: 'Cerrado' },
-              ].map((h) => (
-                <div key={h.day} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <span style={{ fontSize: 13, color: T.ink2 }}>{h.day}</span>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: h.hours === 'Cerrado' ? T.ink3 : T.ink }}>{h.hours}</span>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>
