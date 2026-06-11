@@ -9,8 +9,6 @@ const ZR = {
   orange: '#FF6A00',
 }
 
-const DEMO_CRED = { email: 'albarracin.andres@gmail.com', password: 'NimoAdmin2024!' }
-
 const PLATFORM_STATS = [
   { label: 'Agencias activas', value: '5' },
   { label: 'Propiedades', value: '12' },
@@ -25,12 +23,6 @@ export default function SuperadminLoginClient() {
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
-  const fillDemo = () => {
-    setEmail(DEMO_CRED.email)
-    setPassword(DEMO_CRED.password)
-    setError(null)
-  }
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -39,31 +31,20 @@ export default function SuperadminLoginClient() {
         const { createClient } = await import('@/lib/supabase/client')
         const supabase = createClient()
         const { error: authError } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
-        if (authError) {
-          // Demo mode fallback
-          await fetch('/api/dev/access?as=superadmin', { method: 'GET' })
-          router.refresh()
-          router.push('/superadmin')
-          return
-        }
+        if (authError) { setError('Email o contraseña incorrectos.'); return }
         router.refresh()
         router.push('/superadmin')
       } catch {
-        // No Supabase — demo mode
-        await fetch('/api/dev/access?role=superadmin', { method: 'GET' })
-        router.refresh()
-        router.push('/superadmin')
+        setError('No se pudo conectar con el servidor. Intentá de nuevo.')
       }
     })
   }
 
-  const active = email === DEMO_CRED.email
-
   return (
     <div style={{ display: 'flex', minHeight: '100vh', fontFamily: "'Archivo', system-ui, sans-serif" }}>
 
-      {/* ── LEFT PANEL 60% ── */}
-      <div style={{ width: '60%', background: ZR.black, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+      {/* ── LEFT PANEL 50% ── */}
+      <div style={{ width: '50%', background: ZR.black, display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
         {/* Stripe */}
         <div style={{ height: 4, background: 'linear-gradient(90deg, #E71D0A 0%, #E71D0A 33.3%, #FF6A00 33.3%, #FF6A00 66.6%, #FFC107 66.6%, #FFC107 100%)', flexShrink: 0 }} />
 
@@ -107,8 +88,8 @@ export default function SuperadminLoginClient() {
         </div>
       </div>
 
-      {/* ── RIGHT PANEL 40% ── */}
-      <div style={{ width: '40%', background: ZR.cream, display: 'flex', flexDirection: 'column' }}>
+      {/* ── RIGHT PANEL 50% ── */}
+      <div style={{ width: '50%', background: ZR.cream, display: 'flex', flexDirection: 'column' }}>
         {/* Stripe */}
         <div style={{ height: 4, background: 'linear-gradient(90deg, #E71D0A 0%, #E71D0A 33.3%, #FF6A00 33.3%, #FF6A00 66.6%, #FFC107 66.6%, #FFC107 100%)', flexShrink: 0 }} />
 
@@ -153,30 +134,7 @@ export default function SuperadminLoginClient() {
             </button>
           </form>
 
-          {/* Demo credential */}
-          <div style={{ width: '100%', marginTop: 28 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-              <div style={{ flex: 1, height: 1, background: ZR.creamBorder }} />
-              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: ZR.ink3, textTransform: 'uppercase', letterSpacing: '.1em', whiteSpace: 'nowrap' }}>// DEMO</span>
-              <div style={{ flex: 1, height: 1, background: ZR.creamBorder }} />
-            </div>
-            <button onClick={fillDemo} type="button" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', background: active ? 'rgba(255,106,0,.07)' : ZR.cream2, border: `1px solid ${active ? 'rgba(255,106,0,.35)' : ZR.creamBorder}`, borderRadius: 5, cursor: 'pointer', textAlign: 'left', width: '100%', transition: 'all .12s' }}>
-              <div style={{ width: 32, height: 32, borderRadius: 9999, background: active ? 'rgba(255,106,0,.15)' : '#EBEBDF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Archivo Black', sans-serif", fontSize: 11, color: active ? ZR.orange : ZR.ink3, flexShrink: 0 }}>SA</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: ZR.black }}>Super Administrador</span>
-                  <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: active ? ZR.orange : ZR.ink3, textTransform: 'uppercase', letterSpacing: '.08em', background: active ? 'rgba(255,106,0,.1)' : '#EBEBDF', padding: '2px 6px', borderRadius: 2 }}>NIMO</span>
-                </div>
-                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: ZR.ink3 }}>{DEMO_CRED.email}</div>
-                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: ZR.ink3, marginTop: 1 }}>{DEMO_CRED.password}</div>
-              </div>
-              <div style={{ fontFamily: "'Archivo Black', sans-serif", fontSize: 9, color: active ? ZR.orange : ZR.ink3, textTransform: 'uppercase', letterSpacing: '.08em', flexShrink: 0 }}>
-                {active ? '✓ OK' : 'USAR →'}
-              </div>
-            </button>
-          </div>
-
-          <p style={{ marginTop: 20, fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: ZR.ink3, textAlign: 'center', textTransform: 'uppercase', letterSpacing: '.08em', lineHeight: 1.6 }}>
+          <p style={{ marginTop: 24, fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: ZR.ink3, textAlign: 'center', textTransform: 'uppercase', letterSpacing: '.08em', lineHeight: 1.6 }}>
             Área restringida. El acceso no autorizado<br />puede ser registrado para auditoría.
           </p>
         </div>

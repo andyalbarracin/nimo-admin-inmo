@@ -34,6 +34,12 @@ export async function proxy(request: NextRequest) {
   const demoRole = request.cookies.get('nimo_demo_role')?.value
   const isAuthenticated = !!user || !!demoRole
 
+  // Superadmin es MÁS estricto: solo el usuario real (email === SUPER_ADMIN_EMAIL)
+  // o la cookie demo específica 'superadmin'. Así una sesión demo de agencia
+  // (nimo_demo_role=owner/agent) NO abre el panel de plataforma.
+  const superEmail = process.env.SUPER_ADMIN_EMAIL
+  const isSuperAuthed = (!!user && (!superEmail || user.email === superEmail)) || demoRole === 'superadmin'
+
   const isAdminRoute = /^\/[^/]+\/admin(\/|$)/.test(pathname)
   // La propia página de login NO debe redirigirse (si no: loop infinito → ERR_TOO_MANY_REDIRECTS).
   const isAdminLogin = /^\/[^/]+\/admin\/login\/?$/.test(pathname)
@@ -51,7 +57,7 @@ export async function proxy(request: NextRequest) {
   const isSuperAdminRoute = pathname.startsWith('/superadmin')
   const isSuperAdminLogin = pathname === '/superadmin/login'
 
-  if (isSuperAdminRoute && !isSuperAdminLogin && !isAuthenticated) {
+  if (isSuperAdminRoute && !isSuperAdminLogin && !isSuperAuthed) {
     const loginUrl = new URL('/superadmin/login', request.url)
     loginUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(loginUrl)
