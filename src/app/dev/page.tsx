@@ -8,7 +8,7 @@ const ROLES = [
   {
     id: 'superadmin',
     label: 'Super Admin',
-    email: 'albarracin.andres@gmail.com',
+    email: 'admin@nimo.app',
     desc: 'Panel de plataforma. Ve todas las agencias, planes y configuración global.',
     href: '/api/dev/access?as=superadmin',
     direct: '/superadmin',

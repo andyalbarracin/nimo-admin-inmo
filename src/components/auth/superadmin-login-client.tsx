@@ -28,10 +28,9 @@ export default function SuperadminLoginClient() {
     setError(null)
     startTransition(async () => {
       try {
-        const { createClient } = await import('@/lib/supabase/client')
-        const supabase = createClient()
-        const { error: authError } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
-        if (authError) { setError('Email o contraseña incorrectos.'); return }
+        const { superadminLogin } = await import('@/lib/auth/superadmin-login')
+        const res = await superadminLogin(email, password)
+        if (!res.ok) { setError(res.error ?? 'Email o contraseña incorrectos.'); return }
         router.refresh()
         router.push('/superadmin')
       } catch {
