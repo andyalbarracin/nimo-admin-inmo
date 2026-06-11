@@ -5,8 +5,8 @@ import type { Database } from '@/types/database'
 
 const ACCOUNTS = {
   superadmin: {
-    email: 'albarracin.andres@gmail.com',
-    password: 'NimoAdmin2024!',
+    email: 'admin@nimo.app',
+    password: 'nimo-demo',
     redirect: '/superadmin',
     demoRole: 'superadmin',
   },

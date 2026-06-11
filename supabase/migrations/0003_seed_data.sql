@@ -12,7 +12,7 @@
 --                • Timeline de eventos por lead
 --
 -- CREDENCIALES DEMO:
---   Super Admin   : albarracin.andres@gmail.com  / NimoAdmin2024!
+--   Super Admin   : admin@nimo.app  / nimo-demo
 --   Owner agencia : owner@lopezasociados.com      / Lopez2024!
 --   Agente        : agente@lopezasociados.com     / Lopez2024!
 --
@@ -34,7 +34,7 @@
 -- 1. USUARIOS AUTH
 -- ─────────────────────────────────────────────────────────────
 
--- Super Admin (albarracin.andres@gmail.com)
+-- Super Admin (admin@nimo.app)
 INSERT INTO auth.users (
   id, instance_id, aud, role, email, encrypted_password,
   email_confirmed_at, raw_app_meta_data, raw_user_meta_data,
@@ -44,11 +44,11 @@ INSERT INTO auth.users (
   'f7c3d4a5-0001-0000-0000-000000000001',
   '00000000-0000-0000-0000-000000000000',
   'authenticated', 'authenticated',
-  'albarracin.andres@gmail.com',
-  crypt('NimoAdmin2024!', gen_salt('bf', 10)),
+  'admin@nimo.app',
+  crypt('nimo-demo', gen_salt('bf', 10)),
   NOW(),
   '{"provider":"email","providers":["email"],"role":"super_admin"}',
-  '{"name":"Andrés Albarracín","avatar_url":null}',
+  '{"name":"Administrador","avatar_url":null}',
   NOW(), NOW(), '', '', '', '', false
 ) ON CONFLICT (id) DO NOTHING;
 
@@ -56,8 +56,8 @@ INSERT INTO auth.identities (id, user_id, provider_id, identity_data, provider, 
 VALUES (
   gen_random_uuid(),
   'f7c3d4a5-0001-0000-0000-000000000001',
-  'albarracin.andres@gmail.com',
-  '{"sub":"f7c3d4a5-0001-0000-0000-000000000001","email":"albarracin.andres@gmail.com"}',
+  'admin@nimo.app',
+  '{"sub":"f7c3d4a5-0001-0000-0000-000000000001","email":"admin@nimo.app"}',
   'email', NOW(), NOW(), NOW()
 ) ON CONFLICT DO NOTHING;
 
@@ -656,7 +656,7 @@ DECLARE
   img_count      INTEGER;
 BEGIN
   SELECT COUNT(*) INTO user_count FROM auth.users WHERE email IN (
-    'albarracin.andres@gmail.com','owner@lopezasociados.com','agente@lopezasociados.com'
+    'admin@nimo.app','owner@lopezasociados.com','agente@lopezasociados.com'
   );
   SELECT COUNT(*) INTO prop_count FROM properties WHERE agency_id = 'a0000001-0001-0000-0000-000000000001';
   SELECT COUNT(*) INTO lead_count FROM leads WHERE agency_id = 'a0000001-0001-0000-0000-000000000001';
