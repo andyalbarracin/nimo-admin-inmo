@@ -5,6 +5,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import type { Property, Agency } from '@/lib/dummy'
+import Lightbox from '@/components/site/lightbox'
+import QrDownload from '@/components/site/qr-download'
 
 const SiteMap = dynamic(() => import('@/components/site/primitives/SiteMap'), { ssr: false })
 
@@ -40,12 +42,14 @@ interface Props {
 export default function AtelierDetail({ slug, agency, prop, related }: Props) {
   const [day, setDay] = useState(20)
   const [hora, setHora] = useState(1)
+  const [lb, setLb] = useState<number | null>(null)
 
   const word = agency.name.split(' ')
   const images = prop.images.length ? prop.images : ['']
   const i0 = images[0] ?? ''
   const book: [string, string, string, string] = [i0, images[1] ?? i0, images[2] ?? i0, images[3] ?? i0]
   const priceLabel = prop.price.toLocaleString('es-AR')
+  const url = `https://${slug}.nimo.app/propiedades/${prop.id}`
 
   const ficha: [string, string][] = [
     ['Tipo', prop.type],
@@ -104,17 +108,18 @@ export default function AtelierDetail({ slug, agency, prop, related }: Props) {
       <section style={{ padding: '0 24px 40px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1.25fr 1fr', gap: 28, maxWidth: 1400, margin: '0 auto' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-            <Figure src={book[0]} ratio="3 / 4" caption="El espacio principal, luz de mañana." alt={prop.title} />
-            <Figure src={book[1]} ratio="16 / 10" caption="Hacia el exterior." alt={prop.title} />
+            <Figure src={book[0]} ratio="3 / 4" caption="El espacio principal, luz de mañana." alt={prop.title} onOpen={() => setLb(0)} />
+            <Figure src={book[1]} ratio="16 / 10" caption="Hacia el exterior." alt={prop.title} onOpen={() => setLb(1)} />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-            <Figure src={book[2]} ratio="1 / 1" caption="Detalle de carpintería." alt={prop.title} />
-            <Figure src={book[3]} ratio="3 / 4" caption="El ambiente, mediodía." alt={prop.title} />
+            <Figure src={book[2]} ratio="1 / 1" caption="Detalle de carpintería." alt={prop.title} onOpen={() => setLb(2)} />
+            <Figure src={book[3]} ratio="3 / 4" caption="El ambiente, mediodía." alt={prop.title} onOpen={() => setLb(3)} />
           </div>
         </div>
-        <div style={{ textAlign: 'center', paddingTop: 28, display: 'flex', justifyContent: 'center', gap: 32, alignItems: 'baseline' }}>
-          <span style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: 18, color: T.sageDark }}>Ver todas las fotografías →</span>
+        <div style={{ textAlign: 'center', paddingTop: 28, display: 'flex', justifyContent: 'center', gap: 32, alignItems: 'baseline', flexWrap: 'wrap' }}>
+          <button onClick={() => setLb(0)} style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: 18, color: T.sageDark, background: 'none', border: 'none', cursor: 'pointer' }}>Ver todas las fotografías →</button>
           <a href={`/api/pdf/propiedad/${prop.id}?slug=${slug}`} target="_blank" rel="noreferrer" style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: 18, color: T.sageDark, textDecoration: 'none' }}>Descargar ficha PDF →</a>
+          <QrDownload url={url} agencyName={agency.name} fileBase={prop.id} fg={T.cocoa} buttonStyle={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: 18, color: T.sageDark, background: 'none', border: 'none', cursor: 'pointer' }}>Descargar QR →</QrDownload>
         </div>
       </section>
 
@@ -245,13 +250,15 @@ export default function AtelierDetail({ slug, agency, prop, related }: Props) {
           </div>
         </div>
       </footer>
+
+      <Lightbox images={images} index={lb} onClose={() => setLb(null)} onChange={setLb} accent={T.sage} mono={T.sans} />
     </div>
   )
 }
 
-function Figure({ src, ratio, caption, alt }: { src: string; ratio: string; caption: string; alt: string }) {
+function Figure({ src, ratio, caption, alt, onOpen }: { src: string; ratio: string; caption: string; alt: string; onOpen?: () => void }) {
   return (
-    <figure style={{ margin: 0, position: 'relative', overflow: 'hidden', aspectRatio: ratio }}>
+    <figure onClick={onOpen} style={{ margin: 0, position: 'relative', overflow: 'hidden', aspectRatio: ratio, cursor: onOpen ? 'pointer' : 'default' }}>
       <Image src={src} alt={alt} fill style={{ objectFit: 'cover' }} sizes="50vw" />
       <figcaption style={{ position: 'absolute', left: 22, bottom: 18, color: '#F5F1EC', fontFamily: "var(--font-cormorant), Georgia, serif", fontStyle: 'italic', fontSize: 17, textShadow: '0 1px 8px rgba(28,22,16,.5)' }}>{caption}</figcaption>
     </figure>
