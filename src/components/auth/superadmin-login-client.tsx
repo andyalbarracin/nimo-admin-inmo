@@ -41,7 +41,7 @@ export default function SuperadminLoginClient() {
         const { error: authError } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
         if (authError) {
           // Demo mode fallback
-          await fetch('/api/dev/access?role=superadmin', { method: 'GET' })
+          await fetch('/api/dev/access?as=superadmin', { method: 'GET' })
           router.refresh()
           router.push('/superadmin')
           return

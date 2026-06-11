@@ -35,7 +35,9 @@ export async function proxy(request: NextRequest) {
   const isAuthenticated = !!user || !!demoRole
 
   const isAdminRoute = /^\/[^/]+\/admin(\/|$)/.test(pathname)
-  if (isAdminRoute) {
+  // La propia página de login NO debe redirigirse (si no: loop infinito → ERR_TOO_MANY_REDIRECTS).
+  const isAdminLogin = /^\/[^/]+\/admin\/login\/?$/.test(pathname)
+  if (isAdminRoute && !isAdminLogin) {
     const slugMatch = pathname.match(/^\/([^/]+)\/admin/)
     const slug = slugMatch?.[1]
 

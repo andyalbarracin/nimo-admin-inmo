@@ -1,5 +1,6 @@
-// Dev-only quick access page — does NOT appear in production builds.
-// Visit /dev to get one-click access to any role.
+// Quick-access panel — one-click login as any role (demo).
+// ⚠️ Disponible también en producción: las credenciales son de seed/demo.
+// Antes de tener clientes reales: re-bloquear o gatear con secreto.
 
 export const metadata = { title: 'Dev Access — NIMO' }
 
@@ -34,16 +35,12 @@ const ROLES = [
 ]
 
 export default function DevPage() {
-  if (process.env.NODE_ENV === 'production') {
-    return <p style={{ padding: 40 }}>Not available in production.</p>
-  }
-
   return (
     <main style={{ minHeight: '100vh', background: '#0F0F0F', color: 'white', padding: '60px 40px', fontFamily: 'system-ui, sans-serif' }}>
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
 
         <div style={{ marginBottom: 48 }}>
-          <div style={{ fontFamily: 'monospace', fontSize: 11, letterSpacing: '.14em', color: '#666', marginBottom: 8 }}>// DEV ONLY — NO DISPONIBLE EN PRODUCCIÓN</div>
+          <div style={{ fontFamily: 'monospace', fontSize: 11, letterSpacing: '.14em', color: '#666', marginBottom: 8 }}>// ACCESO DEMO — QUITAR ANTES DE CLIENTES REALES</div>
           <h1 style={{ fontSize: 40, fontWeight: 800, letterSpacing: '-.03em', margin: '0 0 12px' }}>Acceso rápido NIMO</h1>
           <p style={{ color: '#888', fontSize: 16, margin: 0 }}>
             Entrá como cualquier rol con un click. Requiere que el SQL de seed esté corrido en Supabase.

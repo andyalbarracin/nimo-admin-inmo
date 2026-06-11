@@ -88,7 +88,8 @@ export default function AgencyLoginClient({ slug, agencyName, redirectTo, showDe
       if (authError) {
         // Demo mode fallback: set cookie and redirect
         if (authError.message.includes('Invalid login credentials') || authError.message.includes('fetch')) {
-          await fetch('/api/dev/access?role=agency_owner', { method: 'GET' })
+          // El parámetro correcto es `as` (no `role`); el route acepta owner|agent|superadmin.
+          await fetch('/api/dev/access?as=owner', { method: 'GET' })
           router.refresh()
           router.push(redirectTo)
           return
