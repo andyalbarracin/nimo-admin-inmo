@@ -84,12 +84,12 @@ export default function AtelierHome({ slug, agency, featured, properties = [], s
 
       {/* ═══ SLOW REVEAL ═══ */}
       <section style={{ padding: '90px 0 0' }}>
-        <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 48px' }}>
+        <div className="rwd-pad" style={{ maxWidth: 1240, margin: '0 auto', padding: '0 48px' }}>
           {slow.map((p, i) => {
             const flip = i % 2 === 1
             return (
               <Reveal key={p.id} variant="fadeUp">
-                <article style={{ display: 'grid', gridTemplateColumns: flip ? '1fr 1.1fr' : '1.1fr 1fr', gap: 88, alignItems: 'center', paddingBottom: 140 }}>
+                <article className="rwd-stack" style={{ display: 'grid', gridTemplateColumns: flip ? '1fr 1.1fr' : '1.1fr 1fr', gap: 88, alignItems: 'center', paddingBottom: 140 }}>
                   <div style={{ position: 'relative', aspectRatio: '3 / 4', overflow: 'hidden', order: flip ? 2 : 1 }}>
                     <Image src={p.images[0] ?? ''} alt={p.title} fill style={{ objectFit: 'cover', transition: 'transform 1.4s ease' }} sizes="50vw" className="atelier-slow-img" />
                   </div>
@@ -121,14 +121,14 @@ export default function AtelierHome({ slug, agency, featured, properties = [], s
 
       {/* ═══ PORTFOLIO asimétrico ═══ */}
       <section id="portfolio" style={{ padding: '110px 0', background: T.paper }}>
-        <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 48px' }}>
+        <div className="rwd-pad" style={{ maxWidth: 1240, margin: '0 auto', padding: '0 48px' }}>
           <div style={{ textAlign: 'center', marginBottom: 72 }}>
             <span style={overline}>Colección · {stats.total_properties} propiedades activas</span>
             <h2 style={{ fontFamily: T.serif, fontWeight: 300, fontSize: 'clamp(52px, 6vw, 88px)', lineHeight: 1, letterSpacing: '-.015em', margin: '16px 0 0' }}>
               Nuestro <em style={{ fontStyle: 'italic' }}>portfolio.</em>
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 28, alignItems: 'start' }}>
+          <div className="rwd-stack" style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 28, alignItems: 'start' }}>
             {portfolio.map((p, i) => {
               const spans = [5, 4, 3, 3, 4, 5]
               const ratios = ['4 / 5', '4 / 3', '1 / 1', '4 / 5', '1 / 1', '4 / 3']
@@ -152,7 +152,7 @@ export default function AtelierHome({ slug, agency, featured, properties = [], s
 
       {/* ═══ MAPA discreto ═══ */}
       <section style={{ padding: '110px 0' }}>
-        <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 48px' }}>
+        <div className="rwd-pad" style={{ maxWidth: 1240, margin: '0 auto', padding: '0 48px' }}>
           <div style={{ textAlign: 'center', marginBottom: 56 }}>
             <span style={{ ...overline, color: T.sageDark }}>Zona</span>
             <h2 style={{ fontFamily: T.serif, fontWeight: 300, fontSize: 'clamp(44px, 5vw, 72px)', letterSpacing: '-.015em', margin: '14px 0 0' }}>Donde <em style={{ fontStyle: 'italic' }}>estamos.</em></h2>
@@ -168,12 +168,12 @@ export default function AtelierHome({ slug, agency, featured, properties = [], s
 
       {/* ═══ FILOSOFÍA ═══ */}
       <section style={{ padding: '130px 0', background: T.paper, textAlign: 'center' }}>
-        <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 48px' }}>
+        <div className="rwd-pad" style={{ maxWidth: 1000, margin: '0 auto', padding: '0 48px' }}>
           <span style={{ ...overline, color: T.sageDark }}>Manifiesto</span>
           <p style={{ fontFamily: T.serif, fontStyle: 'italic', fontWeight: 300, fontSize: 'clamp(34px, 4vw, 50px)', lineHeight: 1.25, letterSpacing: '-.01em', maxWidth: 880, margin: '28px auto 0' }}>
             No vendemos propiedades. <span style={{ color: T.sageDark }}>Acompañamos decisiones</span> que se toman pocas veces en la vida.
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 48, maxWidth: 1000, margin: '90px auto 0' }}>
+          <div className="rwd-3col" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 48, maxWidth: 1000, margin: '90px auto 0' }}>
             {[
               ['Curaduría', 'Pocas propiedades activas, no cientos. Cada una elegida por razones que podemos defender.'],
               ['Discreción', 'Parte del portfolio nunca se publica. Las búsquedas sensibles se trabajan en silencio.'],
@@ -191,14 +191,14 @@ export default function AtelierHome({ slug, agency, featured, properties = [], s
       {/* ═══ EQUIPO ═══ */}
       {teamList.length > 0 && (
         <section id="equipo" style={{ padding: '110px 0' }}>
-          <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 48px' }}>
+          <div className="rwd-pad" style={{ maxWidth: 1240, margin: '0 auto', padding: '0 48px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 64 }}>
               <div>
                 <span style={{ ...overline, color: T.sageDark }}>Estudio</span>
                 <h2 style={{ fontFamily: T.serif, fontWeight: 300, fontSize: 'clamp(44px, 5vw, 72px)', letterSpacing: '-.015em', margin: '12px 0 0' }}>El <em style={{ fontStyle: 'italic' }}>equipo.</em></h2>
               </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 28 }}>
+            <div className="rwd-4col" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 28 }}>
               {teamList.map(m => (
                 <div key={m.id} style={{ textAlign: 'center' }}>
                   <div style={{ aspectRatio: '3 / 4', background: T.sageSoft, marginBottom: 20, display: 'grid', placeItems: 'center', filter: 'grayscale(.2)' }}>
@@ -217,7 +217,7 @@ export default function AtelierHome({ slug, agency, featured, properties = [], s
 
       {/* ═══ CONCIERGE CTA ═══ */}
       <section id="concierge" style={{ padding: '90px 0 130px' }}>
-        <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 48px' }}>
+        <div className="rwd-pad" style={{ maxWidth: 1240, margin: '0 auto', padding: '0 48px' }}>
           <div style={{ background: T.paper, padding: '100px 80px', textAlign: 'center', boxShadow: '0 30px 80px -40px rgba(46,38,32,.18)' }}>
             <span style={{ ...overline, color: T.sageDark }}>Concierge inmobiliario</span>
             <h2 style={{ fontFamily: T.serif, fontStyle: 'italic', fontWeight: 300, fontSize: 'clamp(44px, 5.5vw, 80px)', lineHeight: 1, letterSpacing: '-.015em', margin: '20px 0 22px' }}>
@@ -235,7 +235,7 @@ export default function AtelierHome({ slug, agency, featured, properties = [], s
 
       {/* ═══ FOOTER centrado ═══ */}
       <footer id="contacto" style={{ borderTop: `1px solid ${T.rule}`, padding: '80px 0 40px', textAlign: 'center' }}>
-        <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 48px' }}>
+        <div className="rwd-pad" style={{ maxWidth: 1240, margin: '0 auto', padding: '0 48px' }}>
           <Link href={`/${slug}`} style={{ fontFamily: T.sans, fontSize: 14, fontWeight: 600, letterSpacing: '.26em', textTransform: 'uppercase', color: T.cocoa, textDecoration: 'none' }}>
             {word[0]} <span style={{ color: T.sageDark }}>{word.slice(1).join(' ')}</span>
           </Link>

@@ -68,7 +68,7 @@ export default function PropiedadesClient({ slug, agency, properties, op = '', t
   return (
     <div style={{ fontFamily: 'var(--font-sans)', background: T.bg, color: T.ink, minHeight: '100vh' }}>
       {/* NAV */}
-      <header style={{ position: 'sticky', top: 0, zIndex: 50, background: T.bg + 'F5', backdropFilter: 'blur(14px)', borderBottom: `1px solid ${T.rule}`, padding: '0 48px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <header className="rwd-pad" style={{ position: 'sticky', top: 0, zIndex: 50, background: T.bg + 'F5', backdropFilter: 'blur(14px)', borderBottom: `1px solid ${T.rule}`, padding: '0 48px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Link href={`/${slug}`} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 30, height: 30, borderRadius: 8, background: T.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: T.accentContrast, fontSize: 14 }}>
             {agency.name.charAt(0).toUpperCase()}
@@ -132,9 +132,9 @@ export default function PropiedadesClient({ slug, agency, properties, op = '', t
       </div>
 
       {/* Split layout */}
-      <div style={{ display: 'grid', gridTemplateColumns: '42% 58%', height: 'calc(100vh - 160px)', minHeight: 600 }}>
+      <div className="rwd-stack rwd-autoh" style={{ display: 'grid', gridTemplateColumns: '42% 58%', height: 'calc(100vh - 160px)', minHeight: 600 }}>
         {/* List panel */}
-        <div style={{ overflowY: 'auto', padding: '16px 48px 48px 48px', display: view === 'map' ? 'none' : undefined }}>
+        <div className="rwd-pad" style={{ overflowY: 'auto', padding: '16px 48px 48px 48px', display: view === 'map' ? 'none' : undefined }}>
           {properties.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '80px 0' }}>
               <div style={{ fontSize: 40, marginBottom: 16, color: T.ink3 }}>◉</div>
@@ -200,7 +200,7 @@ export default function PropiedadesClient({ slug, agency, properties, op = '', t
         </div>
 
         {/* Map panel */}
-        <div style={{ position: 'sticky', top: 160, display: view === 'list' ? undefined : 'block', height: 'calc(100vh - 160px)' }}>
+        <div className="rwd-unsticky" style={{ position: 'sticky', top: 160, display: view === 'list' ? undefined : 'block', height: 'calc(100vh - 160px)' }}>
           <SiteMap
             markers={mapMarkers}
             zoom={12}

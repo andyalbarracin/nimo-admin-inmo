@@ -66,7 +66,7 @@ export default function AtelierDetail({ slug, agency, prop, related }: Props) {
   const cells: (number | null)[] = [null, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
 
   return (
-    <div style={{ fontFamily: T.serif, background: T.bone, color: T.cocoa, minHeight: '100vh' }}>
+    <div className="site-theme" style={{ fontFamily: T.serif, background: T.bone, color: T.cocoa, minHeight: '100vh' }}>
       {/* NAV */}
       <nav style={{ padding: '40px 0 32px', textAlign: 'center', borderBottom: `1px solid ${T.rule}` }}>
         <Link href={`/${slug}`} style={{ fontFamily: T.sans, fontSize: 14, fontWeight: 600, letterSpacing: '.26em', textTransform: 'uppercase', color: T.cocoa, textDecoration: 'none' }}>
@@ -106,7 +106,7 @@ export default function AtelierDetail({ slug, agency, prop, related }: Props) {
 
       {/* GALERÍA BOOK */}
       <section style={{ padding: '0 24px 40px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.25fr 1fr', gap: 28, maxWidth: 1400, margin: '0 auto' }}>
+        <div className="rwd-stack" style={{ display: 'grid', gridTemplateColumns: '1.25fr 1fr', gap: 28, maxWidth: 1400, margin: '0 auto' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
             <Figure src={book[0]} ratio="3 / 4" caption="El espacio principal, luz de mañana." alt={prop.title} onOpen={() => setLb(0)} />
             <Figure src={book[1]} ratio="16 / 10" caption="Hacia el exterior." alt={prop.title} onOpen={() => setLb(1)} />
@@ -142,7 +142,7 @@ export default function AtelierDetail({ slug, agency, prop, related }: Props) {
           <section style={{ marginBottom: 120 }}>
             <span style={{ fontFamily: T.sans, fontSize: 10.5, letterSpacing: '.2em', textTransform: 'uppercase', color: T.sageDark, display: 'block', marginBottom: 20 }}>— Detalles</span>
             <h2 style={{ fontFamily: T.serif, fontWeight: 300, fontSize: 'clamp(40px, 4.6vw, 64px)', letterSpacing: '-.015em', margin: '0 0 36px' }}>La <em style={{ fontStyle: 'italic' }}>ficha.</em></h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 72px', maxWidth: 880 }}>
+            <div className="rwd-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 72px', maxWidth: 880 }}>
               {ficha.map(([k, v]) => (
                 <div key={k} style={{ display: 'grid', gridTemplateColumns: '160px 1fr', padding: '18px 0', borderBottom: `1px solid ${T.rule}`, alignItems: 'baseline' }}>
                   <span style={{ fontFamily: T.sans, fontSize: 10, letterSpacing: '.18em', textTransform: 'uppercase', color: T.mute }}>{k}</span>
@@ -186,7 +186,7 @@ export default function AtelierDetail({ slug, agency, prop, related }: Props) {
           <section id="visita" style={{ marginBottom: 0 }}>
             <span style={{ fontFamily: T.sans, fontSize: 10.5, letterSpacing: '.2em', textTransform: 'uppercase', color: T.sageDark, display: 'block', marginBottom: 20 }}>— Visita</span>
             <h2 style={{ fontFamily: T.serif, fontWeight: 300, fontSize: 'clamp(40px, 4.6vw, 64px)', letterSpacing: '-.015em', margin: '0 0 36px' }}>Conocerla <em style={{ fontStyle: 'italic' }}>en persona.</em></h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 72, maxWidth: 980, alignItems: 'start' }}>
+            <div className="rwd-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 72, maxWidth: 980, alignItems: 'start' }}>
               <div style={{ background: T.paper, padding: 40 }}>
                 <div style={{ textAlign: 'center', fontFamily: T.serif, fontSize: 24, marginBottom: 24 }}>Junio <em style={{ fontStyle: 'italic' }}>2026</em></div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, textAlign: 'center' }}>
@@ -224,7 +224,7 @@ export default function AtelierDetail({ slug, agency, prop, related }: Props) {
               <span style={{ fontFamily: T.sans, fontSize: 10.5, letterSpacing: '.2em', textTransform: 'uppercase', color: T.sageDark }}>En el mismo portfolio</span>
               <h2 style={{ fontFamily: T.serif, fontWeight: 300, fontSize: 'clamp(44px, 5vw, 72px)', letterSpacing: '-.015em', margin: '16px 0 0' }}>Otras <em style={{ fontStyle: 'italic' }}>casas.</em></h2>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: 28, alignItems: 'start' }}>
+            <div className="rwd-3col" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: 28, alignItems: 'start' }}>
               {related.map((r, i) => (
                 <Link key={r.id} href={`/${slug}/propiedades/${r.id}`} style={{ textDecoration: 'none', color: T.cocoa }}>
                   <div style={{ position: 'relative', aspectRatio: i === 1 ? '1 / 1' : '4 / 5', overflow: 'hidden', marginBottom: 20 }}>

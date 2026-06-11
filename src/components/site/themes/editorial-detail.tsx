@@ -82,9 +82,9 @@ export default function EditorialDetail({ slug, agency, prop, related }: Props) 
   ]
 
   return (
-    <div style={{ fontFamily: T.body, background: T.bg, color: T.ink, minHeight: '100vh' }}>
+    <div className="site-theme" style={{ fontFamily: T.body, background: T.bg, color: T.ink, minHeight: '100vh' }}>
       {/* ── NAV con borde ── */}
-      <header style={{ position: 'sticky', top: 0, zIndex: 50, background: T.bg + 'F2', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${T.ink}`, padding: '0 48px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <header className="rwd-pad" style={{ position: 'sticky', top: 0, zIndex: 50, background: T.bg + 'F2', backdropFilter: 'blur(12px)', borderBottom: `1px solid ${T.ink}`, padding: '0 48px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Link href={`/${slug}`} style={{ fontFamily: T.serif, fontWeight: 600, fontSize: 22, color: T.ink, textDecoration: 'none', letterSpacing: '-.01em' }}>
           {agency.name.split(' ')[0]}{' '}
           <em style={{ fontStyle: 'italic', color: T.rust }}>{agency.name.split(' ').slice(1).join(' ') || 'Propiedades'}</em>
@@ -96,7 +96,7 @@ export default function EditorialDetail({ slug, agency, prop, related }: Props) 
       </header>
 
       {/* ── HEADER 2-col ── */}
-      <section style={{ padding: '48px 48px 32px', display: 'grid', gridTemplateColumns: '1fr auto', gap: 48, alignItems: 'end', borderBottom: `1px solid ${T.rule}` }}>
+      <section className="rwd-stack" style={{ padding: '48px 48px 32px', display: 'grid', gridTemplateColumns: '1fr auto', gap: 48, alignItems: 'end', borderBottom: `1px solid ${T.rule}` }}>
         <div>
           <div style={{ fontFamily: T.mono, fontSize: 11, color: T.rust, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 14 }}>
             {prop.operation} · {prop.type} · {prop.neighborhood}, {prop.city}
@@ -114,7 +114,7 @@ export default function EditorialDetail({ slug, agency, prop, related }: Props) 
       </section>
 
       {/* ── GALERÍA ── */}
-      <section style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 4, padding: '4px 48px 0', height: 520 }}>
+      <section className="rwd-gallery" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 4, padding: '4px 48px 0', height: 520 }}>
         <button onClick={() => setLightbox(0)} style={{ position: 'relative', border: 'none', padding: 0, cursor: 'pointer', overflow: 'hidden', borderRadius: 4 }}>
           <Image src={main} alt={prop.title} fill style={{ objectFit: 'cover' }} sizes="70vw" priority />
         </button>
@@ -133,7 +133,7 @@ export default function EditorialDetail({ slug, agency, prop, related }: Props) 
       </section>
 
       {/* ── BODY ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.55fr 1fr', gap: 56, padding: '56px 48px 80px', alignItems: 'start' }}>
+      <div className="rwd-stack rwd-pad" style={{ display: 'grid', gridTemplateColumns: '1.55fr 1fr', gap: 56, padding: '56px 48px 80px', alignItems: 'start' }}>
         {/* LEFT */}
         <div>
           {/* Ficha técnica */}
@@ -141,7 +141,7 @@ export default function EditorialDetail({ slug, agency, prop, related }: Props) 
             <h2 style={{ fontFamily: T.serif, fontSize: 30, fontWeight: 400, margin: '0 0 24px', letterSpacing: '-.02em' }}>
               Ficha <em style={{ fontStyle: 'italic', color: T.rust }}>técnica</em>
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 48px' }}>
+            <div className="rwd-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 48px' }}>
               {ficha.map(([k, v]) => (
                 <div key={k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '14px 0', borderBottom: `1px solid ${T.rule}` }}>
                   <span style={{ fontFamily: T.mono, fontSize: 10.5, color: T.ink3, textTransform: 'uppercase', letterSpacing: '.08em' }}>{k}</span>
@@ -185,7 +185,7 @@ export default function EditorialDetail({ slug, agency, prop, related }: Props) 
             <div style={{ height: 360, borderRadius: 4, overflow: 'hidden', border: `1px solid ${T.rule}` }}>
               <SiteMap markers={[{ lat: prop.lat, lng: prop.lng, title: prop.title, price: priceLabel, id: prop.id }]} center={{ lat: prop.lat, lng: prop.lng }} zoom={15} height="100%" accentColor={T.rust} tiles="positron" />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 48px', marginTop: 12 }}>
+            <div className="rwd-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 48px', marginTop: 12 }}>
               {POIS.map(([d, name, cat]) => (
                 <div key={name} style={{ display: 'grid', gridTemplateColumns: '60px 1fr auto', gap: 12, alignItems: 'center', padding: '12px 0', borderBottom: `1px solid ${T.ruleSoft}` }}>
                   <span style={{ fontFamily: T.mono, fontSize: 11, color: T.rust, fontWeight: 600 }}>{d}</span>
@@ -216,7 +216,7 @@ export default function EditorialDetail({ slug, agency, prop, related }: Props) 
         </div>
 
         {/* RIGHT · sticky sidebar */}
-        <aside style={{ position: 'sticky', top: 88, display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <aside className="rwd-unsticky" style={{ position: 'sticky', top: 88, display: 'flex', flexDirection: 'column', gap: 20 }}>
           {/* Agendar visita */}
           <div style={{ background: T.paper, border: `1px solid ${T.rule}`, borderRadius: 4, padding: 28 }}>
             <div style={{ fontFamily: T.mono, fontSize: 10.5, color: T.rust, letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 6 }}>Agendar visita</div>
@@ -278,7 +278,7 @@ export default function EditorialDetail({ slug, agency, prop, related }: Props) 
             <h2 style={{ fontFamily: T.serif, fontSize: 30, fontWeight: 400, margin: 0, letterSpacing: '-.02em' }}>Propiedades <em style={{ fontStyle: 'italic', color: T.rust }}>similares</em></h2>
             <Link href={`/${slug}/propiedades`} style={{ fontFamily: T.serif, fontStyle: 'italic', fontSize: 17, color: T.ink, textDecoration: 'none' }}>Ver todas →</Link>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+          <div className="rwd-3col" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
             {related.map(r => (
               <Link key={r.id} href={`/${slug}/propiedades/${r.id}`} style={{ textDecoration: 'none' }}>
                 <article>

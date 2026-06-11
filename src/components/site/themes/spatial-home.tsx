@@ -72,14 +72,14 @@ export default function SpatialHome({ slug, agency, featured, properties = [], o
   ]
 
   return (
-    <div style={{ fontFamily: T.display, background: T.white, color: T.graphite, minHeight: '100vh' }}>
+    <div className="site-theme" style={{ fontFamily: T.display, background: T.white, color: T.graphite, minHeight: '100vh' }}>
       {/* ═══ NAV bracket ═══ */}
-      <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255,255,255,.94)', backdropFilter: 'blur(10px)', borderBottom: `1.5px solid ${T.graphite}`, display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: 40, alignItems: 'center', height: 64, padding: '0 40px' }}>
+      <header className="rwd-pad" style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255,255,255,.94)', backdropFilter: 'blur(10px)', borderBottom: `1.5px solid ${T.graphite}`, display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: 40, alignItems: 'center', height: 64, padding: '0 40px' }}>
         <Link href={`/${slug}`} style={{ textDecoration: 'none', display: 'flex', alignItems: 'baseline', gap: 8 }}>
           <span style={{ fontWeight: 800, fontSize: 19, letterSpacing: '-.03em', textTransform: 'uppercase', color: T.graphite }}>{agency.name.split(' ')[0]}</span>
           <span style={{ fontFamily: T.mono, fontSize: 11, color: T.electric, letterSpacing: '.04em' }}>/ {agency.name.split(' ').slice(1).join(' ') || 'PROPIEDADES'}</span>
         </Link>
-        <nav style={{ display: 'flex', gap: 2, justifySelf: 'center' }}>
+        <nav className="rwd-hide-mobile" style={{ display: 'flex', gap: 2, justifySelf: 'center' }}>
           {NAV.map(n => (
             <Link key={n.label} href={n.href.startsWith('#') ? n.href : `/${slug}/${n.href}`} style={{ fontFamily: T.mono, fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', fontWeight: 600, color: T.graphite, textDecoration: 'none', padding: '8px 14px', borderRadius: 4 }}>
               [ {n.label} ]
@@ -92,7 +92,7 @@ export default function SpatialHome({ slug, agency, featured, properties = [], o
       </header>
 
       {/* ═══ HERO split text + map ═══ */}
-      <section id="mapa" style={{ display: 'grid', gridTemplateColumns: '480px 1fr', borderBottom: `1.5px solid ${T.graphite}`, minHeight: 560 }}>
+      <section id="mapa" className="rwd-stack" style={{ display: 'grid', gridTemplateColumns: '480px 1fr', borderBottom: `1.5px solid ${T.graphite}`, minHeight: 560 }}>
         <div style={{ padding: '56px 48px', display: 'flex', flexDirection: 'column', justifyContent: 'center', borderRight: `1.5px solid ${T.graphite}` }}>
           <span style={{ fontFamily: T.mono, fontSize: 11, color: T.electric, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase' }}>
             // {stats.total_properties} propiedades en el mapa
@@ -148,7 +148,7 @@ export default function SpatialHome({ slug, agency, featured, properties = [], o
             <h2 style={{ fontSize: 'clamp(26px, 2.6vw, 38px)', fontWeight: 800, letterSpacing: '-.03em', textTransform: 'uppercase', margin: 0 }}>Últimos ingresos</h2>
             <Link href={`/${slug}/propiedades`} style={{ fontFamily: T.mono, fontSize: 11, fontWeight: 700, color: T.electric, textDecoration: 'none', letterSpacing: '.06em', textTransform: 'uppercase' }}>[ VER TODAS → ]</Link>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0, border: `1.5px solid ${T.graphite}` }}>
+          <div className="rwd-3col" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0, border: `1.5px solid ${T.graphite}` }}>
             {ingresos.map((p, i) => (
               <Link key={p.id} href={`/${slug}/propiedades/${p.id}`} style={{ textDecoration: 'none', color: T.graphite, borderRight: i < 2 ? `1.5px solid ${T.graphite}` : 'none' }}>
                 <article>
@@ -177,7 +177,7 @@ export default function SpatialHome({ slug, agency, featured, properties = [], o
       {oportunidad && (
         <Reveal variant="fadeUp">
           <Link href={`/${slug}/propiedades/${oportunidad.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
-            <section style={{ display: 'grid', gridTemplateColumns: '1fr 1.1fr', borderBottom: `1.5px solid ${T.graphite}`, background: T.graphite, color: T.white }}>
+            <section className="rwd-stack" style={{ display: 'grid', gridTemplateColumns: '1fr 1.1fr', borderBottom: `1.5px solid ${T.graphite}`, background: T.graphite, color: T.white }}>
               <div style={{ position: 'relative', minHeight: 360, borderRight: `1.5px solid ${T.graphite}` }}>
                 <Image src={oportunidad.images[0] ?? ''} alt={oportunidad.title} fill style={{ objectFit: 'cover' }} sizes="50vw" />
                 <span style={{ position: 'absolute', top: 16, left: 16, fontFamily: T.mono, fontSize: 10, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', background: T.electric, color: T.white, padding: '6px 12px' }}>★ Oportunidad</span>
@@ -205,7 +205,7 @@ export default function SpatialHome({ slug, agency, featured, properties = [], o
               <h2 style={{ fontSize: 'clamp(26px, 2.6vw, 38px)', fontWeight: 800, letterSpacing: '-.03em', textTransform: 'uppercase', margin: 0 }}>Propiedades destacadas</h2>
               <Link href={`/${slug}/propiedades`} style={{ fontFamily: T.mono, fontSize: 11, fontWeight: 700, color: T.electric, textDecoration: 'none', letterSpacing: '.06em', textTransform: 'uppercase' }}>[ VER TODAS → ]</Link>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: `1.5px solid ${T.graphite}`, borderLeft: `1.5px solid ${T.graphite}` }}>
+            <div className="rwd-3col" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: `1.5px solid ${T.graphite}`, borderLeft: `1.5px solid ${T.graphite}` }}>
               {destacadas.map(p => (
                 <Link key={p.id} href={`/${slug}/propiedades/${p.id}`} style={{ textDecoration: 'none', color: T.graphite, borderRight: `1.5px solid ${T.graphite}`, borderBottom: `1.5px solid ${T.graphite}` }}>
                   <article>
@@ -233,7 +233,7 @@ export default function SpatialHome({ slug, agency, featured, properties = [], o
       <Reveal variant="fadeUp">
         <section id="barrios" style={{ padding: '56px 40px', borderBottom: `1.5px solid ${T.graphite}` }}>
           <h2 style={{ fontSize: 'clamp(26px, 2.6vw, 38px)', fontWeight: 800, letterSpacing: '-.03em', textTransform: 'uppercase', margin: '0 0 28px' }}>Barrios</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0, border: `1.5px solid ${T.graphite}` }}>
+          <div className="rwd-4col" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0, border: `1.5px solid ${T.graphite}` }}>
             {barrios.map((b, i) => {
               const count = featured.filter(p => p.neighborhood === b).length
               return (

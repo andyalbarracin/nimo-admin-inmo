@@ -60,9 +60,9 @@ export default function SpatialListado({ slug, agency, properties, op, tipo }: P
   ].filter(Boolean) as { k: string; label: string; href: string }[]
 
   return (
-    <div style={{ fontFamily: T.display, background: T.white, color: T.graphite, height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="rwd-autoh" style={{ fontFamily: T.display, background: T.white, color: T.graphite, height: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* NAV */}
-      <header style={{ borderBottom: `1.5px solid ${T.graphite}`, display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: 32, alignItems: 'center', height: 60, padding: '0 32px', flexShrink: 0 }}>
+      <header className="rwd-pad" style={{ borderBottom: `1.5px solid ${T.graphite}`, display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: 32, alignItems: 'center', height: 60, padding: '0 32px', flexShrink: 0 }}>
         <Link href={`/${slug}`} style={{ textDecoration: 'none', display: 'flex', alignItems: 'baseline', gap: 8 }}>
           <span style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-.03em', textTransform: 'uppercase' }}>{agency.name.split(' ')[0]}</span>
           <span style={{ fontFamily: T.mono, fontSize: 10.5, color: T.electric }}>/ PROPIEDADES</span>
@@ -97,7 +97,7 @@ export default function SpatialListado({ slug, agency, properties, op, tipo }: P
       </div>
 
       {/* SPLIT 50/50 */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', flex: 1, minHeight: 0 }}>
+      <div className="rwd-stack rwd-autoh" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', flex: 1, minHeight: 0 }}>
         {/* LIST */}
         <div style={{ overflowY: 'auto', borderRight: `1.5px solid ${T.graphite}`, padding: 16 }}>
           {sorted.length === 0 ? (
@@ -135,7 +135,7 @@ export default function SpatialListado({ slug, agency, properties, op, tipo }: P
         </div>
 
         {/* MAP */}
-        <div style={{ position: 'relative' }}>
+        <div className="rwd-maph" style={{ position: 'relative' }}>
           <SiteMap markers={markers} zoom={12} height="100%" accentColor={T.electric} tiles="positron" numbered activeId={activeId} onMarkerHover={setActiveId} />
         </div>
       </div>

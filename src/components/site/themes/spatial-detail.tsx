@@ -74,9 +74,9 @@ export default function SpatialDetail({ slug, agency, prop, related }: Props) {
   const refNum = prop.id.replace(/\D/g, '')
 
   return (
-    <div style={{ fontFamily: T.display, background: T.white, color: T.graphite, minHeight: '100vh', maxWidth: 1440, margin: '0 auto' }}>
+    <div className="site-theme" style={{ fontFamily: T.display, background: T.white, color: T.graphite, minHeight: '100vh', maxWidth: 1440, margin: '0 auto' }}>
       {/* NAV */}
-      <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255,255,255,.94)', backdropFilter: 'blur(10px)', borderBottom: `1.5px solid ${T.graphite}`, display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: 40, alignItems: 'center', height: 64, padding: '0 40px' }}>
+      <header className="rwd-pad" style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(255,255,255,.94)', backdropFilter: 'blur(10px)', borderBottom: `1.5px solid ${T.graphite}`, display: 'grid', gridTemplateColumns: 'auto 1fr auto', gap: 40, alignItems: 'center', height: 64, padding: '0 40px' }}>
         <Link href={`/${slug}`} style={{ textDecoration: 'none', display: 'flex', alignItems: 'baseline', gap: 8 }}>
           <span style={{ fontWeight: 800, fontSize: 19, letterSpacing: '-.03em', textTransform: 'uppercase' }}>{agency.name.split(' ')[0]}</span>
           <span style={{ fontFamily: T.mono, fontSize: 11, color: T.electric }}>/ PROPIEDADES</span>
@@ -100,7 +100,7 @@ export default function SpatialDetail({ slug, agency, prop, related }: Props) {
       </div>
 
       {/* HEADER strip */}
-      <header style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 48, alignItems: 'end', padding: '40px 40px 28px', borderBottom: `1.5px solid ${T.graphite}` }}>
+      <header className="rwd-stack rwd-pad" style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 48, alignItems: 'end', padding: '40px 40px 28px', borderBottom: `1.5px solid ${T.graphite}` }}>
         <div>
           <span style={{ fontFamily: T.mono, fontSize: 11, letterSpacing: '.1em', color: T.electric, fontWeight: 700, textTransform: 'uppercase' }}>// {prop.operation} · {prop.type} · {prop.neighborhood}</span>
           <h1 style={{ fontSize: 'clamp(38px, 4.4vw, 56px)', fontWeight: 800, lineHeight: 0.94, letterSpacing: '-.04em', textTransform: 'uppercase', margin: '14px 0 10px', maxWidth: 760 }}>{prop.title}</h1>
@@ -114,7 +114,7 @@ export default function SpatialDetail({ slug, agency, prop, related }: Props) {
       </header>
 
       {/* GALLERY */}
-      <section style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gridTemplateRows: '240px 240px', borderBottom: `1.5px solid ${T.graphite}` }}>
+      <section className="rwd-gallery" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gridTemplateRows: '240px 240px', borderBottom: `1.5px solid ${T.graphite}` }}>
         {gallery.map((img, i) => (
           <div key={i} onClick={() => setLb(i)} style={{ position: 'relative', cursor: 'pointer', gridRow: i === 0 ? 'span 2' : undefined, borderRight: i === 0 || i === 1 || i === 3 ? `1.5px solid ${T.graphite}` : 'none', borderBottom: i === 1 || i === 2 ? `1.5px solid ${T.graphite}` : 'none' }}>
             <Image src={img} alt={`${prop.title} ${i + 1}`} fill style={{ objectFit: 'cover' }} sizes={i === 0 ? '50vw' : '25vw'} priority={i === 0} />
@@ -127,7 +127,7 @@ export default function SpatialDetail({ slug, agency, prop, related }: Props) {
       </section>
 
       {/* BODY */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr' }}>
+      <div className="rwd-stack" style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr' }}>
         {/* MAIN */}
         <div style={{ borderRight: `1.5px solid ${T.graphite}` }}>
           {/* FICHA */}
@@ -201,7 +201,7 @@ export default function SpatialDetail({ slug, agency, prop, related }: Props) {
         </div>
 
         {/* SIDE */}
-        <aside style={{ position: 'sticky', top: 64, alignSelf: 'start' }}>
+        <aside className="rwd-unsticky" style={{ position: 'sticky', top: 64, alignSelf: 'start' }}>
           <div style={{ padding: 32, borderBottom: `1.5px solid ${T.graphite}` }}>
             <span style={{ fontFamily: T.mono, fontSize: 10, letterSpacing: '.1em', color: T.electric, fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>// Agendar visita</span>
             <h3 style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-.025em', textTransform: 'uppercase', margin: '0 0 16px' }}>Coordinar ahora</h3>
@@ -254,7 +254,7 @@ export default function SpatialDetail({ slug, agency, prop, related }: Props) {
       {related.length > 0 && (
         <section style={{ padding: '40px 40px', borderTop: `1.5px solid ${T.graphite}` }}>
           <h2 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-.03em', textTransform: 'uppercase', margin: '0 0 24px' }}>Propiedades similares</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0, border: `1.5px solid ${T.graphite}` }}>
+          <div className="rwd-3col" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0, border: `1.5px solid ${T.graphite}` }}>
             {related.map((r, i) => (
               <Link key={r.id} href={`/${slug}/propiedades/${r.id}`} style={{ textDecoration: 'none', color: T.graphite, borderRight: i < related.length - 1 ? `1.5px solid ${T.graphite}` : 'none' }}>
                 <div style={{ position: 'relative', height: 180, borderBottom: `1.5px solid ${T.graphite}` }}>

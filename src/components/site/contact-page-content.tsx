@@ -109,7 +109,7 @@ export default function ContactPageContent({ slug, agency, agents }: Props) {
     <div style={{ fontFamily: T.fontBody, background: T.bg, color: T.ink, minHeight: '100vh' }}>
       <Nav />
 
-      <div style={{ maxWidth: 1180, margin: '0 auto', padding: themeId === 'atelier' ? '72px 48px 90px' : '56px 48px 80px', textAlign: themeId === 'atelier' ? 'center' : 'left' }}>
+      <div className="rwd-pad" style={{ maxWidth: 1180, margin: '0 auto', padding: themeId === 'atelier' ? '72px 48px 90px' : '56px 48px 80px', textAlign: themeId === 'atelier' ? 'center' : 'left' }}>
         <div style={{ marginBottom: 48 }}>
           <span style={{ fontFamily: T.fontMono, fontSize: 11, fontWeight: 600, color: T.accent, letterSpacing: '.14em', textTransform: 'uppercase' }}>Contacto</span>
           <div style={{ marginTop: 14 }}><Title /></div>
@@ -118,7 +118,7 @@ export default function ContactPageContent({ slug, agency, agents }: Props) {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 40, textAlign: 'left' }}>
+        <div className="rwd-stack" style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 40, textAlign: 'left' }}>
           {/* Form */}
           <div style={{ background: T.surface, border: `1px solid ${T.rule}`, borderRadius: r, padding: 36 }}>
             {status === 'success' ? (
@@ -133,7 +133,7 @@ export default function ContactPageContent({ slug, agency, agents }: Props) {
               <form onSubmit={handleSubmit}>
                 <h2 style={{ fontFamily: T.fontDisplay, fontSize: 22, color: T.ink, margin: '0 0 24px', fontWeight: themeId === 'atelier' ? 400 : themeId === 'spatial' ? 800 : 400, textTransform: themeId === 'spatial' ? 'uppercase' : 'none' }}>Envianos un mensaje</h2>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <div className="rwd-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     <div><label style={labelStyle}>Nombre *</label><input required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Tu nombre" style={inputStyle} /></div>
                     <div><label style={labelStyle}>Email *</label><input required type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="tu@email.com" style={inputStyle} /></div>
                   </div>
