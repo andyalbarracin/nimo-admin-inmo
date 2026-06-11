@@ -1,5 +1,5 @@
 /* Ficha de propiedad en PDF (@react-pdf/renderer). Render server-side. */
-import { Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer'
+import { Document, Page, View, Text, Image, StyleSheet } from '@react-pdf/renderer'
 import type { Property, Agency } from '@/lib/dummy'
 
 const C = { ink: '#1A1A1A', ink2: '#525252', ink3: '#8A8A8A', accent: '#FF6B6B', line: '#E8E2D8', bg: '#FAF7F2' }
@@ -21,10 +21,13 @@ const s = StyleSheet.create({
   desc: { fontSize: 10, color: C.ink2, lineHeight: 1.6, marginBottom: 16 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginBottom: 16 },
   chip: { fontSize: 8, color: C.ink2, borderWidth: 1, borderColor: C.line, paddingVertical: 3, paddingHorizontal: 7, borderRadius: 3 },
+  cover: { width: '100%', height: 210, objectFit: 'cover', borderRadius: 4, marginBottom: 6 },
+  thumbRow: { flexDirection: 'row', gap: 6, marginBottom: 16 },
+  thumb: { flex: 1, height: 96, objectFit: 'cover', borderRadius: 4 },
   footer: { position: 'absolute', bottom: 32, left: 40, right: 40, borderTopWidth: 1, borderTopColor: C.line, paddingTop: 10, flexDirection: 'row', justifyContent: 'space-between', fontSize: 8, color: C.ink3 },
 })
 
-export function PropertyDoc({ property: p, agency }: { property: Property; agency: Agency | null }) {
+export function PropertyDoc({ property: p, agency, photos = [] }: { property: Property; agency: Agency | null; photos?: string[] }) {
   const specs: [string, string][] = [
     ['Operación', p.operation], ['Tipo', p.type],
     ['Ambientes', p.rooms != null ? String(p.rooms) : '—'],
@@ -53,6 +56,19 @@ export function PropertyDoc({ property: p, agency }: { property: Property; agenc
             {m2 && <Text style={s.pricePer}>{p.currency} {m2.toLocaleString('es-AR')}/m²</Text>}
           </View>
         </View>
+
+        {photos.length > 0 && (
+          <View>
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
+            <Image src={photos[0]} style={s.cover} />
+            {photos.length > 1 && (
+              <View style={s.thumbRow}>
+                {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                {photos.slice(1, 3).map((u, i) => <Image key={i} src={u} style={s.thumb} />)}
+              </View>
+            )}
+          </View>
+        )}
 
         <View style={s.specRow}>
           {specs.map(([k, v]) => (

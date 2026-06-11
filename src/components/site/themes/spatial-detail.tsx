@@ -5,6 +5,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import type { Property, Agency } from '@/lib/dummy'
+import Lightbox from '@/components/site/lightbox'
+import QrDownload from '@/components/site/qr-download'
 
 const SiteMap = dynamic(() => import('@/components/site/primitives/SiteMap'), { ssr: false })
 
@@ -40,12 +42,14 @@ interface Props {
 
 export default function SpatialDetail({ slug, agency, prop, related }: Props) {
   const [slot, setSlot] = useState(1)
+  const [lb, setLb] = useState<number | null>(null)
 
   const priceLabel = `${prop.currency} ${prop.price.toLocaleString('es-AR')}`
   const m2Price = prop.total_area ? Math.round(prop.price / prop.total_area) : null
   const images = prop.images.length ? prop.images : ['']
   const gallery = images.slice(0, 5)
   const extra = Math.max(0, images.length - 5)
+  const url = `https://${slug}.nimo.app/propiedades/${prop.id}`
 
   const specs: [string, string, string?][] = [
     ['SUP. TOTAL', String(prop.total_area ?? '—'), 'M²'],
@@ -112,7 +116,7 @@ export default function SpatialDetail({ slug, agency, prop, related }: Props) {
       {/* GALLERY */}
       <section style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gridTemplateRows: '240px 240px', borderBottom: `1.5px solid ${T.graphite}` }}>
         {gallery.map((img, i) => (
-          <div key={i} style={{ position: 'relative', gridRow: i === 0 ? 'span 2' : undefined, borderRight: i === 0 || i === 1 || i === 3 ? `1.5px solid ${T.graphite}` : 'none', borderBottom: i === 1 || i === 2 ? `1.5px solid ${T.graphite}` : 'none' }}>
+          <div key={i} onClick={() => setLb(i)} style={{ position: 'relative', cursor: 'pointer', gridRow: i === 0 ? 'span 2' : undefined, borderRight: i === 0 || i === 1 || i === 3 ? `1.5px solid ${T.graphite}` : 'none', borderBottom: i === 1 || i === 2 ? `1.5px solid ${T.graphite}` : 'none' }}>
             <Image src={img} alt={`${prop.title} ${i + 1}`} fill style={{ objectFit: 'cover' }} sizes={i === 0 ? '50vw' : '25vw'} priority={i === 0} />
             <span style={{ position: 'absolute', top: 12, left: 12, fontFamily: T.mono, fontSize: 9.5, letterSpacing: '.08em', background: 'rgba(255,255,255,.92)', padding: '3px 7px', borderRadius: 3, fontWeight: 700 }}>{String(i + 1).padStart(2, '0')}{i === 0 ? ` / ${images.length}` : ''}</span>
             {i === gallery.length - 1 && extra > 0 && (
@@ -231,6 +235,7 @@ export default function SpatialDetail({ slug, agency, prop, related }: Props) {
               {['PLANO ↓', 'REGLAMENTO ↓', 'EXPENSAS ↓'].map(d => (
                 <button key={d} style={{ border: `1.5px solid ${T.graphite}`, background: T.white, color: T.graphite, padding: '10px', borderRadius: 5, fontFamily: T.mono, fontSize: 10, fontWeight: 700, letterSpacing: '.04em', cursor: 'pointer' }}>{d}</button>
               ))}
+              <QrDownload url={url} agencyName={agency.name} fileBase={refNum || prop.id} fg={T.graphite} buttonStyle={{ gridColumn: '1 / -1', border: `1.5px solid ${T.electric}`, background: T.white, color: T.electricDark, padding: '10px', borderRadius: 5, fontFamily: T.mono, fontSize: 10, fontWeight: 700, letterSpacing: '.04em', cursor: 'pointer' }}>DESCARGAR QR ↓</QrDownload>
             </div>
           </div>
 
@@ -265,6 +270,8 @@ export default function SpatialDetail({ slug, agency, prop, related }: Props) {
           </div>
         </section>
       )}
+
+      <Lightbox images={images} index={lb} onClose={() => setLb(null)} onChange={setLb} accent={T.electric} mono={T.mono} />
     </div>
   )
 }

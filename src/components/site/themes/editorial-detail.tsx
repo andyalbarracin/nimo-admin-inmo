@@ -7,6 +7,8 @@ import dynamic from 'next/dynamic'
 import { QRCodeSVG } from 'qrcode.react'
 import type { Property, Agency } from '@/lib/dummy'
 import SiteFooter from '@/components/site/primitives/SiteFooter'
+import Lightbox from '@/components/site/lightbox'
+import QrDownload from '@/components/site/qr-download'
 
 const SiteMap = dynamic(() => import('@/components/site/primitives/SiteMap'), { ssr: false })
 
@@ -255,6 +257,7 @@ export default function EditorialDetail({ slug, agency, prop, related }: Props) 
               <a href={`/api/pdf/propiedad/${prop.id}?slug=${slug}`} target="_blank" rel="noreferrer" style={{ textAlign: 'left', fontFamily: T.body, fontSize: 13.5, color: T.rust, fontWeight: 600, textDecoration: 'none' }}>
                 Descargar ficha PDF →
               </a>
+              <QrDownload url={url} agencyName={agency.name} fileBase={prop.id} fg={T.ink} buttonStyle={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0, fontFamily: T.body, fontSize: 13.5, color: T.rust, fontWeight: 600 }}>Descargar QR ↓</QrDownload>
               {['Guardar propiedad', 'Compartir'].map(a => (
                 <button key={a} style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0, fontFamily: T.body, fontSize: 13.5, color: T.ink2 }}>
                   {a} →
@@ -295,19 +298,7 @@ export default function EditorialDetail({ slug, agency, prop, related }: Props) 
       <SiteFooter slug={slug} agency={agency} accent={T.rust} bg={T.ink} ink="#FAF7F0" ink2="rgba(250,247,240,.6)" ink3="rgba(250,247,240,.35)" rule="rgba(250,247,240,.1)" fontDisplay={T.serif} />
 
       {/* ── LIGHTBOX ── */}
-      {lightbox !== null && (
-        <div onClick={() => setLightbox(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(26,22,20,.92)', zIndex: 200, display: 'grid', placeItems: 'center', padding: 48, cursor: 'zoom-out' }}>
-          <button onClick={() => setLightbox(null)} style={{ position: 'absolute', top: 24, right: 32, background: 'none', border: 'none', color: T.bg, fontSize: 32, cursor: 'pointer', lineHeight: 1 }}>×</button>
-          <div style={{ position: 'relative', width: 'min(1100px, 90vw)', height: '82vh' }}>
-            <Image src={images[lightbox] ?? main} alt={prop.title} fill style={{ objectFit: 'contain' }} sizes="90vw" />
-          </div>
-          <div style={{ position: 'absolute', bottom: 28, display: 'flex', gap: 8 }}>
-            {images.map((_, i) => (
-              <button key={i} onClick={(e) => { e.stopPropagation(); setLightbox(i) }} style={{ width: 8, height: 8, borderRadius: 99, border: 'none', cursor: 'pointer', background: i === lightbox ? T.rust : 'rgba(250,247,240,.4)' }} />
-            ))}
-          </div>
-        </div>
-      )}
+      <Lightbox images={images} index={lightbox} onClose={() => setLightbox(null)} onChange={setLightbox} accent={T.rust} mono={T.mono} />
     </div>
   )
 }
