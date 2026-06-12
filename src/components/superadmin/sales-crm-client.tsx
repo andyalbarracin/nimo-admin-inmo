@@ -24,11 +24,11 @@ const COLUMNS: KanbanColumn[] = [
   { id: 'client', label: 'Cliente', color: '#2D7D5F' },
   { id: 'churn_risk', label: 'Riesgo churn', color: '#E71D0A' },
 ]
-const PLAN_COLOR: Record<string, string> = { Starter: '#2D7D5F', Pro: '#8B5CF6', Business: '#4A90E2', Enterprise: '#E71D0A' }
+const PLAN_COLOR: Record<string, string> = { Esencial: '#2D7D5F', Profesional: '#8B5CF6', 'A medida': '#E71D0A' }
 
 const blank = (column: string): SalesLead => ({
   id: `tmp-${Date.now()}`, column, company: '', contact: '', city: '', email: '', phone1: '', phone2: '',
-  address: '', plan: 'Pro', monthly: 59, source: '', budget: '', notes: '', files: [],
+  address: '', plan: 'Profesional', monthly: 99, source: '', budget: '', notes: '', files: [],
 })
 
 export default function SalesCrmClient({ initialLeads, persisted }: { initialLeads: SalesLead[]; persisted: boolean }) {

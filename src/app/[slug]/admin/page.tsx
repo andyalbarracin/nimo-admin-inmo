@@ -30,8 +30,9 @@ const STAGE_COLORS: Record<string, string> = {
 const VISITS_SPARK = [42, 60, 48, 72, 55, 80, 65, 88, 74, 92, 80, 100]
 const WA_BARS = [30, 55, 42, 68, 52, 75, 48, 88, 62, 100, 80, 65]
 
-const PLAN_PRICE: Record<string, number> = { starter: 39, pro: 79, business: 149, enterprise: 299 }
-const PLAN_LIMIT: Record<string, number> = { starter: 50, pro: 200, business: 600, enterprise: 2000 }
+const PLAN_PRICE: Record<string, number> = { esencial: 49, profesional: 99, a_medida: 199 }
+const PLAN_LIMIT: Record<string, number> = { esencial: 50, profesional: 9999, a_medida: 99999 }
+const PLAN_USERS: Record<string, number> = { esencial: 2, profesional: 6, a_medida: 99 }
 
 export default async function AdminDashboard({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -42,9 +43,12 @@ export default async function AdminDashboard({ params }: { params: Promise<{ slu
   const ownerFirst = owner?.name.split(' ')[0] ?? 'equipo'
   const recentLeads = LEADS.slice(0, 5)
   const featured = PROPERTIES.filter(p => p.is_featured).slice(0, 5)
-  const plan = agency?.plan ?? 'pro'
-  const planPrice = PLAN_PRICE[plan] ?? 79
-  const planLimit = PLAN_LIMIT[plan] ?? 200
+  const plan = agency?.plan ?? 'profesional'
+  const planName = plan.replace('_', ' ')
+  const planPrice = PLAN_PRICE[plan] ?? 99
+  const planLimit = PLAN_LIMIT[plan] ?? 9999
+  const planUsers = PLAN_USERS[plan] ?? 6
+  const unlimited = planLimit >= 9999
 
   const kpis = [
     { label: 'Propiedades activas', value: AGENCY_STATS.available_properties, pill: '+3 esta semana', pillKind: 'neutral' as const, href: `/${slug}/admin/propiedades` },
@@ -200,14 +204,14 @@ export default async function AdminDashboard({ params }: { params: Promise<{ slu
                   </span>
                   <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-.02em', marginTop: 6 }}>
                     <span style={{ fontSize: 13, color: LA.ink3, verticalAlign: 'super' }}>USD </span>{planPrice}
-                    <span style={{ fontSize: 13, color: LA.ink3, fontWeight: 500 }}> /mes · {plan}</span>
+                    <span style={{ fontSize: 13, color: LA.ink3, fontWeight: 500, textTransform: 'capitalize' }}> /mes · {planName}</span>
                   </div>
                 </div>
                 <Link href={`/${slug}/admin/configuracion`} style={{ fontSize: 13, color: accent, textDecoration: 'none', fontWeight: 600 }}>Cambiar →</Link>
               </div>
               {[
-                { label: 'Propiedades', val: `${AGENCY_STATS.total_properties} / ${planLimit}`, pct: (AGENCY_STATS.total_properties / planLimit) * 100, color: accent },
-                { label: 'Usuarios', val: `${agency?.members_count ?? 3} / ${plan === 'starter' ? 1 : plan === 'pro' ? 3 : 10}`, pct: 66, color: accent },
+                { label: 'Propiedades', val: unlimited ? `${AGENCY_STATS.total_properties} · ilimitadas` : `${AGENCY_STATS.total_properties} / ${planLimit}`, pct: unlimited ? 100 : (AGENCY_STATS.total_properties / planLimit) * 100, color: accent },
+                { label: 'Usuarios', val: `${agency?.members_count ?? 3} / ${planUsers}`, pct: Math.min(100, ((agency?.members_count ?? 3) / planUsers) * 100), color: accent },
                 { label: 'Leads gestionados (mes)', val: `${AGENCY_STATS.leads_this_month} · sin límite`, pct: 100, color: LA.green },
               ].map(u => (
                 <div key={u.label} style={{ marginBottom: 12 }}>

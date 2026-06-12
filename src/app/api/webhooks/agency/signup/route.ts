@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
       name,
       slug,
       owner_email,
-      plan: plan ?? 'trial',
+      plan: plan ?? 'esencial',
       created_at: new Date().toISOString(),
     }
 
@@ -41,7 +41,7 @@ export async function GET() {
       name: 'string (required) — Agency name',
       slug: 'string (required) — URL slug e.g. mi-inmobiliaria',
       owner_email: 'string (required) — Owner email',
-      plan: 'starter | pro | business | enterprise — defaults to trial',
+      plan: 'esencial | profesional | a_medida — defaults to esencial',
     },
   })
 }

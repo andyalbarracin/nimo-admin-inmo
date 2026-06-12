@@ -25,12 +25,11 @@ const MRR_SPARK = [28, 42, 38, 65, 52, 78, 70, 88, 95, 80, 92, 100]
 const LEADS_SPARK = [40, 55, 48, 62, 58, 80, 72, 90, 84, 96, 88, 100]
 
 const PLAN_META: Record<string, { label: string; color: string; mrr: number }> = {
-  starter: { label: 'STARTER', color: ZR.ink3, mrr: 39 },
-  pro: { label: 'PRO', color: ZR.orange, mrr: 79 },
-  business: { label: 'BUSINESS', color: ZR.yellow, mrr: 149 },
-  enterprise: { label: 'ENTERPRISE', color: ZR.red, mrr: 299 },
+  esencial: { label: 'ESENCIAL', color: ZR.ink3, mrr: 49 },
+  profesional: { label: 'PROFESIONAL', color: ZR.orange, mrr: 99 },
+  a_medida: { label: 'A MEDIDA', color: ZR.red, mrr: 199 },
 }
-const PLAN_ORDER = ['starter', 'pro', 'business', 'enterprise'] as const
+const PLAN_ORDER = ['esencial', 'profesional', 'a_medida'] as const
 
 const SERVICES: [string, string, 'ok' | 'warn' | 'crit'][] = [
   ['SUPABASE API', '45ms', 'ok'],
@@ -44,7 +43,7 @@ const SERVICES: [string, string, 'ok' | 'warn' | 'crit'][] = [
 
 const EVENTS: [string, string][] = [
   ['5MIN', 'AGENCIA REGISTRADA · CASTELAR CENTRO'],
-  ['1H', 'UPGRADE PRO→BUSINESS · BOUTIQUE DEL PLATA'],
+  ['1H', 'UPGRADE ESENCIAL→PROFESIONAL · BOUTIQUE DEL PLATA'],
   ['3H', 'WHATSAPP WEBHOOK TIMEOUT · RETRY 3/3'],
   ['5H', 'BACKUP COMPLETADO · TODAS LAS AGENCIAS'],
   ['8H', 'PROMPT DEPLOYED · LEAD_SCORING_V3'],
@@ -156,7 +155,7 @@ export default function SuperadminDashboard() {
               </thead>
               <tbody>
                 {topAgencies.map((a, i) => {
-                  const st = a.plan_status === 'active' ? { c: ZR.green, l: 'ACTIVA' } : a.plan_status === 'trial' ? { c: ZR.yellow, l: 'TRIAL' } : { c: ZR.red, l: 'SUSP.' }
+                  const st = a.plan_status === 'active' ? { c: ZR.green, l: 'ACTIVA' } : { c: ZR.red, l: 'SUSP.' }
                   return (
                     <tr key={a.id} className="z-row">
                       <td style={{ fontFamily: ZR.display, fontSize: 16, padding: '13px 14px', borderBottom: `1px solid ${ZR.line}`, width: 32 }}>{String(i + 1).padStart(2, '0')}</td>

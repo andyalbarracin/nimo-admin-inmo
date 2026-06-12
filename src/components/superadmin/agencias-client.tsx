@@ -13,21 +13,19 @@ const ZR = {
 }
 
 const PLAN_COLORS: Record<string, { bg: string; color: string }> = {
-  enterprise: { bg: 'rgba(231,29,10,.1)', color: '#E71D0A' },
-  business: { bg: 'rgba(255,193,7,.16)', color: '#A07C0A' },
-  pro: { bg: 'rgba(255,106,0,.12)', color: '#FF6A00' },
-  starter: { bg: 'rgba(138,138,131,.14)', color: '#6A6A64' },
+  a_medida: { bg: 'rgba(231,29,10,.1)', color: '#E71D0A' },
+  profesional: { bg: 'rgba(255,106,0,.12)', color: '#FF6A00' },
+  esencial: { bg: 'rgba(138,138,131,.14)', color: '#6A6A64' },
 }
 const STATUS = {
   active: { bg: 'rgba(45,125,95,.12)', color: '#2D7D5F', label: 'Activo' },
-  trial: { bg: 'rgba(255,193,7,.16)', color: '#A07C0A', label: 'Trial' },
   suspended: { bg: 'rgba(231,29,10,.1)', color: '#E71D0A', label: 'Suspendido' },
 } as const
 
-type Filter = 'todas' | 'business' | 'pro' | 'starter' | 'trial' | 'suspendidas'
+type Filter = 'todas' | 'esencial' | 'profesional' | 'a_medida' | 'suspendidas'
 const FILTERS: { id: Filter; label: string }[] = [
-  { id: 'todas', label: 'Todas' }, { id: 'business', label: 'Business' }, { id: 'pro', label: 'Pro' },
-  { id: 'starter', label: 'Starter' }, { id: 'trial', label: 'Trial' }, { id: 'suspendidas', label: 'Suspendidas' },
+  { id: 'todas', label: 'Todas' }, { id: 'esencial', label: 'Esencial' }, { id: 'profesional', label: 'Profesional' },
+  { id: 'a_medida', label: 'A medida' }, { id: 'suspendidas', label: 'Suspendidas' },
 ]
 
 export default function AgenciasClient({ initialAgencies }: { initialAgencies: Agency[] }) {
@@ -37,8 +35,7 @@ export default function AgenciasClient({ initialAgencies }: { initialAgencies: A
 
   const filtered = useMemo(() => agencies.filter(a => {
     if (filter === 'suspendidas' && a.plan_status !== 'suspended') return false
-    if (filter === 'trial' && a.plan_status !== 'trial') return false
-    if (['business', 'pro', 'starter'].includes(filter) && a.plan !== filter) return false
+    if (['esencial', 'profesional', 'a_medida'].includes(filter) && a.plan !== filter) return false
     if (query && !`${a.name} ${a.slug} ${a.owner_email}`.toLowerCase().includes(query.toLowerCase())) return false
     return true
   }), [agencies, filter, query])
@@ -72,7 +69,7 @@ export default function AgenciasClient({ initialAgencies }: { initialAgencies: A
         </div>
         {filtered.length === 0 && <div style={{ padding: '40px', textAlign: 'center', color: ZR.ink3, fontSize: 13 }}>Sin agencias para ese filtro.</div>}
         {filtered.map((agency, i) => {
-          const ps = PLAN_COLORS[agency.plan] ?? PLAN_COLORS.starter!
+          const ps = PLAN_COLORS[agency.plan] ?? PLAN_COLORS.esencial!
           const st = STATUS[agency.plan_status]
           return (
             <div key={agency.id} className="z-row rwd-row" style={{ display: 'grid', gridTemplateColumns: '2fr 1.1fr 64px 64px 1.4fr 110px 150px', padding: '14px 24px', borderTop: i > 0 ? `1px solid ${ZR.border}` : 'none', alignItems: 'center' }}>
@@ -84,13 +81,13 @@ export default function AgenciasClient({ initialAgencies }: { initialAgencies: A
                 </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <span style={{ fontSize: 9.5, fontFamily: ZR.mono, fontWeight: 700, letterSpacing: '.04em', background: ps.bg, color: ps.color, padding: '3px 8px', textTransform: 'uppercase', width: 'fit-content' }}>{agency.plan}</span>
+                <span style={{ fontSize: 9.5, fontFamily: ZR.mono, fontWeight: 700, letterSpacing: '.04em', background: ps.bg, color: ps.color, padding: '3px 8px', textTransform: 'uppercase', width: 'fit-content' }}>{agency.plan.replace('_', ' ')}</span>
                 <span style={{ fontSize: 9, fontFamily: ZR.mono, letterSpacing: '.06em', background: st.bg, color: st.color, padding: '2px 8px', textTransform: 'uppercase', width: 'fit-content' }}>{st.label}</span>
               </div>
               <div style={{ fontFamily: ZR.mono, fontSize: 12.5, fontWeight: 600 }}>{agency.properties_count}</div>
               <div style={{ fontFamily: ZR.mono, fontSize: 12.5, fontWeight: 600 }}>{agency.leads_count}</div>
               <div className="z-row-mute" style={{ fontSize: 12, color: ZR.ink3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{agency.owner_email}</div>
-              <div style={{ fontFamily: ZR.display, fontSize: 14, color: agency.mrr > 0 ? ZR.orange : ZR.ink3 }}>{agency.mrr > 0 ? `$${agency.mrr}` : 'Trial'}</div>
+              <div style={{ fontFamily: ZR.display, fontSize: 14, color: agency.mrr > 0 ? ZR.orange : ZR.ink3 }}>{agency.mrr > 0 ? `$${agency.mrr}` : '—'}</div>
               <div style={{ display: 'flex', gap: 6 }}>
                 <Link href={`/superadmin/agencias/${agency.slug}`} style={{ fontFamily: ZR.mono, fontSize: 10, fontWeight: 700, color: ZR.black, textDecoration: 'none', padding: '6px 9px', background: ZR.cream, border: `1px solid ${ZR.black}` }}>VER</Link>
                 <button onClick={() => toggleSuspend(agency.id)} style={{ fontFamily: ZR.mono, fontSize: 10, fontWeight: 700, color: agency.plan_status === 'suspended' ? ZR.green : ZR.red, padding: '6px 9px', background: ZR.white, border: `1px solid ${agency.plan_status === 'suspended' ? ZR.green : ZR.red}`, cursor: 'pointer', textTransform: 'uppercase' }}>{agency.plan_status === 'suspended' ? 'Activar' : 'Suspender'}</button>

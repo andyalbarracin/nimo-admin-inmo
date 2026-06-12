@@ -77,7 +77,7 @@ export default function SuperadminConfiguracion() {
               {[
                 { label: 'Total agencias',  value: PLATFORM_STATS.total_agencies,  accent: ZR.orange },
                 { label: 'Activas',         value: PLATFORM_STATS.active_agencies,  accent: '#2D7D5F' },
-                { label: 'En trial',        value: PLATFORM_STATS.trial_agencies,   accent: '#A07C0A' },
+                { label: 'MRR (USD)',       value: PLATFORM_STATS.mrr,              accent: '#A07C0A' },
                 { label: 'Propiedades',     value: PLATFORM_STATS.total_properties, accent: '#4A90E2' },
               ].map((s) => (
                 <div key={s.label} style={{ background: ZR.cream, border: `1px solid ${ZR.border}`, borderRadius: 4, padding: 16, textAlign: 'center' }}>
@@ -94,9 +94,9 @@ export default function SuperadminConfiguracion() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {[
                 { label: 'Registro de nuevas agencias', desc: 'Permite que nuevas inmobiliarias se registren en la plataforma.', enabled: true },
-                { label: 'Trial gratuito 15 días', desc: 'Nuevas agencias tienen 15 días de prueba sin tarjeta de crédito.', enabled: true },
+                { label: 'Onboarding asistido', desc: 'Cada alta nueva incluye implementación llave en mano y capacitación.', enabled: true },
                 { label: 'Editor de tema avanzado', desc: 'Permite a agencias personalizar colores y fuentes (solo superadmin asigna).', enabled: true },
-                { label: 'API pública', desc: 'Acceso a la API REST para planes Business+.', enabled: false },
+                { label: 'API pública', desc: 'Acceso a la API REST para el plan A medida.', enabled: false },
                 { label: 'Modo mantenimiento', desc: 'Muestra una página de mantenimiento a todos los visitantes.', enabled: false },
               ].map((flag, i, arr) => (
                 <div key={flag.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 0', borderBottom: i < arr.length - 1 ? `1px solid ${ZR.border}` : 'none' }}>
