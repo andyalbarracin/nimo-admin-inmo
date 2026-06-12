@@ -71,7 +71,7 @@ export default function SuperadminDashboard() {
   const topAgencies = [...AGENCIES].sort((a, b) => b.mrr - a.mrr)
 
   return (
-    <div style={{ padding: '36px 40px 64px', minHeight: '100vh', background: ZR.cream, fontFamily: ZR.body, color: ZR.black }}>
+    <div className="rwd-pad" style={{ padding: '36px 40px 64px', minHeight: '100vh', background: ZR.cream, fontFamily: ZR.body, color: ZR.black }}>
       {/* HEADER */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 32 }}>
         <div>
@@ -113,7 +113,7 @@ export default function SuperadminDashboard() {
           {/* DONUT */}
           <section className="z-block" style={{ padding: 24 }}>
             <BlockHead title="INMOBILIARIAS POR PLAN" right={`TOTAL ${total}`} />
-            <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 28, alignItems: 'center', marginTop: 16 }}>
+            <div className="rwd-stack" style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 28, alignItems: 'center', marginTop: 16 }}>
               <div style={{ position: 'relative', width: 200, height: 200 }}>
                 <svg viewBox="0 0 100 100" width="200" height="200" style={{ transform: 'rotate(-90deg)' }}>
                   <circle cx="50" cy="50" r={R} fill="none" stroke={ZR.line} strokeWidth="18" />

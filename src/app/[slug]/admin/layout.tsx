@@ -32,6 +32,15 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
   },
 ]
 
+// Tab bar inferior (mobile): las 5 secciones más usadas (Tema queda en escritorio).
+const TABS: NavItem[] = [
+  { href: '',               label: 'Inicio',  icon: 'grid' },
+  { href: '/propiedades',   label: 'Props',   icon: 'home' },
+  { href: '/leads',         label: 'Leads',   icon: 'users' },
+  { href: '/equipo',        label: 'Equipo',  icon: 'user-plus' },
+  { href: '/configuracion', label: 'Ajustes', icon: 'settings' },
+]
+
 function Icon({ name }: { name: string }) {
   const icons: Record<string, React.ReactNode> = {
     grid: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>,
@@ -61,8 +70,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div style={{ '--admin-accent': accent, display: 'flex', minHeight: '100vh', background: LA.bg, fontFamily: 'var(--font-sans)' } as React.CSSProperties}>
-      {/* Sidebar */}
-      <aside style={{ width: W, minWidth: W, background: LA.white, borderRight: `1px solid ${LA.border}`, display: 'flex', flexDirection: 'column', position: 'sticky', top: 0, height: '100vh', overflowY: 'auto', transition: 'width .2s cubic-bezier(.2,.7,.2,1)' }}>
+      {/* Sidebar (oculto en mobile → tab bar inferior) */}
+      <aside className="admin-sidebar" style={{ width: W, minWidth: W, background: LA.white, borderRight: `1px solid ${LA.border}`, display: 'flex', flexDirection: 'column', position: 'sticky', top: 0, height: '100vh', overflowY: 'auto', transition: 'width .2s cubic-bezier(.2,.7,.2,1)' }}>
         <div style={{ height: 3, background: accent, flexShrink: 0 }} />
 
         {/* Logo */}
@@ -140,9 +149,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main */}
-      <main style={{ flex: 1, minWidth: 0, overflowY: 'auto', background: LA.bg }}>
+      <main className="admin-main" style={{ flex: 1, minWidth: 0, overflowY: 'auto', background: LA.bg }}>
         {children}
       </main>
+
+      {/* Tab bar inferior — solo mobile (modo app) */}
+      <nav className="admin-tabbar" style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 200, height: 60, background: LA.white, borderTop: `1px solid ${LA.border}`, boxShadow: '0 -2px 16px rgba(0,0,0,.05)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        {TABS.map(item => {
+          const href = `/${slug}/admin${item.href}`
+          const active = item.href === '' ? pathname === href : pathname.startsWith(href)
+          return (
+            <Link key={item.href} href={href} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none', color: active ? accent : LA.ink3, fontSize: 10, fontWeight: active ? 700 : 500 }}>
+              <Icon name={item.icon} />
+              <span>{item.label}</span>
+            </Link>
+          )
+        })}
+      </nav>
     </div>
   )
 }

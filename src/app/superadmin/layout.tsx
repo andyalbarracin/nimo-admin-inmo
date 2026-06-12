@@ -27,6 +27,15 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
   },
 ]
 
+// Tab bar inferior (mobile)
+const TABS: NavItem[] = [
+  { href: '/superadmin',               label: 'Inicio',   icon: 'grid', exact: true },
+  { href: '/superadmin/agencias',      label: 'Agencias', icon: 'building' },
+  { href: '/superadmin/crm',           label: 'CRM',      icon: 'crm' },
+  { href: '/superadmin/planes',        label: 'Planes',   icon: 'layers' },
+  { href: '/superadmin/configuracion', label: 'Config',   icon: 'settings' },
+]
+
 function Icon({ name }: { name: string }) {
   const d: Record<string, React.ReactNode> = {
     grid: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>,
@@ -51,7 +60,7 @@ export default function SuperadminLayout({ children }: { children: React.ReactNo
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#F5F5F0', fontFamily: BODY }}>
-      <aside style={{ width: W, minWidth: W, background: '#111111', display: 'flex', flexDirection: 'column', position: 'sticky', top: 0, height: '100vh', overflowY: 'auto', transition: 'width .2s cubic-bezier(.2,.7,.2,1)' }}>
+      <aside className="admin-sidebar" style={{ width: W, minWidth: W, background: '#111111', display: 'flex', flexDirection: 'column', position: 'sticky', top: 0, height: '100vh', overflowY: 'auto', transition: 'width .2s cubic-bezier(.2,.7,.2,1)' }}>
         <div style={{ height: 4, background: 'linear-gradient(90deg, #E71D0A 0%, #E71D0A 33.3%, #FF6A00 33.3%, #FF6A00 66.6%, #FFC107 66.6%, #FFC107 100%)', flexShrink: 0 }} />
 
         {/* Wordmark */}
@@ -119,9 +128,22 @@ export default function SuperadminLayout({ children }: { children: React.ReactNo
         </div>
       </aside>
 
-      <main style={{ flex: 1, minWidth: 0, overflowY: 'auto' }}>
+      <main className="admin-main" style={{ flex: 1, minWidth: 0, overflowY: 'auto' }}>
         {children}
       </main>
+
+      {/* Tab bar inferior — solo mobile (modo app) */}
+      <nav className="admin-tabbar" style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 200, height: 60, background: '#111111', borderTop: '1px solid rgba(255,255,255,.08)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        {TABS.map(item => {
+          const active = item.exact ? pathname === item.href : pathname.startsWith(item.href)
+          return (
+            <Link key={item.href} href={item.href} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none', color: active ? '#FF6A00' : '#8A8A83', fontSize: 10, fontFamily: MONO, fontWeight: active ? 700 : 500 }}>
+              <Icon name={item.icon} />
+              <span>{item.label}</span>
+            </Link>
+          )
+        })}
+      </nav>
     </div>
   )
 }

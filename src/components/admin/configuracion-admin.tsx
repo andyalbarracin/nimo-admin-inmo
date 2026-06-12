@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { useParams } from 'next/navigation'
 import type { Agency } from '@/lib/dummy'
+import { uploadAgencyLogo, removeAgencyLogo } from '@/lib/agency/logo-action'
 
 /* Admin · Configuración — form funcional en sesión, themed. */
 
@@ -18,7 +20,7 @@ interface Settings {
   hours: string; whatsapp_auto: boolean; seo_title: string; seo_description: string
 }
 
-export default function ConfiguracionAdmin({ agency }: { agency: Agency }) {
+export default function ConfiguracionAdmin({ agency, initialLogo = '' }: { agency: Agency; initialLogo?: string }) {
   const [form, setForm] = useState<Settings>({
     name: agency.name, tagline: agency.tagline ?? '', address: agency.address ?? '',
     phone: agency.phone ?? '', email: agency.email ?? '', instagram: agency.instagram ?? '',
@@ -28,6 +30,23 @@ export default function ConfiguracionAdmin({ agency }: { agency: Agency }) {
   const [saved, setSaved] = useState(false)
   const set = <K extends keyof Settings>(k: K, v: Settings[K]) => { setForm(f => ({ ...f, [k]: v })); setSaved(false) }
   const save = () => { setSaved(true); setTimeout(() => setSaved(false), 2500) }
+
+  // Logo (persiste en la DB al subir)
+  const params = useParams()
+  const slug = (params?.slug as string) ?? ''
+  const [logo, setLogo] = useState<string>(initialLogo)
+  const [logoBusy, setLogoBusy] = useState(false)
+  const [logoErr, setLogoErr] = useState('')
+  const onLogoFile = async (file: File | undefined) => {
+    if (!file) return
+    setLogoBusy(true); setLogoErr('')
+    const fd = new FormData(); fd.append('file', file)
+    const res = await uploadAgencyLogo(slug, fd)
+    if (res.ok && res.url) setLogo(res.url)
+    else setLogoErr(res.error ?? 'No se pudo subir el logo')
+    setLogoBusy(false)
+  }
+  const clearLogo = async () => { setLogo(''); await removeAgencyLogo(slug) }
 
   const field: React.CSSProperties = { width: '100%', background: LA.white, border: `1px solid ${LA.border}`, borderRadius: 10, padding: '11px 13px', fontSize: 13.5, color: LA.ink, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }
   const label: React.CSSProperties = { fontFamily: LA.mono, fontSize: 9.5, color: LA.ink3, textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 6, display: 'block' }
@@ -44,7 +63,7 @@ export default function ConfiguracionAdmin({ agency }: { agency: Agency }) {
 
   return (
     <div style={{ padding: '0 0 40px', minHeight: '100vh', background: LA.bg, fontFamily: LA.sans, color: LA.ink }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 40px', borderBottom: `1px solid ${LA.border}`, gap: 24, position: 'sticky', top: 0, background: LA.bg, zIndex: 10 }}>
+      <header className="rwd-pad" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 40px', borderBottom: `1px solid ${LA.border}`, gap: 24, position: 'sticky', top: 0, background: LA.bg, zIndex: 10 }}>
         <div>
           <div style={{ fontFamily: LA.mono, fontSize: 11, color: LA.ink3, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 6 }}>Panel</div>
           <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-.02em', margin: 0 }}>Configuración</h1>
@@ -55,7 +74,25 @@ export default function ConfiguracionAdmin({ agency }: { agency: Agency }) {
         </div>
       </header>
 
-      <div style={{ padding: '24px 40px', maxWidth: 720 }}>
+      <div className="rwd-pad" style={{ padding: '24px 40px', maxWidth: 720 }}>
+        <Card title="Logo" desc="Aparece en tu panel y en el sitio público. PNG o SVG, fondo transparente recomendado.">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
+            <div style={{ width: 96, height: 96, borderRadius: 16, border: `1px solid ${LA.border}`, background: LA.bg, display: 'grid', placeItems: 'center', overflow: 'hidden', flexShrink: 0 }}>
+              {logo
+                ? <img src={logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                : <div style={{ width: 44, height: 44, borderRadius: 12, background: LA.accent, display: 'grid', placeItems: 'center', color: LA.white, fontWeight: 800, fontSize: 20 }}>{form.name.charAt(0).toUpperCase()}</div>}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <label style={{ background: LA.accent, color: LA.white, padding: '10px 18px', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: logoBusy ? 'wait' : 'pointer', display: 'inline-block' }}>
+                <input type="file" accept="image/*" disabled={logoBusy} onChange={e => { onLogoFile(e.target.files?.[0]); e.target.value = '' }} style={{ display: 'none' }} />
+                {logoBusy ? 'Subiendo…' : logo ? 'Cambiar logo' : 'Subir logo'}
+              </label>
+              {logo && <button onClick={clearLogo} style={{ background: 'none', border: 'none', color: LA.ink3, fontSize: 12, cursor: 'pointer', textAlign: 'left', padding: 0, fontFamily: 'inherit' }}>Quitar logo</button>}
+              {logoErr && <span style={{ fontSize: 12, color: '#C0392B' }}>{logoErr}</span>}
+            </div>
+          </div>
+        </Card>
+
         <Card title="Empresa" desc="Datos que aparecen en tu sitio público.">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <div><label style={label}>Nombre</label><input style={field} value={form.name} onChange={e => set('name', e.target.value)} /></div>
@@ -65,7 +102,7 @@ export default function ConfiguracionAdmin({ agency }: { agency: Agency }) {
         </Card>
 
         <Card title="Contacto" desc="Cómo te encuentran tus clientes.">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+          <div className="rwd-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div><label style={label}>Teléfono / WhatsApp</label><input style={field} value={form.phone} onChange={e => set('phone', e.target.value)} /></div>
             <div><label style={label}>Email</label><input style={field} value={form.email} onChange={e => set('email', e.target.value)} /></div>
             <div><label style={label}>Instagram</label><input style={field} value={form.instagram} onChange={e => set('instagram', e.target.value)} placeholder="@usuario" /></div>
