@@ -136,7 +136,7 @@ export default function CrmClient({ slug, initialLeads, team }: Props) {
   return (
     <div style={{ padding: '0 0 40px', background: LA.bg, minHeight: '100vh', color: LA.ink, fontFamily: LA.sans }}>
       {/* Header */}
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 40px', borderBottom: `1px solid ${LA.border}`, gap: 24, flexWrap: 'wrap' }}>
+      <header className="rwd-pad" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 40px', borderBottom: `1px solid ${LA.border}`, gap: 24, flexWrap: 'wrap' }}>
         <div>
           <div style={{ fontFamily: LA.mono, fontSize: 11, color: LA.ink3, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 6 }}>CRM · {slug}</div>
           <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-.02em', margin: 0 }}>Gestión de Leads</h1>
@@ -240,13 +240,13 @@ function StageEditor({ stages, leadCount, onRename, onRecolor, onAdd, onRemove }
 function LeadsTable({ leads, stageLabel, stageColor, onRowClick }: { leads: Lead[]; stageLabel: Record<string, string>; stageColor: Record<string, string>; onRowClick: (l: Lead) => void }) {
   const col = (s: string) => stageColor[s] ?? '#9A9590'
   return (
-    <div style={{ background: LA.white, border: `1px solid ${LA.border}`, borderRadius: 16, overflow: 'hidden' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr 1.2fr 1fr 1fr 110px', gap: 12, padding: '12px 20px', borderBottom: `1px solid ${LA.border}`, fontFamily: LA.mono, fontSize: 10, color: LA.ink3, textTransform: 'uppercase', letterSpacing: '.08em' }}>
+    <div className="rwd-tablewrap" style={{ background: LA.white, border: `1px solid ${LA.border}`, borderRadius: 16, overflow: 'hidden' }}>
+      <div className="rwd-row" style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr 1.2fr 1fr 1fr 110px', gap: 12, padding: '12px 20px', borderBottom: `1px solid ${LA.border}`, fontFamily: LA.mono, fontSize: 10, color: LA.ink3, textTransform: 'uppercase', letterSpacing: '.08em' }}>
         <div>Cliente</div><div>Tipo</div><div>Contacto</div><div>Interés</div><div>Agente</div><div>Etapa</div>
       </div>
       {leads.length === 0 && <div style={{ padding: '40px', textAlign: 'center', color: LA.ink3, fontSize: 13 }}>Sin leads todavía.</div>}
       {leads.map((l, i) => (
-        <button key={l.id} onClick={() => onRowClick(l)} className="coral-row" style={{ width: '100%', textAlign: 'left', display: 'grid', gridTemplateColumns: '1.6fr 1fr 1.2fr 1fr 1fr 110px', gap: 12, padding: '14px 20px', alignItems: 'center', background: 'none', border: 'none', borderTop: i > 0 ? `1px solid ${LA.border}` : 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+        <button key={l.id} onClick={() => onRowClick(l)} className="coral-row rwd-row" style={{ width: '100%', textAlign: 'left', display: 'grid', gridTemplateColumns: '1.6fr 1fr 1.2fr 1fr 1fr 110px', gap: 12, padding: '14px 20px', alignItems: 'center', background: 'none', border: 'none', borderTop: i > 0 ? `1px solid ${LA.border}` : 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
             <span style={{ width: 32, height: 32, borderRadius: 99, background: col(l.stage) + '1A', color: col(l.stage), display: 'grid', placeItems: 'center', fontWeight: 700, fontSize: 12, flexShrink: 0 }}>{(l.name || '·').split(' ').map(w => w[0]).slice(0, 2).join('')}</span>
             <span style={{ fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name || 'Sin nombre'}</span>
@@ -350,7 +350,7 @@ function LeadDrawer({ lead, team, slug, stages, isNew, onSave, onDelete, onClose
         </div>
 
         {/* Footer actions */}
-        <div style={{ padding: '16px 24px', borderTop: `1px solid ${LA.border}`, background: LA.white, display: 'flex', gap: 10, alignItems: 'center' }}>
+        <div style={{ padding: '16px 24px', borderTop: `1px solid ${LA.border}`, background: LA.white, display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           {!isNew && (
             <button onClick={() => onDelete(form.id)} style={{ background: 'none', border: `1px solid ${LA.border}`, color: LA.danger, padding: '11px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Eliminar</button>
           )}

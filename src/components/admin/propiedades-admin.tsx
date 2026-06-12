@@ -100,7 +100,7 @@ export default function PropiedadesAdmin({ slug, initialProperties, team, openNe
   return (
     <div style={{ padding: '0 0 40px', minHeight: '100vh', background: LA.bg, fontFamily: LA.sans, color: LA.ink }}>
       {/* Header */}
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 40px', borderBottom: `1px solid ${LA.border}`, gap: 24, flexWrap: 'wrap' }}>
+      <header className="rwd-pad" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 40px', borderBottom: `1px solid ${LA.border}`, gap: 24, flexWrap: 'wrap' }}>
         <div>
           <div style={{ fontFamily: LA.mono, fontSize: 11, color: LA.ink3, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 6 }}>Panel · {slug}</div>
           <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-.02em', margin: 0 }}>Propiedades</h1>
@@ -119,15 +119,15 @@ export default function PropiedadesAdmin({ slug, initialProperties, team, openNe
         </div>
 
         {/* Table */}
-        <div style={{ background: LA.white, border: `1px solid ${LA.border}`, borderRadius: 16, overflow: 'hidden' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '2.2fr 1fr 1.1fr 110px 120px 96px', padding: '12px 20px', borderBottom: `1px solid ${LA.border}`, fontFamily: LA.mono, fontSize: 10, fontWeight: 600, color: LA.ink3, textTransform: 'uppercase', letterSpacing: '.08em' }}>
+        <div className="rwd-tablewrap" style={{ background: LA.white, border: `1px solid ${LA.border}`, borderRadius: 16, overflow: 'hidden' }}>
+          <div className="rwd-row" style={{ display: 'grid', gridTemplateColumns: '2.2fr 1fr 1.1fr 110px 120px 96px', padding: '12px 20px', borderBottom: `1px solid ${LA.border}`, fontFamily: LA.mono, fontSize: 10, fontWeight: 600, color: LA.ink3, textTransform: 'uppercase', letterSpacing: '.08em' }}>
             <div>Propiedad</div><div>Precio</div><div>Ubicación</div><div>Operación</div><div>Estado</div><div>Acciones</div>
           </div>
           {filtered.length === 0 && <div style={{ padding: '40px', textAlign: 'center', color: LA.ink3, fontSize: 13 }}>No hay propiedades con ese filtro.</div>}
           {filtered.map((prop, i) => {
             const st = STATUS_STYLES[prop.status] ?? STATUS_STYLES.available!
             return (
-              <div key={prop.id} style={{ display: 'grid', gridTemplateColumns: '2.2fr 1fr 1.1fr 110px 120px 96px', padding: '14px 20px', borderTop: i > 0 ? `1px solid ${LA.border}` : 'none', alignItems: 'center' }}>
+              <div key={prop.id} className="rwd-row" style={{ display: 'grid', gridTemplateColumns: '2.2fr 1fr 1.1fr 110px 120px 96px', padding: '14px 20px', borderTop: i > 0 ? `1px solid ${LA.border}` : 'none', alignItems: 'center' }}>
                 <button onClick={() => setEditing(prop)} className="coral-row" style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '4px', borderRadius: 10, minWidth: 0 }}>
                   <img src={prop.images[0] ?? DEFAULT_IMG} alt={prop.title} style={{ width: 52, height: 40, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }} />
                   <div style={{ minWidth: 0 }}>
@@ -276,7 +276,7 @@ function PropertyDrawer({ property, team, slug, isNew, saving, onSave, onDelete,
           </div>
         </div>
 
-        <div style={{ padding: '16px 24px', borderTop: `1px solid ${LA.border}`, background: LA.white, display: 'flex', gap: 10, alignItems: 'center' }}>
+        <div style={{ padding: '16px 24px', borderTop: `1px solid ${LA.border}`, background: LA.white, display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           {!isNew && <button onClick={() => onDelete(form.id)} style={{ background: 'none', border: `1px solid ${LA.border}`, color: LA.danger, padding: '11px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Eliminar</button>}
           {!isNew && <a href={`/api/pdf/propiedad/${form.id}?slug=${slug}`} target="_blank" rel="noreferrer" style={{ background: LA.white, border: `1px solid ${LA.border}`, color: LA.ink2, padding: '11px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>Ficha PDF ↓</a>}
           <button onClick={onClose} style={{ marginLeft: 'auto', background: LA.white, border: `1px solid ${LA.border}`, color: LA.ink2, padding: '11px 18px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Cancelar</button>

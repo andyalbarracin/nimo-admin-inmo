@@ -47,8 +47,8 @@ export default function AgenciasClient({ initialAgencies }: { initialAgencies: A
     ? { ...a, plan_status: a.plan_status === 'suspended' ? 'active' : 'suspended' } : a))
 
   return (
-    <div style={{ padding: '36px 40px', minHeight: '100vh', background: ZR.cream, fontFamily: ZR.body, color: ZR.black }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
+    <div className="rwd-pad" style={{ padding: '36px 40px', minHeight: '100vh', background: ZR.cream, fontFamily: ZR.body, color: ZR.black }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28, gap: 16, flexWrap: 'wrap' }}>
         <div>
           <div style={{ fontFamily: ZR.mono, fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 6 }}>// SUPERADMIN</div>
           <h1 style={{ fontFamily: ZR.display, fontSize: 'clamp(28px, 4vw, 40px)', margin: 0, textTransform: 'uppercase', letterSpacing: '-.01em' }}>AGENCIAS</h1>
@@ -66,8 +66,8 @@ export default function AgenciasClient({ initialAgencies }: { initialAgencies: A
       </div>
 
       {/* Table */}
-      <div className="z-block" style={{ overflow: 'hidden' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1.1fr 64px 64px 1.4fr 110px 150px', padding: '12px 24px', borderBottom: `2px solid ${ZR.black}`, fontFamily: ZR.mono, fontSize: 9.5, color: ZR.ink3, textTransform: 'uppercase', letterSpacing: '.12em', fontWeight: 700 }}>
+      <div className="z-block rwd-tablewrap" style={{ overflow: 'hidden' }}>
+        <div className="rwd-row" style={{ display: 'grid', gridTemplateColumns: '2fr 1.1fr 64px 64px 1.4fr 110px 150px', padding: '12px 24px', borderBottom: `2px solid ${ZR.black}`, fontFamily: ZR.mono, fontSize: 9.5, color: ZR.ink3, textTransform: 'uppercase', letterSpacing: '.12em', fontWeight: 700 }}>
           <div>Agencia</div><div>Plan / Estado</div><div>Props</div><div>Leads</div><div>Owner</div><div>MRR</div><div>Acciones</div>
         </div>
         {filtered.length === 0 && <div style={{ padding: '40px', textAlign: 'center', color: ZR.ink3, fontSize: 13 }}>Sin agencias para ese filtro.</div>}
@@ -75,7 +75,7 @@ export default function AgenciasClient({ initialAgencies }: { initialAgencies: A
           const ps = PLAN_COLORS[agency.plan] ?? PLAN_COLORS.starter!
           const st = STATUS[agency.plan_status]
           return (
-            <div key={agency.id} className="z-row" style={{ display: 'grid', gridTemplateColumns: '2fr 1.1fr 64px 64px 1.4fr 110px 150px', padding: '14px 24px', borderTop: i > 0 ? `1px solid ${ZR.border}` : 'none', alignItems: 'center' }}>
+            <div key={agency.id} className="z-row rwd-row" style={{ display: 'grid', gridTemplateColumns: '2fr 1.1fr 64px 64px 1.4fr 110px 150px', padding: '14px 24px', borderTop: i > 0 ? `1px solid ${ZR.border}` : 'none', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ width: 32, height: 32, borderRadius: 6, background: ps.bg, border: `1px solid ${ps.color}33`, display: 'grid', placeItems: 'center', fontFamily: ZR.display, fontSize: 13, color: ps.color }}>{agency.name[0]}</div>
                 <div style={{ minWidth: 0 }}>
