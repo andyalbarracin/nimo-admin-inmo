@@ -63,11 +63,9 @@ export default function SiteFooter({ slug, agency, bg, rule, ink, ink2, ink3, ac
         </div>
 
         {/* Bottom bar */}
-        <div style={{ borderTop: `1px solid ${rule}`, paddingTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ borderTop: `1px solid ${rule}`, paddingTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           <span style={{ fontSize: 11, color: ink3 }}>© 2026 {agency.name}. Todos los derechos reservados.</span>
-          <a href="https://nimo.app" target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, color: ink3, textDecoration: 'none' }}>
-            Powered by <span style={{ color: accent, fontWeight: 700 }}>NIMO</span>
-          </a>
+          <span style={{ fontSize: 11, color: ink3 }}>Sitio web por <span style={{ color: accent, fontWeight: 700 }}>NIMO</span></span>
         </div>
       </div>
     </footer>
