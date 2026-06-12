@@ -1,4 +1,5 @@
 import { PROP_IMAGES } from './images'
+import type { PlanId } from '@/lib/plans/server'
 
 export type Property = {
   id: string
@@ -64,8 +65,8 @@ export type Agency = {
   id: string
   name: string
   slug: string
-  plan: 'starter' | 'pro' | 'business' | 'enterprise'
-  plan_status: 'active' | 'trial' | 'suspended'
+  plan: PlanId
+  plan_status: 'active' | 'suspended'
   properties_count: number
   leads_count: number
   members_count: number
@@ -569,12 +570,12 @@ export const AGENCIES: Agency[] = [
     id: 'agency-001',
     name: 'López & Asociados',
     slug: 'lopez-asociados',
-    plan: 'pro',
+    plan: 'profesional',
     plan_status: 'active',
     properties_count: 12,
     leads_count: 10,
     members_count: 4,
-    mrr: 299,
+    mrr: 99,
     owner_email: 'martin.lopez@lopezasociados.com',
     created_at: '2026-01-15',
     theme: 'editorial',
@@ -588,12 +589,12 @@ export const AGENCIES: Agency[] = [
     id: 'agency-002',
     name: 'Norte Propiedades',
     slug: 'norte-propiedades',
-    plan: 'business',
+    plan: 'a_medida',
     plan_status: 'active',
     properties_count: 48,
     leads_count: 67,
     members_count: 12,
-    mrr: 599,
+    mrr: 199,
     owner_email: 'admin@nortepropiedades.com.ar',
     created_at: '2026-02-01',
     theme: 'spatial',
@@ -607,12 +608,12 @@ export const AGENCIES: Agency[] = [
     id: 'agency-003',
     name: 'Propiedades del Sur',
     slug: 'propiedades-del-sur',
-    plan: 'starter',
-    plan_status: 'trial',
+    plan: 'esencial',
+    plan_status: 'active',
     properties_count: 6,
     leads_count: 8,
     members_count: 2,
-    mrr: 0,
+    mrr: 49,
     owner_email: 'contacto@propiedadesdelsur.com',
     created_at: '2026-05-20',
     theme: 'editorial',
@@ -625,12 +626,12 @@ export const AGENCIES: Agency[] = [
     id: 'agency-004',
     name: 'Inversiones Norte',
     slug: 'inversiones-norte',
-    plan: 'pro',
+    plan: 'profesional',
     plan_status: 'active',
     properties_count: 23,
     leads_count: 31,
     members_count: 6,
-    mrr: 299,
+    mrr: 99,
     owner_email: 'info@inversionesnorte.com.ar',
     created_at: '2026-03-10',
     theme: 'spatial',
@@ -643,12 +644,12 @@ export const AGENCIES: Agency[] = [
     id: 'agency-005',
     name: 'Distrito Atelier',
     slug: 'distrito-atelier',
-    plan: 'business',
+    plan: 'profesional',
     plan_status: 'active',
     properties_count: 18,
     leads_count: 22,
     members_count: 5,
-    mrr: 599,
+    mrr: 99,
     owner_email: 'owner@distritiatelier.com.ar',
     created_at: '2026-02-28',
     theme: 'atelier',
@@ -684,11 +685,10 @@ export const AGENCY_STATS = {
 
 export const PLATFORM_STATS = {
   total_agencies: 5,
-  active_agencies: 4,
-  trial_agencies: 1,
+  active_agencies: 5,
   total_properties: 107,
   total_leads: 138,
-  mrr: 1196,
-  arr: 14352,
+  mrr: 545,
+  arr: 6540,
   monthly_growth: 23,
 }

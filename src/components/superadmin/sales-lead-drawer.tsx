@@ -14,7 +14,7 @@ const ZR = {
   mono: "var(--font-mono), 'JetBrains Mono', monospace",
 }
 
-const PLANS = ['Starter', 'Pro', 'Business', 'Enterprise']
+const PLANS = ['Esencial', 'Profesional', 'A medida']
 const SOURCES = ['Recomendación', 'Búsqueda web', 'Instagram', 'Evento / feria', 'Llamada en frío', 'Webinar', 'Otro']
 
 export default function SalesLeadDrawer({ lead, isNew, onSave, onDelete, onClose }: {

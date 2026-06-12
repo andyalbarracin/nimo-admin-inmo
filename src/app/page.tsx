@@ -47,6 +47,7 @@ export default async function LandingPage() {
   const plans = await planMap()
   const price = (code: string) => plans[code]?.monthly ?? 0
   const setup = (code: string) => plans[code]?.setup ?? 0
+  const CONTACTO = 'https://www.zairetech.com/contacto'
   return (
     <div className="lp-wrap">
 
@@ -65,7 +66,7 @@ export default async function LandingPage() {
           </nav>
           <div className="nav-cta">
             <a className="link" href="/lopez-asociados/admin/login">Iniciar sesión</a>
-            <a className="btn btn-coral" href="#pricing">Iniciá gratis <ArrowRight /></a>
+            <a className="btn btn-coral" href={CONTACTO}>Hablemos <ArrowRight /></a>
           </div>
         </div>
       </header>
@@ -83,7 +84,7 @@ export default async function LandingPage() {
               Todo administrado desde un panel diseñado para vos — no para un programador.
             </p>
             <div className="cta-row">
-              <a className="btn btn-coral btn-lg" href="#pricing">Probá 15 días gratis <ArrowRight /></a>
+              <a className="btn btn-coral btn-lg" href={CONTACTO}>Coordiná una demo <ArrowRight /></a>
               <a className="btn btn-ghost btn-lg" href="#features">
                 <svg className="ico" viewBox="0 0 24 24">
                   <polygon points="6 4 20 12 6 20 6 4" fill="currentColor" stroke="none" />
@@ -93,9 +94,9 @@ export default async function LandingPage() {
             </div>
             <div className="hero-badge">
               <span className="dot" />
-              Sin tarjeta de crédito
+              Implementación llave en mano
               <span className="sep">·</span>
-              Migrá desde cualquier plataforma, gratis
+              Soporte humano, no chatbot
             </div>
           </div>
 
@@ -142,9 +143,9 @@ export default async function LandingPage() {
                     </div>
                     <div className="dash-divider" />
                     <div className="dash-promo">
-                      <b>Subí a Business</b>
-                      7 días gratis. Hasta 5 agentes y reportes avanzados.
-                      <span className="mini-btn">Probar →</span>
+                      <b>Plan Profesional</b>
+                      Propiedades ilimitadas, CRM con Kanban y WhatsApp.
+                      <span className="mini-btn">Ver planes →</span>
                     </div>
                   </aside>
                   <main className="dash-main">
@@ -266,7 +267,7 @@ export default async function LandingPage() {
             <div className="card" style={{ background: 'linear-gradient(180deg,#FBF7EE 0%,#F4ECD9 100%)' }}>
               <div className="card-tag">/ 03 — WhatsApp</div>
               <h3 className="card-h">WhatsApp integrado.</h3>
-              <p className="card-p">Cada conversación se guarda como lead. Respuestas automáticas con IA fuera de horario.</p>
+              <p className="card-p">Cada consulta llega con un click-to-chat y queda registrada como lead en tu CRM.</p>
               <div className="wa-art">
                 <div className="wa-msg wa-in">
                   ¡Hola! Vi el aviso del depto en Palermo. ¿Sigue disponible?
@@ -400,9 +401,9 @@ export default async function LandingPage() {
               { label: 'Diseño del sitio público', detail: 'Cómo se ve para el cliente final', nimo: { type: 'yes', text: '3 layouts premium curados' }, cms: { type: 'mid', text: 'Depende del theme' }, tokko: { type: 'no', text: 'Templates 2014' } },
               { label: 'Velocidad de carga', detail: 'Tiempo hasta primera vista útil', nimo: { type: 'yes', text: '< 1s · 95+ PageSpeed' }, cms: { type: 'mid', text: '3–6s típico' }, tokko: { type: 'no', text: '4–8s' } },
               { label: 'CRM con Kanban + WhatsApp', detail: 'Gestionar leads sin salir del panel', nimo: { type: 'yes', text: 'Nativo, drag & drop' }, cms: { type: 'no', text: 'No incluido' }, tokko: { type: 'mid', text: 'Solo listado básico' } },
-              { label: 'Respuestas con IA', detail: 'Auto-respuesta fuera de horario en WhatsApp', nimo: { type: 'yes', text: 'Incluido en Pro+' }, cms: { type: 'no', text: 'No disponible' }, tokko: { type: 'no', text: 'No disponible' } },
+              { label: 'Implementación llave en mano', detail: 'Carga de propiedades + tema + dominio + capacitación', nimo: { type: 'yes', text: 'Incluida en el setup' }, cms: { type: 'no', text: 'Lo hacés vos' }, tokko: { type: 'mid', text: 'Parcial' } },
               { label: 'Soporte en español', detail: 'Atención humana, no chatbot', nimo: { type: 'yes', text: 'WhatsApp directo, <1h' }, cms: { type: 'no', text: 'Buscás un freelance' }, tokko: { type: 'mid', text: 'Tickets por email' } },
-              { label: 'Precio total mensual', detail: 'Hosting + CMS + CRM + WhatsApp', nimo: { type: 'yes', text: 'Desde USD 29/mes, todo' }, cms: { type: 'mid', text: 'USD 60+ sumando piezas' }, tokko: { type: 'mid', text: 'USD 49/mes (solo CRM)' } },
+              { label: 'Precio total mensual', detail: 'Hosting + sitio + CRM + WhatsApp', nimo: { type: 'yes', text: 'Desde USD 49/mes, todo' }, cms: { type: 'mid', text: 'USD 60+ sumando piezas' }, tokko: { type: 'mid', text: 'USD 49/mes (solo CRM)' } },
             ].map((row) => (
               <div className="compare-row" key={row.label}>
                 <div className="compare-cell cat">
@@ -427,82 +428,88 @@ export default async function LandingPage() {
               <h2 className="sec-title">Un plan para cada tamaño. <em>Sin sorpresas.</em></h2>
             </div>
             <p className="sec-sub">
-              Sin permanencia, cancelás cuando quieras. A cada plan se suma una implementación inicial (única vez): dejamos tu sitio, tu CRM y tus propiedades cargados y listos para vender.
+              Sin permanencia, cancelás cuando quieras. Cada plan incluye una implementación inicial (única vez) que cubre la carga de tus propiedades, configuración de tu tema, dominio propio y capacitación. Después, abonás solo la mensualidad.
             </p>
           </div>
-          <div className="price-grid">
+          <div className="price-grid price-grid-3">
+            {/* ESENCIAL */}
             <div className="price-card">
               <div className="price-head">
-                <div className="price-name">Starter</div>
-                <h3>Empezando</h3>
-                <p>Inmobiliaria de 1 persona. Empezás con sitio web + hasta 30 propiedades.</p>
+                <div className="price-name">Esencial</div>
+                <h3>Para arrancar bien.</h3>
+                <p>{plans['esencial']?.tagline}</p>
               </div>
-              <div className="price-amount"><sup>USD</sup>{price('starter')}<span className="per">por mes · facturación mensual</span></div>
-              <div className="price-setup">+ USD {setup('starter')} de implementación · pago único</div>
+              <div className="price-amount"><sup>USD</sup>{price('esencial')}<span className="per">por mes · facturación mensual</span></div>
+              <div className="price-setup">+ USD {setup('esencial')} de implementación · pago único</div>
               <ul className="price-feat">
-                <li><CheckIcon /> Sitio web (1 layout)</li>
-                <li><CheckIcon /> Hasta 30 propiedades</li>
-                <li><CheckIcon /> Formulario de contacto</li>
-                <li><CheckIcon /> QR para carteles</li>
-                <li><CheckIcon /> Soporte por email</li>
+                {(plans['esencial']?.features ?? []).map((f, i) => (
+                  <li key={i}><CheckIcon /> {f.startsWith('Todo lo de') ? <b>{f}</b> : f}</li>
+                ))}
               </ul>
-              <a className="btn btn-ghost" href="/lopez-asociados/admin/login">Probar 15 días</a>
+              <a className="btn btn-ghost" href={CONTACTO}>Contactar</a>
             </div>
+
+            {/* PROFESIONAL — destacado */}
             <div className="price-card featured">
               <div className="badge">Más elegido</div>
               <div className="price-head">
-                <div className="price-name featured">Pro</div>
-                <h3>El estándar NIMO</h3>
-                <p>Inmobiliaria con 2–4 agentes. CRM, WhatsApp y propiedades ilimitadas.</p>
+                <div className="price-name featured">Profesional</div>
+                <h3>El estándar NIMO.</h3>
+                <p>{plans['profesional']?.tagline}</p>
               </div>
-              <div className="price-amount"><sup>USD</sup>{price('pro')}<span className="per">por mes · facturación mensual</span></div>
-              <div className="price-setup">+ USD {setup('pro')} de implementación · pago único</div>
+              <div className="price-amount"><sup>USD</sup>{price('profesional')}<span className="per">por mes · facturación mensual</span></div>
+              <div className="price-setup">+ USD {setup('profesional')} de implementación · pago único</div>
               <ul className="price-feat">
-                <li><CheckIcon /> <b>Todo lo de Starter, más:</b></li>
-                <li><CheckIcon /> Los 3 layouts premium</li>
-                <li><CheckIcon /> CRM con Kanban</li>
-                <li><CheckIcon /> WhatsApp integrado</li>
-                <li><CheckIcon /> Auto-respuesta IA</li>
-                <li><CheckIcon /> Fichas PDF de marca</li>
+                {(plans['profesional']?.features ?? []).map((f, i) => (
+                  <li key={i}><CheckIcon /> {f.startsWith('Todo lo de') ? <b>{f}</b> : f}</li>
+                ))}
               </ul>
-              <a className="btn btn-coral" href="/lopez-asociados/admin/login">Probar 15 días</a>
+              <a className="btn btn-coral" href={CONTACTO}>Contactar</a>
             </div>
-            <div className="price-card">
-              <div className="price-head">
-                <div className="price-name">Business</div>
-                <h3>Equipo en crecimiento</h3>
-                <p>5+ agentes, reportes, integraciones avanzadas y dominio propio.</p>
-              </div>
-              <div className="price-amount"><sup>USD</sup>{price('business')}<span className="per">por mes · facturación mensual</span></div>
-              <div className="price-setup">+ USD {setup('business')} de implementación · pago único</div>
-              <ul className="price-feat">
-                <li><CheckIcon /> <b>Todo lo de Pro, más:</b></li>
-                <li><CheckIcon /> Hasta 10 agentes</li>
-                <li><CheckIcon /> Reportes y comisiones</li>
-                <li><CheckIcon /> Dominio personalizado</li>
-                <li><CheckIcon /> API + integraciones</li>
-              </ul>
-              <a className="btn btn-ghost" href="mailto:hola@nimo.app">Hablar con ventas</a>
-            </div>
+
+            {/* A MEDIDA — oscura */}
             <div className="price-card" style={{ background: '#0F0F0F', color: 'white', borderColor: '#1F1F1F' }}>
               <div className="price-head">
-                <div className="price-name" style={{ color: '#FFD93D' }}>Enterprise</div>
-                <h3 style={{ color: 'white' }}>A medida</h3>
-                <p style={{ color: 'rgba(255,255,255,.7)' }}>Cadenas, franquicias y operaciones multi-sucursal. White-label disponible.</p>
+                <div className="price-name" style={{ color: '#FFD93D' }}>A medida</div>
+                <h3 style={{ color: 'white' }}>Multi-sucursal.</h3>
+                <p style={{ color: 'rgba(255,255,255,.7)' }}>{plans['a_medida']?.tagline}</p>
               </div>
               <div className="price-amount" style={{ color: 'white' }}>
-                A medida<span className="per" style={{ color: 'rgba(255,255,255,.5)' }}>Hablemos de tu operación</span>
+                <sup>Desde USD</sup>{price('a_medida')}<span className="per" style={{ color: 'rgba(255,255,255,.5)' }}>por mes</span>
               </div>
-              <div className="price-setup" style={{ color: 'rgba(255,255,255,.55)' }}>Implementación a medida · incluida en la propuesta</div>
+              <div className="price-setup" style={{ color: 'rgba(255,255,255,.55)' }}>Desde USD {setup('a_medida')} · setup a medida</div>
               <ul className="price-feat">
-                <li style={{ color: 'rgba(255,255,255,.8)' }}><CheckIconYellow /> Agentes ilimitados</li>
-                <li style={{ color: 'rgba(255,255,255,.8)' }}><CheckIconYellow /> Multi-sucursal</li>
-                <li style={{ color: 'rgba(255,255,255,.8)' }}><CheckIconYellow /> SSO + auditoría</li>
-                <li style={{ color: 'rgba(255,255,255,.8)' }}><CheckIconYellow /> Soporte dedicado 24/7</li>
-                <li style={{ color: 'rgba(255,255,255,.8)' }}><CheckIconYellow /> SLA contractual</li>
+                {(plans['a_medida']?.features ?? []).map((f, i) => (
+                  <li key={i} style={{ color: 'rgba(255,255,255,.8)' }}><CheckIconYellow /> {f.startsWith('Todo lo de') ? <b>{f}</b> : f}</li>
+                ))}
               </ul>
-              <a className="btn btn-white" href="mailto:hola@nimo.app">Contactar →</a>
+              <a className="btn btn-white" href={CONTACTO}>Hablemos →</a>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== FAQ ===== */}
+      <section className="price-sec" id="faq">
+        <div className="container">
+          <div className="sec-head">
+            <div>
+              <span className="eyebrow">// Preguntas</span>
+              <h2 className="sec-title">Lo que más nos consultan.</h2>
+            </div>
+          </div>
+          <div className="faq-grid">
+            {[
+              { q: '¿Puedo cambiar de plan?', a: 'Cuando quieras, sin penalidades. Cobramos la diferencia prorrateada.' },
+              { q: '¿Qué incluye exactamente la implementación?', a: 'Carga inicial de propiedades, configuración del tema con tu marca, alta del dominio, alta de tu equipo, capacitación y 15-30 días de ajustes según el plan.' },
+              { q: '¿Aceptan pagos en pesos?', a: 'Sí, al tipo de cambio del día. Factura A en pesos.' },
+              { q: '¿Cómo es el proceso para empezar?', a: 'Coordinamos una llamada o visita, te mostramos el producto en vivo, definimos el plan que mejor te sirve y arrancamos. La implementación demora 7 días hábiles.' },
+            ].map((item) => (
+              <div className="faq-item" key={item.q}>
+                <h3>{item.q}</h3>
+                <p>{item.a}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -513,12 +520,12 @@ export default async function LandingPage() {
           <div>
             <h2 className="cta-h">Modernizá tu inmobiliaria <em>esta semana.</em></h2>
             <p className="cta-p">
-              15 días gratis. Sin tarjeta de crédito. Migración asistida incluida — vos seguís vendiendo mientras nosotros mudamos las propiedades.
+              Coordinamos una llamada o visita, te mostramos el producto en vivo y armamos tu sitio. La implementación demora 7 días hábiles — vos seguís vendiendo mientras cargamos tus propiedades.
             </p>
           </div>
           <div className="cta-actions">
-            <a className="btn btn-white btn-lg" href="/lopez-asociados/admin/login">Acceder a la demo <ArrowRight /></a>
-            <span className="micro">o <a href="mailto:hola@nimo.app" style={{ color: 'rgba(255,255,255,.7)' }}>agendá una demo de 20 min →</a></span>
+            <a className="btn btn-white btn-lg" href={CONTACTO}>Coordiná una demo <ArrowRight /></a>
+            <span className="micro">Te respondemos el mismo día.</span>
           </div>
         </div>
       </section>

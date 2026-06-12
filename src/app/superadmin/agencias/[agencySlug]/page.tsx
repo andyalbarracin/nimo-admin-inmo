@@ -12,7 +12,6 @@ const ZR = {
 
 const STATUS_MAP = {
   active:    { label: 'Activo',     color: ZR.green },
-  trial:     { label: 'Trial',      color: '#D4A017' },
   suspended: { label: 'Suspendido', color: ZR.red },
 } as const
 
@@ -24,7 +23,7 @@ const DUMMY_COMMERCIAL = {
   contract_start: '2024-03-15',
   contract_end: '2025-03-15',
   contract_value: 3588,
-  notes: 'Agencia sólida, paga puntualmente. Dueño es Martín López, muy comunicativo. Interesado en upgrading a Business a fin de año.',
+  notes: 'Agencia sólida, paga puntualmente. Dueño es Martín López, muy comunicativo. Interesado en upgrading a A medida a fin de año.',
   commercial_contact: 'Andrés García',
   last_visit: '2026-05-10',
   next_followup: '2026-07-01',
@@ -75,7 +74,7 @@ export default async function AgencyDetail({ params }: { params: Promise<{ agenc
           { label: 'PROPIEDADES', value: agency.properties_count, accent: ZR.orange },
           { label: 'LEADS',       value: agency.leads_count,      accent: '#4A90E2' },
           { label: 'EQUIPO',      value: agency.members_count,    accent: '#8B5CF6' },
-          { label: 'MRR',         value: agency.mrr > 0 ? `$${agency.mrr}` : 'Trial', accent: ZR.green },
+          { label: 'MRR',         value: agency.mrr > 0 ? `$${agency.mrr}` : '—', accent: ZR.green },
         ].map((s) => (
           <div key={s.label} style={{ background: ZR.cream2, border: `1px solid ${ZR.creamBorder}`, borderRadius: 6, padding: '18px 20px' }}>
             <Mono>{`// ${s.label}`}</Mono>
@@ -97,7 +96,7 @@ export default async function AgencyDetail({ params }: { params: Promise<{ agenc
                 { label: 'Slug / URL', value: `/${agency.slug}` },
                 { label: 'Owner email', value: agency.owner_email },
                 { label: 'Fecha de alta', value: agency.created_at },
-                { label: 'Plan', value: agency.plan.charAt(0).toUpperCase() + agency.plan.slice(1) },
+                { label: 'Plan', value: agency.plan.replace('_', ' ').replace(/^\w/, c => c.toUpperCase()) },
                 { label: 'Estado', value: status.label },
               ].map((f) => (
                 <div key={f.label}>

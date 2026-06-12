@@ -10,11 +10,10 @@ const ZR = {
   mono: "var(--font-mono), 'JetBrains Mono', monospace",
 }
 
-const PLANS = ['starter', 'pro', 'business', 'enterprise']
-type Status = 'active' | 'trial' | 'suspended'
+const PLANS = ['esencial', 'profesional', 'a_medida']
+type Status = 'active' | 'suspended'
 const STATUS_META: Record<Status, { label: string; color: string }> = {
   active: { label: 'Activo', color: ZR.green },
-  trial: { label: 'Trial', color: ZR.yellow },
   suspended: { label: 'Suspendido', color: ZR.red },
 }
 
@@ -58,7 +57,6 @@ export default function AgencyControls({ plan: initialPlan, status: initialStatu
         <div style={title}>Control de cuenta · <span style={{ color: STATUS_META[status].color }}>{STATUS_META[status].label}</span></div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <button onClick={() => setSt('active')} disabled={status === 'active'} style={{ padding: '9px', background: 'rgba(45,125,95,.08)', border: `1px solid ${status === 'active' ? ZR.green : 'rgba(45,125,95,.2)'}`, borderRadius: 4, color: ZR.green, fontSize: 12, cursor: status === 'active' ? 'default' : 'pointer', fontFamily: ZR.body, fontWeight: status === 'active' ? 700 : 400 }}>Activar cuenta</button>
-          <button onClick={() => setSt('trial')} disabled={status === 'trial'} style={{ padding: '9px', background: 'rgba(212,160,23,.08)', border: `1px solid ${status === 'trial' ? ZR.yellow : 'rgba(212,160,23,.2)'}`, borderRadius: 4, color: ZR.yellow, fontSize: 12, cursor: status === 'trial' ? 'default' : 'pointer', fontFamily: ZR.body, fontWeight: status === 'trial' ? 700 : 400 }}>Resetear a trial</button>
           <button onClick={() => setSt('suspended')} disabled={status === 'suspended'} style={{ padding: '9px', background: 'rgba(231,29,10,.06)', border: `1px solid ${status === 'suspended' ? ZR.red : 'rgba(231,29,10,.2)'}`, borderRadius: 4, color: ZR.red, fontSize: 12, cursor: status === 'suspended' ? 'default' : 'pointer', fontFamily: ZR.body, fontWeight: status === 'suspended' ? 700 : 400 }}>Suspender cuenta</button>
         </div>
       </div>

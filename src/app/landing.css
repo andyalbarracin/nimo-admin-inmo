@@ -314,7 +314,7 @@
 
 /* ---- PRICING ---- */
 .lp-wrap .price-sec { background: #ffffff; }
-.lp-wrap .price-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; align-items: stretch; }
+.lp-wrap .price-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; align-items: stretch; }
 .lp-wrap .price-card { background: white; border: 1px solid var(--line); border-radius: var(--r-lg); padding: 28px; display: flex; flex-direction: column; gap: 16px; transition: transform .2s ease, box-shadow .2s ease; }
 .lp-wrap .price-card:hover { transform: translateY(-4px); box-shadow: var(--lp-shadow-md); }
 .lp-wrap .price-card.featured { border: 2px solid var(--coral); position: relative; box-shadow: var(--lp-shadow-md); background: linear-gradient(180deg,#FFF8F6 0%,white 40%); }
@@ -396,6 +396,13 @@
 
 /* Setup fee bajo el precio */
 .lp-wrap .price-setup { font-size: 12px; font-weight: 600; color: var(--coral); margin: -8px 0 18px; letter-spacing: -.005em; }
+
+/* FAQ */
+.lp-wrap .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.lp-wrap .faq-item { background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px 26px; box-shadow: var(--lp-shadow-sm); }
+.lp-wrap .faq-item h3 { font-size: 17px; font-weight: 700; margin: 0 0 8px; letter-spacing: -.01em; }
+.lp-wrap .faq-item p { font-size: 14.5px; color: var(--ink-2); line-height: 1.55; margin: 0; }
+@media (max-width: 768px) { .lp-wrap .faq-grid { grid-template-columns: 1fr; } }
 
 /* ============================================================
    RESPONSIVE — breakpoints (mobile-friendly)
