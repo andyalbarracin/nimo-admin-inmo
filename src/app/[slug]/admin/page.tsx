@@ -69,7 +69,7 @@ export default async function AdminDashboard({ params }: { params: Promise<{ slu
   return (
     <div style={{ padding: '0 0 40px', background: LA.bg, minHeight: '100vh', color: LA.ink, fontFamily: LA.sans }}>
       {/* TOP HEADER */}
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '22px 40px', background: LA.bg, borderBottom: `1px solid ${LA.border}`, gap: 24 }}>
+      <header className="rwd-pad" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '22px 40px', background: LA.bg, borderBottom: `1px solid ${LA.border}`, gap: 24, flexWrap: 'wrap' }}>
         <div>
           <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-.02em', margin: 0, lineHeight: 1.1 }}>Buen día, {ownerFirst} 👋</h1>
           <div style={{ fontSize: 13, color: LA.ink2, marginTop: 5, display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -87,7 +87,7 @@ export default async function AdminDashboard({ params }: { params: Promise<{ slu
         </div>
       </header>
 
-      <div style={{ padding: '28px 40px' }}>
+      <div className="rwd-pad" style={{ padding: '28px 40px' }}>
         {/* KPIs */}
         <div className="dash-kpis" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 18, marginBottom: 20 }}>
           {kpis.map(kpi => (
