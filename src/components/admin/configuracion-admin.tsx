@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import type { Agency } from '@/lib/dummy'
 import { uploadAgencyLogo, removeAgencyLogo } from '@/lib/agency/logo-action'
+import ZaireCredit from '@/components/zaire-credit'
 
 /* Admin · Configuración — form funcional en sesión, themed. */
 
@@ -63,7 +64,7 @@ export default function ConfiguracionAdmin({ agency, initialLogo = '' }: { agenc
 
   return (
     <div style={{ padding: '0 0 40px', minHeight: '100vh', background: LA.bg, fontFamily: LA.sans, color: LA.ink }}>
-      <header className="rwd-pad" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 40px', borderBottom: `1px solid ${LA.border}`, gap: 24, position: 'sticky', top: 0, background: LA.bg, zIndex: 10 }}>
+      <header className="rwd-pad rwd-wrap" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 40px', borderBottom: `1px solid ${LA.border}`, gap: 24, position: 'sticky', top: 0, background: LA.bg, zIndex: 10 }}>
         <div>
           <div style={{ fontFamily: LA.mono, fontSize: 11, color: LA.ink3, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 6 }}>Panel</div>
           <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-.02em', margin: 0 }}>Configuración</h1>
@@ -120,6 +121,8 @@ export default function ConfiguracionAdmin({ agency, initialLogo = '' }: { agenc
             <div><label style={label}>Descripción SEO</label><textarea style={{ ...field, resize: 'vertical', minHeight: 80 }} value={form.seo_description} onChange={e => set('seo_description', e.target.value)} /></div>
           </div>
         </Card>
+
+        <ZaireCredit name={form.name || 'NIMO'} color={LA.ink3} accent="var(--admin-accent, #FF6B6B)" style={{ marginTop: 8, paddingTop: 20, borderTop: `1px solid ${LA.border}` }} />
       </div>
     </div>
   )

@@ -45,7 +45,7 @@ export default function PlanesClient({ initialPlans }: { initialPlans: PlanRow[]
   const num: React.CSSProperties = { width: 80, border: `2px solid ${ZR.black}`, padding: '4px 6px', fontFamily: ZR.display, fontSize: 18 }
 
   return (
-    <div style={{ padding: '36px 40px', minHeight: '100vh', background: ZR.cream, fontFamily: ZR.body, color: ZR.black }}>
+    <div className="rwd-pad" style={{ padding: '36px 40px', minHeight: '100vh', background: ZR.cream, fontFamily: ZR.body, color: ZR.black }}>
       <div style={{ marginBottom: 32 }}>
         <div style={{ fontFamily: ZR.mono, fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 6 }}>// SUPERADMIN</div>
         <h1 style={{ fontFamily: ZR.display, fontSize: 'clamp(28px, 4vw, 40px)', margin: 0, textTransform: 'uppercase', letterSpacing: '-.01em' }}>PLANES</h1>
@@ -113,13 +113,13 @@ export default function PlanesClient({ initialPlans }: { initialPlans: PlanRow[]
         })}
       </div>
 
-      <div className="z-block" style={{ overflow: 'hidden' }}>
+      <div className="z-block rwd-tablewrap" style={{ overflow: 'hidden' }}>
         <div style={{ padding: '18px 24px 14px', borderBottom: `2px solid ${ZR.black}`, fontFamily: ZR.mono, fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em' }}>// AGENCIAS POR PLAN</div>
         {AGENCIES.map((agency, i) => {
           const sc = agency.plan_status === 'active' ? '#2D7D5F' : agency.plan_status === 'trial' ? '#A07C0A' : '#E71D0A'
           const sl = agency.plan_status === 'active' ? 'Activo' : agency.plan_status === 'trial' ? 'Trial' : 'Suspendido'
           return (
-            <div key={agency.id} className="z-row" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 130px', padding: '13px 24px', borderTop: i > 0 ? `1px solid ${ZR.border}` : 'none', alignItems: 'center' }}>
+            <div key={agency.id} className="z-row rwd-row" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 130px', padding: '13px 24px', borderTop: i > 0 ? `1px solid ${ZR.border}` : 'none', alignItems: 'center' }}>
               <div style={{ fontSize: 13, fontWeight: 700 }}>{agency.name}</div>
               <span style={{ fontFamily: ZR.mono, fontSize: 10, fontWeight: 700, background: 'rgba(255,106,0,.1)', color: ZR.orange, padding: '3px 9px', textTransform: 'uppercase', width: 'fit-content' }}>{agency.plan}</span>
               <span style={{ fontFamily: ZR.mono, fontSize: 9, background: sc + '18', color: sc, padding: '3px 9px', width: 'fit-content', textTransform: 'uppercase', letterSpacing: '.08em' }}>{sl}</span>

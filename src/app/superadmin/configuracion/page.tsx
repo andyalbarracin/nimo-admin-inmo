@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { PLATFORM_STATS } from '@/lib/dummy'
+import ZaireCredit from '@/components/zaire-credit'
 
 const ZR = {
   black: '#111111', cream: '#F5F5F0', white: '#FFFFFF',
@@ -29,9 +30,9 @@ export default function SuperadminConfiguracion() {
   const [saved, setSaved] = useState(false)
   const save = () => { setSaved(true); setTimeout(() => setSaved(false), 2500) }
   return (
-    <div style={{ padding: '36px 40px', minHeight: '100vh', background: ZR.cream, fontFamily: 'var(--font-archivo), system-ui, sans-serif' }}>
+    <div className="rwd-pad" style={{ padding: '36px 40px', minHeight: '100vh', background: ZR.cream, fontFamily: 'var(--font-archivo), system-ui, sans-serif' }}>
       <div style={{ maxWidth: 760, margin: '0 auto' }}>
-        <div style={{ marginBottom: 36, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 16 }}>
+        <div style={{ marginBottom: 36, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 16, flexWrap: 'wrap' }}>
           <div>
             <div style={{ fontFamily: "var(--font-mono), var(--font-mono), 'JetBrains Mono', monospace", fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 6 }}>// SUPERADMIN</div>
             <h1 style={{ fontFamily: "var(--font-archivo-black), var(--font-archivo-black), 'Archivo Black', sans-serif", fontSize: 28, color: ZR.black, margin: 0, textTransform: 'uppercase', letterSpacing: '-.01em' }}>CONFIGURACIÓN GLOBAL</h1>
@@ -48,7 +49,7 @@ export default function SuperadminConfiguracion() {
           <div style={sectionStyle}>
             <div style={{ fontFamily: "var(--font-mono), 'JetBrains Mono', monospace", fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 20 }}>// IDENTIDAD DE LA PLATAFORMA</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              <div className="rwd-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                 <div>
                   <label style={labelStyle}>Nombre de la plataforma</label>
                   <input defaultValue="NIMO" style={inputStyle} />
@@ -72,7 +73,7 @@ export default function SuperadminConfiguracion() {
           {/* Platform stats snapshot */}
           <div style={sectionStyle}>
             <div style={{ fontFamily: "var(--font-mono), 'JetBrains Mono', monospace", fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 20 }}>// MÉTRICAS DE LA PLATAFORMA</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+            <div className="rwd-4col" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
               {[
                 { label: 'Total agencias',  value: PLATFORM_STATS.total_agencies,  accent: ZR.orange },
                 { label: 'Activas',         value: PLATFORM_STATS.active_agencies,  accent: '#2D7D5F' },
@@ -154,6 +155,8 @@ export default function SuperadminConfiguracion() {
               GUARDAR CONFIGURACIÓN →
             </button>
           </div>
+
+          <ZaireCredit name="NIMO" color={ZR.ink3} accent={ZR.orange} style={{ marginTop: 8, paddingTop: 20, borderTop: `1px solid ${ZR.border}` }} />
         </div>
       </div>
     </div>

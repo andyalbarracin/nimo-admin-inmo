@@ -477,6 +477,13 @@
   .admin-sidebar { display: none !important; }
   .admin-main { padding-bottom: 66px !important; }
   .admin-tabbar { display: flex !important; }
+  /* headers/filas de botones que no entran → wrappean */
+  .rwd-wrap { flex-wrap: wrap !important; }
+  /* paneles que en desktop son % fijos (logins) → full width */
+  .rwd-full { width: 100% !important; }
+  /* tablas anchas → scroll horizontal en vez de aplastarse */
+  .rwd-tablewrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+  .rwd-row { min-width: 660px !important; }
 }
 @media (max-width: 560px) {
   .rwd-3col, .rwd-4col { grid-template-columns: 1fr !important; }

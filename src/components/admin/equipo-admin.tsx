@@ -46,7 +46,7 @@ export default function EquipoAdmin({ initialTeam, planLimit = 10 }: { initialTe
 
   return (
     <div style={{ padding: '0 0 40px', minHeight: '100vh', background: LA.bg, fontFamily: LA.sans, color: LA.ink }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 40px', borderBottom: `1px solid ${LA.border}`, gap: 24, flexWrap: 'wrap' }}>
+      <header className="rwd-pad" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 40px', borderBottom: `1px solid ${LA.border}`, gap: 24, flexWrap: 'wrap' }}>
         <div>
           <div style={{ fontFamily: LA.mono, fontSize: 11, color: LA.ink3, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 6 }}>Gestión</div>
           <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-.02em', margin: 0 }}>Equipo</h1>
@@ -55,7 +55,7 @@ export default function EquipoAdmin({ initialTeam, planLimit = 10 }: { initialTe
         <button onClick={() => setInviting(true)} style={{ background: LA.accent, color: LA.white, padding: '11px 22px', borderRadius: 12, fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer' }}>+ Invitar miembro</button>
       </header>
 
-      <div style={{ padding: '24px 40px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
+      <div className="rwd-pad" style={{ padding: '24px 40px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
         {members.map(m => {
           const rm = roleMeta(m.role)
           return (

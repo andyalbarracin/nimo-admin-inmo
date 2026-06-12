@@ -4,6 +4,7 @@ import { useState, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import ZaireCredit from '@/components/zaire-credit'
 
 const ZR = {
   black: '#111111', cream: '#F5F5F0', cream2: '#FFFFFF',
@@ -107,8 +108,8 @@ export default function AgencyLoginClient({ slug, agencyName, redirectTo, showDe
   return (
     <div style={{ display: 'flex', minHeight: '100vh', fontFamily: "'Archivo', system-ui, sans-serif" }}>
 
-      {/* ── LEFT PANEL 60% — slides ── */}
-      <div style={{ width: '60%', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      {/* ── LEFT PANEL 60% — slides (oculto en mobile) ── */}
+      <div className="rwd-hide-mobile" style={{ width: '60%', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         {/* Background image with crossfade */}
         {SLIDES.map((s, i) => (
           <div key={i} style={{
@@ -172,8 +173,8 @@ export default function AgencyLoginClient({ slug, agencyName, redirectTo, showDe
         </div>
       </div>
 
-      {/* ── RIGHT PANEL 40% — login ── */}
-      <div style={{ width: '40%', background: ZR.cream, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      {/* ── RIGHT PANEL 40% — login (full width en mobile) ── */}
+      <div className="rwd-full" style={{ width: '40%', background: ZR.cream, display: 'flex', flexDirection: 'column', position: 'relative' }}>
         {/* Stripe top */}
         <div style={{ height: 4, background: 'linear-gradient(90deg, #E71D0A 0%, #E71D0A 33.3%, #FF6A00 33.3%, #FF6A00 66.6%, #FFC107 66.6%, #FFC107 100%)', flexShrink: 0 }} />
 
@@ -266,14 +267,12 @@ export default function AgencyLoginClient({ slug, agencyName, redirectTo, showDe
         </div>
 
         {/* Footer */}
-        <div style={{ padding: '14px 52px', borderTop: `1px solid ${ZR.creamBorder}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
-          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: ZR.ink3, textTransform: 'uppercase', letterSpacing: '.1em' }}>
-            © 2026 NIMO — ZAIRE TECH
-          </div>
-          <div style={{ display: 'flex', gap: 16 }}>
+        <div style={{ padding: '14px 52px', borderTop: `1px solid ${ZR.creamBorder}`, display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 16 }}>
             <a href="#" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: ZR.ink3, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '.1em' }}>Términos</a>
             <a href="#" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 8, color: ZR.ink3, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '.1em' }}>Privacidad</a>
           </div>
+          <ZaireCredit name="NIMO" color={ZR.ink3} accent={ZR.orange} fontFamily="'JetBrains Mono', monospace" />
         </div>
       </div>
     </div>

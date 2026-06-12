@@ -81,13 +81,13 @@ export default function SalesCrmClient({ initialLeads, persisted }: { initialLea
 
   return (
     <div style={{ padding: '36px 40px', minHeight: '100vh', background: ZR.cream, fontFamily: ZR.body, color: ZR.black }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, gap: 16, flexWrap: 'wrap' }}>
         <div>
           <div style={{ fontFamily: ZR.mono, fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 6 }}>// SUPERADMIN</div>
           <h1 style={{ fontFamily: ZR.display, fontSize: 'clamp(26px, 4vw, 36px)', margin: 0, textTransform: 'uppercase', letterSpacing: '-.01em' }}>CRM — MIS CLIENTES</h1>
           <p style={{ fontSize: 13, color: ZR.ink3, margin: '4px 0 0' }}>Clic en una card para abrir la ficha completa (con archivos)</p>
         </div>
-        <div style={{ display: 'flex', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <Link href="/api/webhooks/crm" className="z-btn-bk">[ API DOCS → ]</Link>
           <button onClick={() => setEditing(blank('prospect'))} className="z-btn-bk is-orange">[ + NUEVO CLIENTE ]</button>
         </div>
@@ -120,16 +120,16 @@ export default function SalesCrmClient({ initialLeads, persisted }: { initialLea
 
       <div className="z-block" style={{ marginTop: 36, padding: 24 }}>
         <div style={{ fontFamily: ZR.mono, fontSize: 10, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 16 }}>// AUTOMATIZACIÓN — WEBHOOKS</div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+        <div className="rwd-3col" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
           {[
             { endpoint: '/api/webhooks/crm', desc: 'Crear o actualizar lead en el CRM. JSON con name, contact, stage, plan_interest, mrr_potential.' },
             { endpoint: '/api/webhooks/lead', desc: 'Recibir leads entrantes de agencias.' },
             { endpoint: '/api/webhooks/agency/signup', desc: 'Notifica alta de nueva agencia.' },
           ].map(wh => (
-            <div key={wh.endpoint} style={{ padding: '14px 16px', background: ZR.cream, border: `1px solid ${ZR.border}` }}>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}>
+            <div key={wh.endpoint} style={{ padding: '14px 16px', background: ZR.cream, border: `1px solid ${ZR.border}`, minWidth: 0 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6, flexWrap: 'wrap' }}>
                 <span style={{ fontFamily: ZR.display, fontSize: 9, background: ZR.black, color: ZR.cream, padding: '2px 7px' }}>POST</span>
-                <code style={{ fontFamily: ZR.mono, fontSize: 9, color: ZR.orange }}>{wh.endpoint}</code>
+                <code style={{ fontFamily: ZR.mono, fontSize: 9, color: ZR.orange, overflowWrap: 'anywhere' }}>{wh.endpoint}</code>
               </div>
               <div style={{ fontSize: 11, color: ZR.ink3, lineHeight: 1.5 }}>{wh.desc}</div>
             </div>

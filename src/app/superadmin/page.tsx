@@ -73,7 +73,7 @@ export default function SuperadminDashboard() {
   return (
     <div className="rwd-pad" style={{ padding: '36px 40px 64px', minHeight: '100vh', background: ZR.cream, fontFamily: ZR.body, color: ZR.black }}>
       {/* HEADER */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 32 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 20, flexWrap: 'wrap' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontFamily: ZR.mono, fontSize: 11.5, letterSpacing: '.14em', textTransform: 'uppercase', color: ZR.ink3 }}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
@@ -81,14 +81,14 @@ export default function SuperadminDashboard() {
               // VISTA GLOBAL · ÚLTIMOS 30 DÍAS
             </span>
           </div>
-          <h1 style={{ fontFamily: ZR.display, fontSize: 'clamp(48px, 6vw, 80px)', letterSpacing: '.01em', lineHeight: 0.92, textTransform: 'uppercase', margin: '14px 0 10px' }}>
+          <h1 style={{ fontFamily: ZR.display, fontSize: 'clamp(34px, 6vw, 80px)', letterSpacing: '.01em', lineHeight: 0.92, textTransform: 'uppercase', margin: '14px 0 10px', wordBreak: 'break-word' }}>
             OPER<span style={{ color: ZR.orange }}>A</span>CIONES
           </h1>
           <p style={{ fontFamily: ZR.mono, fontSize: 13, letterSpacing: '.04em', color: ZR.ink3, margin: 0, textTransform: 'uppercase' }}>
             {PLATFORM_STATS.active_agencies} inmobiliarias activas · MRR USD {PLATFORM_STATS.mrr.toLocaleString('es-AR')} · {PLATFORM_STATS.total_leads} leads este mes
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           <span className="z-btn-bk">[ ÚLTIMOS 30 DÍAS ▾ ]</span>
           <span className="z-btn-bk">[ EXPORT CSV ]</span>
           <Link href="/superadmin/planes" className="z-btn-bk is-orange">[ + AGENCIA ]</Link>
