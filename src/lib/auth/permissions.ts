@@ -49,7 +49,7 @@ const PERMISOS: Record<string, Rol[]> = {
   // Métricas / Reportes
   'analytics:view': ['owner', 'admin'],
 
-  // IA (cuando esté habilitada)
+  // Funciones avanzadas (futuro)
   'ai:use': ['owner', 'admin', 'agent'],
   'ai:settings': ['owner', 'admin'],
 }
