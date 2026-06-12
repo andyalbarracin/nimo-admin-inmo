@@ -107,9 +107,9 @@ export default function SuperadminDashboard() {
       </div>
 
       {/* BODY */}
-      <div className="dash-2col" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 14 }}>
+      <div className="dash-2col" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)', gap: 14 }}>
         {/* LEFT */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, minWidth: 0 }}>
           {/* DONUT */}
           <section className="z-block" style={{ padding: 24 }}>
             <BlockHead title="INMOBILIARIAS POR PLAN" right={`TOTAL ${total}`} />
@@ -145,7 +145,8 @@ export default function SuperadminDashboard() {
             <div style={{ padding: '20px 24px 16px' }}>
               <BlockHead title="TOP INMOBILIARIAS · POR MRR" rightHref={{ label: '[ VER TODAS → ]', href: '/superadmin/agencias' }} />
             </div>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <div className="rwd-tablewrap">
+            <table style={{ width: '100%', minWidth: 560, borderCollapse: 'collapse' }}>
               <thead>
                 <tr>
                   {['#', 'NOMBRE', 'PLAN', 'PROPS', 'LEADS', 'MRR', 'ESTADO'].map((h, i) => (
@@ -176,11 +177,12 @@ export default function SuperadminDashboard() {
                 })}
               </tbody>
             </table>
+            </div>
           </section>
         </div>
 
         {/* RIGHT */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, minWidth: 0 }}>
           {/* SERVICES */}
           <section className="z-block" style={{ padding: 24 }}>
             <BlockHead title="SALUD DE SERVICIOS" right={`${okServices}/${SERVICES.length} OK`} />
@@ -201,9 +203,9 @@ export default function SuperadminDashboard() {
             <BlockHead title="EVENTOS RECIENTES" rightHref={{ label: '[ VER LOGS → ]', href: '/superadmin/crm' }} />
             <div style={{ marginTop: 8 }}>
               {EVENTS.map(([tm, msg], i) => (
-                <div key={i} style={{ display: 'grid', gridTemplateColumns: '64px 1fr', gap: 14, padding: '11px 0', borderTop: i === 0 ? 'none' : `1px solid ${ZR.line}`, fontFamily: ZR.mono, fontSize: 11.5, letterSpacing: '.04em', textTransform: 'uppercase', alignItems: 'center' }}>
+                <div key={i} style={{ display: 'grid', gridTemplateColumns: '64px minmax(0, 1fr)', gap: 14, padding: '11px 0', borderTop: i === 0 ? 'none' : `1px solid ${ZR.line}`, fontFamily: ZR.mono, fontSize: 11.5, letterSpacing: '.04em', textTransform: 'uppercase', alignItems: 'center' }}>
                   <span style={{ color: ZR.orange, fontWeight: 700 }}>[{tm}]</span>
-                  <span style={{ color: i === 2 ? ZR.red : ZR.black, fontWeight: i === 2 ? 700 : 400 }}>{msg}</span>
+                  <span style={{ color: i === 2 ? ZR.red : ZR.black, fontWeight: i === 2 ? 700 : 400, overflowWrap: 'anywhere' }}>{msg}</span>
                 </div>
               ))}
             </div>
