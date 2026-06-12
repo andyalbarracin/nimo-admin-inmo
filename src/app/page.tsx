@@ -502,7 +502,7 @@ export default async function LandingPage() {
             {[
               { q: '¿Puedo cambiar de plan?', a: 'Cuando quieras, sin penalidades. Cobramos la diferencia prorrateada.' },
               { q: '¿Qué incluye exactamente la implementación?', a: 'Carga inicial de propiedades, configuración del tema con tu marca, alta del dominio, alta de tu equipo, capacitación y 15-30 días de ajustes según el plan.' },
-              { q: '¿Aceptan pagos en pesos?', a: 'Sí, al tipo de cambio del día. Factura A en pesos.' },
+              { q: '¿Aceptan pagos en pesos?', a: 'Sí, al tipo de cambio MEP del día. Factura C en pesos.' },
               { q: '¿Cómo es el proceso para empezar?', a: 'Coordinamos una llamada o visita, te mostramos el producto en vivo, definimos el plan que mejor te sirve y arrancamos. La implementación demora 7 días hábiles.' },
             ].map((item) => (
               <div className="faq-item" key={item.q}>
