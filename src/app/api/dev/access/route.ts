@@ -1,87 +1,60 @@
+/*
+ * Archivo : route.ts
+ * Ruta    : src/app/api/dev/access/route.ts
+ * Modif.  : 2026-06-13
+ * Descripción: Atajo de desarrollo para previsualizar la app como un rol de la
+ *              AGENCIA demo (owner/agent), vía login REAL de Supabase.
+ *              El superadmin NO tiene atajo: se entra siempre por
+ *              /superadmin/login con credencial real. Antes este endpoint
+ *              entregaba una cookie de superadmin sin contraseña (puerta
+ *              trasera) — eso se eliminó.
+ */
 import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import type { Database } from '@/types/database'
 
-const ACCOUNTS = {
-  superadmin: {
-    email: 'admin@nimo.app',
-    password: 'nimo-demo',
-    redirect: '/superadmin',
-    demoRole: 'superadmin',
-  },
-  owner: {
-    email: 'owner@lopezasociados.com',
-    password: 'Lopez2024!',
-    redirect: '/lopez-asociados/admin',
-    demoRole: 'owner',
-  },
-  agent: {
-    email: 'agente@lopezasociados.com',
-    password: 'Lopez2024!',
-    redirect: '/lopez-asociados/admin',
-    demoRole: 'agent',
-  },
+// Solo roles de la AGENCIA demo. El superadmin se excluye a propósito:
+// es acceso a la plataforma y debe pasar por /superadmin/login.
+const DEMO_ACCOUNTS = {
+  owner: { email: 'owner@lopezasociados.com', password: 'Lopez2024!', redirect: '/lopez-asociados/admin' },
+  agent: { email: 'agente@lopezasociados.com', password: 'Lopez2024!', redirect: '/lopez-asociados/admin' },
 } as const
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const role = searchParams.get('as') as keyof typeof ACCOUNTS | null
-  const account = role ? ACCOUNTS[role] : null
+  const role = new URL(request.url).searchParams.get('as')
 
+  // El superadmin nunca se autologuea: al login real (sin bypass de cookie).
+  if (role === 'superadmin') {
+    return NextResponse.redirect(new URL('/superadmin/login', request.url))
+  }
+
+  const account = role ? DEMO_ACCOUNTS[role as keyof typeof DEMO_ACCOUNTS] : null
   if (!account) {
-    return new NextResponse(
-      `<html><body style="font-family:monospace;padding:40px;background:#0F0F0F;color:white">
-        <h2>Dev Access — NIMO</h2>
-        <ul>
-          <li><a href="/api/dev/access?as=superadmin" style="color:#FF6B6B">Super Admin</a></li>
-          <li><a href="/api/dev/access?as=owner" style="color:#FF6B6B">Owner (López & Asociados)</a></li>
-          <li><a href="/api/dev/access?as=agent" style="color:#FF6B6B">Agente</a></li>
-        </ul>
-      </body></html>`,
-      { headers: { 'content-type': 'text/html' } },
-    )
+    return NextResponse.redirect(new URL('/dev', request.url))
   }
 
-  // Try Supabase login first
-  try {
-    const cookieStore = await cookies()
-    const supabase = createServerClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll: () => cookieStore.getAll(),
-          setAll: (cs) => cs.forEach(({ name, value, options }) => cookieStore.set(name, value, options)),
-        },
+  // Login REAL contra Supabase (cuenta de seed de la agencia demo).
+  // Sin fallback de cookie: si no hay sesión válida, va al login de la agencia.
+  const cookieStore = await cookies()
+  const supabase = createServerClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll: () => cookieStore.getAll(),
+        setAll: (cs) => cs.forEach(({ name, value, options }) => cookieStore.set(name, value, options)),
       },
-    )
+    },
+  )
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: account.email,
-      password: account.password,
-    })
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: account.email,
+    password: account.password,
+  })
 
-    if (!error && data.session) {
-      return NextResponse.redirect(new URL(account.redirect, request.url))
-    }
-  } catch {
-    // Supabase not configured — fall through to demo mode
+  if (error || !data.session) {
+    return NextResponse.redirect(new URL('/lopez-asociados/admin/login', request.url))
   }
-
-  // Demo mode: set a cookie so pages can render without real auth
-  const response = NextResponse.redirect(new URL(account.redirect, request.url))
-  response.cookies.set('nimo_demo_role', account.demoRole, {
-    path: '/',
-    maxAge: 60 * 60 * 8, // 8 hours
-    httpOnly: false,
-    sameSite: 'lax',
-  })
-  response.cookies.set('nimo_demo_slug', 'lopez-asociados', {
-    path: '/',
-    maxAge: 60 * 60 * 8,
-    httpOnly: false,
-    sameSite: 'lax',
-  })
-  return response
+  return NextResponse.redirect(new URL(account.redirect, request.url))
 }

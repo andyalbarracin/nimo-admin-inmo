@@ -1,6 +1,11 @@
-// Quick-access panel — one-click login as any role (demo).
-// ⚠️ Disponible también en producción: las credenciales son de seed/demo.
-// Antes de tener clientes reales: re-bloquear o gatear con secreto.
+/*
+ * Archivo : page.tsx
+ * Ruta    : src/app/dev/page.tsx
+ * Modif.  : 2026-06-13
+ * Descripción: Panel interno de acceso rápido. El SUPERADMIN va al login real
+ *              (/superadmin/login, sin bypass). owner/agent siguen siendo un
+ *              atajo de la AGENCIA demo vía login real de Supabase (datos demo).
+ */
 
 export const metadata = { title: 'Dev Access — NIMO' }
 
@@ -8,9 +13,9 @@ const ROLES = [
   {
     id: 'superadmin',
     label: 'Super Admin',
-    email: 'admin@nimo.app',
-    desc: 'Panel de plataforma. Ve todas las agencias, planes y configuración global.',
-    href: '/api/dev/access?as=superadmin',
+    email: 'login con tu credencial real',
+    desc: 'Panel de plataforma. Requiere login real (sin atajo): te lleva a /superadmin/login.',
+    href: '/superadmin/login',
     direct: '/superadmin',
     color: '#1A1A1A',
   },
@@ -40,7 +45,7 @@ export default function DevPage() {
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
 
         <div style={{ marginBottom: 48 }}>
-          <div style={{ fontFamily: 'monospace', fontSize: 11, letterSpacing: '.14em', color: '#666', marginBottom: 8 }}>// ACCESO DEMO — QUITAR ANTES DE CLIENTES REALES</div>
+          <div style={{ fontFamily: 'monospace', fontSize: 11, letterSpacing: '.14em', color: '#666', marginBottom: 8 }}>// ACCESO INTERNO · superadmin con login real · owner/agent = demo</div>
           <h1 style={{ fontSize: 40, fontWeight: 800, letterSpacing: '-.03em', margin: '0 0 12px' }}>Acceso rápido NIMO</h1>
           <p style={{ color: '#888', fontSize: 16, margin: 0 }}>
             Entrá como cualquier rol con un click. Requiere que el SQL de seed esté corrido en Supabase.
