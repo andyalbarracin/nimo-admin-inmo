@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation'
 import { updateAgencyFiscal } from '@/lib/agencies/provision'
 import { uploadDocument, getDocumentUrl, deleteDocument, type AgencyDocument } from '@/lib/agencies/documents'
 import { addCredential, revealCredential, deleteCredential, type AgencyCredential } from '@/lib/agencies/credentials'
+import { setOnboardingEnabled } from '@/lib/agencies/onboarding'
 
 const ZR = {
   black: '#111111', cream: '#F5F5F0', white: '#FFFFFF', border: '#DEDED4',
@@ -86,6 +87,12 @@ export default function AgencyDetailLive({ agency, documents, credentials }: { a
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function GeneralTab({ agency }: { agency: any }) {
+  const router = useRouter()
+  const [pending, start] = useTransition()
+  const enabled = !!agency.onboarding_enabled
+  const completed = !!agency.onboarding_completed
+  const toggle = () => start(async () => { await setOnboardingEnabled(agency.id, !enabled); router.refresh() })
+
   const fields = [
     { label: 'Nombre', value: agency.name },
     { label: 'Slug / URL', value: `/${agency.slug}` },
@@ -95,16 +102,33 @@ function GeneralTab({ agency }: { agency: any }) {
     { label: 'Fecha de alta', value: (agency.created_at ?? '').slice(0, 10) },
   ]
   return (
-    <div style={card}>
-      <div style={{ fontFamily: ZR.mono, fontSize: 9, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 4 }}>// DATOS DE LA AGENCIA</div>
-      <div style={{ fontFamily: ZR.display, fontSize: 14, marginBottom: 18 }}>Información general</div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-        {fields.map(f => (
-          <div key={f.label}>
-            <span style={lbl}>{f.label}</span>
-            <div style={{ fontSize: 14, color: ZR.ink2, fontWeight: 500 }}>{f.value}</div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={card}>
+        <div style={{ fontFamily: ZR.mono, fontSize: 9, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 4 }}>// DATOS DE LA AGENCIA</div>
+        <div style={{ fontFamily: ZR.display, fontSize: 14, marginBottom: 18 }}>Información general</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+          {fields.map(f => (
+            <div key={f.label}>
+              <span style={lbl}>{f.label}</span>
+              <div style={{ fontSize: 14, color: ZR.ink2, fontWeight: 500 }}>{f.value}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={card}>
+        <div style={{ fontFamily: ZR.mono, fontSize: 9, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 4 }}>// ONBOARDING</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+          <div style={{ flex: 1, minWidth: 200 }}>
+            <div style={{ fontFamily: ZR.display, fontSize: 14, marginBottom: 2 }}>Wizard de primer login</div>
+            <div style={{ fontSize: 12.5, color: ZR.ink3 }}>
+              {completed ? 'Completado por la agencia ✓' : enabled ? 'Activado · pendiente de completar' : 'Desactivado'}
+            </div>
           </div>
-        ))}
+          <button onClick={toggle} disabled={pending} style={{ fontFamily: ZR.mono, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em', padding: '9px 16px', cursor: pending ? 'default' : 'pointer', opacity: pending ? .6 : 1, background: enabled ? ZR.white : ZR.green, color: enabled ? ZR.red : ZR.white, border: `2px solid ${enabled ? ZR.red : ZR.green}` }}>
+            {pending ? '…' : enabled ? 'Desactivar' : 'Activar onboarding'}
+          </button>
+        </div>
       </div>
     </div>
   )

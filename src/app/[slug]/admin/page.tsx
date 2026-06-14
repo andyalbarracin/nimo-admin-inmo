@@ -1,6 +1,8 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { PROPERTIES, LEADS, AGENCY_STATS, AGENCIES, TEAM } from '@/lib/dummy'
 import { THEMES } from '@/lib/themes'
+import { getOnboardingStatus } from '@/lib/agencies/onboarding'
 
 /* ============================================================
  * Universo A · CORAL & CREAM · Dashboard del Panel — A4.
@@ -36,6 +38,12 @@ const PLAN_USERS: Record<string, number> = { esencial: 2, profesional: 6, a_medi
 
 export default async function AdminDashboard({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+
+  // Onboarding: si está activado y sin completar, el owner va primero al wizard.
+  // (Solo aplica a agencias reales con la fila en DB; las demo no tienen registro.)
+  const onboarding = await getOnboardingStatus(slug)
+  if (onboarding && onboarding.enabled && !onboarding.completed) redirect(`/${slug}/admin/onboarding`)
+
   const agency = AGENCIES.find(a => a.slug === slug)
   const accent = THEMES[agency?.theme ?? 'editorial'].accent
   const accentSoft = accent + '24'
