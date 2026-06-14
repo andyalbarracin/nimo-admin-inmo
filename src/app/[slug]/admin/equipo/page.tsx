@@ -1,10 +1,23 @@
 import { TEAM, AGENCIES } from '@/lib/dummy'
 import EquipoAdmin from '@/components/admin/equipo-admin'
+import { listAgencyMembers } from '@/lib/agencies/members'
+import { getLiveAgency } from '@/lib/agencies/provision'
+
+export const dynamic = 'force-dynamic'
 
 const PLAN_USERS: Record<string, number> = { esencial: 2, profesional: 6, a_medida: 99 }
 
 export default async function EquipoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+
+  // Coexistencia: agencia DEMO → equipo de muestra; agencia REAL → sus miembros.
+  const isDemo = AGENCIES.some(a => a.slug === slug)
+  if (!isDemo) {
+    const [members, live] = await Promise.all([listAgencyMembers(slug), getLiveAgency(slug)])
+    const planLimit = PLAN_USERS[live?.plan?.code ?? 'profesional'] ?? 6
+    return <EquipoAdmin initialTeam={members} planLimit={planLimit} />
+  }
+
   const agency = AGENCIES.find(a => a.slug === slug)
   return <EquipoAdmin initialTeam={TEAM} planLimit={PLAN_USERS[agency?.plan ?? 'profesional'] ?? 6} />
 }

@@ -1,5 +1,6 @@
-import { TEAM } from '@/lib/dummy'
+import { TEAM, AGENCIES } from '@/lib/dummy'
 import { listPropertiesForAgency } from '@/lib/properties/server'
+import { listAgencyMembers } from '@/lib/agencies/members'
 import PropiedadesAdmin from '@/components/admin/propiedades-admin'
 
 export const dynamic = 'force-dynamic'
@@ -13,6 +14,10 @@ export default async function PropiedadesAdminPage({
 }) {
   const { slug } = await params
   const { new: isNew } = await searchParams
-  const properties = await listPropertiesForAgency(slug)
-  return <PropiedadesAdmin slug={slug} initialProperties={properties} team={TEAM} openNew={!!isNew} />
+  const isDemo = AGENCIES.some(a => a.slug === slug)
+  const [properties, team] = await Promise.all([
+    listPropertiesForAgency(slug),
+    isDemo ? Promise.resolve(TEAM) : listAgencyMembers(slug),
+  ])
+  return <PropiedadesAdmin slug={slug} initialProperties={properties} team={team} openNew={!!isNew} />
 }

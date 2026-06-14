@@ -3,6 +3,13 @@ import { redirect } from 'next/navigation'
 import { PROPERTIES, LEADS, AGENCY_STATS, AGENCIES, TEAM } from '@/lib/dummy'
 import { THEMES } from '@/lib/themes'
 import { getOnboardingStatus } from '@/lib/agencies/onboarding'
+import { getLiveAgency } from '@/lib/agencies/provision'
+import { listPropertiesForAgency } from '@/lib/properties/server'
+import { listLeadsForAgency } from '@/lib/leads/server'
+import { listAgencyMembers } from '@/lib/agencies/members'
+import AgencyDashboardLive from '@/components/agency/agency-dashboard-live'
+
+export const dynamic = 'force-dynamic'
 
 /* ============================================================
  * Universo A · CORAL & CREAM · Dashboard del Panel — A4.
@@ -43,6 +50,32 @@ export default async function AdminDashboard({ params }: { params: Promise<{ slu
   // (Solo aplica a agencias reales con la fila en DB; las demo no tienen registro.)
   const onboarding = await getOnboardingStatus(slug)
   if (onboarding && onboarding.enabled && !onboarding.completed) redirect(`/${slug}/admin/onboarding`)
+
+  // Coexistencia: las agencias DEMO (en dummy) mantienen el dashboard de muestra;
+  // una agencia REAL (no demo) ve su propio dashboard con datos reales.
+  const isDemo = AGENCIES.some(a => a.slug === slug)
+  if (!isDemo) {
+    const live = await getLiveAgency(slug)
+    if (live) {
+      const [props, leads, members] = await Promise.all([
+        listPropertiesForAgency(slug),
+        listLeadsForAgency(slug),
+        listAgencyMembers(slug),
+      ])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const available = props.filter((p: any) => p.status === 'available').length
+      return (
+        <AgencyDashboardLive
+          slug={slug}
+          agencyName={live.name}
+          planName={live.plan?.name ?? live.plan?.code ?? ''}
+          stats={{ properties: props.length, available, leads: leads.length, members: members.length }}
+          recentLeads={leads}
+          recentProperties={props}
+        />
+      )
+    }
+  }
 
   const agency = AGENCIES.find(a => a.slug === slug)
   const accent = THEMES[agency?.theme ?? 'editorial'].accent
