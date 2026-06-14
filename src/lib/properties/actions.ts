@@ -10,6 +10,7 @@ import slugify from 'slugify'
 import { nanoid } from 'nanoid'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getAgencyIdBySlug, toDbWrite, type PropertyInput } from './server'
+import { canCreateProperty } from '@/lib/agencies/status'
 
 type Result = { ok: boolean; id?: string; error?: string }
 
@@ -49,6 +50,10 @@ export async function createProperty(slug: string, input: PropertyInput): Promis
   try {
     const agencyId = await getAgencyIdBySlug(slug)
     if (!agencyId) return { ok: false, error: 'Agencia no encontrada' }
+
+    // Límite de propiedades según el plan (Subsistema C).
+    const limit = await canCreateProperty(agencyId)
+    if (!limit.ok) return { ok: false, error: limit.error }
 
     if (input.is_opportunity) await clearOtherOpportunities(agencyId)
 

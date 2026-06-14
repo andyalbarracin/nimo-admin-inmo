@@ -15,6 +15,7 @@ import { updateAgencyFiscal } from '@/lib/agencies/provision'
 import { uploadDocument, getDocumentUrl, deleteDocument, type AgencyDocument } from '@/lib/agencies/documents'
 import { addCredential, revealCredential, deleteCredential, type AgencyCredential } from '@/lib/agencies/credentials'
 import { setOnboardingEnabled } from '@/lib/agencies/onboarding'
+import { setAgencyStatus, type AgencyStatus } from '@/lib/agencies/status'
 
 const ZR = {
   black: '#111111', cream: '#F5F5F0', white: '#FFFFFF', border: '#DEDED4',
@@ -93,6 +94,11 @@ function GeneralTab({ agency }: { agency: any }) {
   const completed = !!agency.onboarding_completed
   const toggle = () => start(async () => { await setOnboardingEnabled(agency.id, !enabled); router.refresh() })
 
+  const status = (agency.plan_status ?? 'active') as AgencyStatus
+  const changeStatus = (s: AgencyStatus) => start(async () => { await setAgencyStatus(agency.id, s); router.refresh() })
+  const STATUS_LABEL: Record<AgencyStatus, string> = { active: 'Activa', suspended: 'Suspendida', past_due: 'Pago pendiente', canceled: 'Dada de baja' }
+  const STATUS_COLOR: Record<AgencyStatus, string> = { active: ZR.green, suspended: ZR.red, past_due: ZR.orange, canceled: ZR.ink2 }
+
   const fields = [
     { label: 'Nombre', value: agency.name },
     { label: 'Slug / URL', value: `/${agency.slug}` },
@@ -128,6 +134,22 @@ function GeneralTab({ agency }: { agency: any }) {
           <button onClick={toggle} disabled={pending} style={{ fontFamily: ZR.mono, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em', padding: '9px 16px', cursor: pending ? 'default' : 'pointer', opacity: pending ? .6 : 1, background: enabled ? ZR.white : ZR.green, color: enabled ? ZR.red : ZR.white, border: `2px solid ${enabled ? ZR.red : ZR.green}` }}>
             {pending ? '…' : enabled ? 'Desactivar' : 'Activar onboarding'}
           </button>
+        </div>
+      </div>
+
+      <div style={card}>
+        <div style={{ fontFamily: ZR.mono, fontSize: 9, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 4 }}>// ESTADO DE LA CUENTA</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+          <div style={{ flex: 1, minWidth: 200 }}>
+            <div style={{ fontFamily: ZR.display, fontSize: 14, marginBottom: 2 }}>Suspensión / baja</div>
+            <div style={{ fontSize: 12.5 }}>Estado actual: <strong style={{ color: STATUS_COLOR[status] }}>{STATUS_LABEL[status]}</strong></div>
+            {status !== 'active' && <div style={{ fontSize: 11.5, color: ZR.ink3, marginTop: 2 }}>El sitio y el panel de la agencia están apagados.</div>}
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {status !== 'active' && <button onClick={() => changeStatus('active')} disabled={pending} style={{ fontFamily: ZR.mono, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', padding: '9px 14px', cursor: 'pointer', background: ZR.green, color: ZR.white, border: `2px solid ${ZR.green}` }}>Reactivar</button>}
+            {status !== 'suspended' && status !== 'canceled' && <button onClick={() => changeStatus('suspended')} disabled={pending} style={{ fontFamily: ZR.mono, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', padding: '9px 14px', cursor: 'pointer', background: ZR.white, color: ZR.red, border: `2px solid ${ZR.red}` }}>Suspender</button>}
+            {status !== 'canceled' && <button onClick={() => { if (confirm('¿Dar de baja la agencia? Se apaga el sitio y el panel.')) changeStatus('canceled') }} disabled={pending} style={{ fontFamily: ZR.mono, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', padding: '9px 14px', cursor: 'pointer', background: ZR.ink2, color: ZR.white, border: `2px solid ${ZR.ink2}` }}>Dar de baja</button>}
+          </div>
         </div>
       </div>
     </div>
