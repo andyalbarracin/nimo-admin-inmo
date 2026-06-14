@@ -3,6 +3,12 @@ import { notFound } from 'next/navigation'
 import { AGENCIES, PROPERTIES, LEADS, TEAM } from '@/lib/dummy'
 import ThemeSelector from '@/components/superadmin/theme-selector'
 import AgencyControls from '@/components/superadmin/agency-controls'
+import AgencyDetailLive from '@/components/superadmin/agency-detail-live'
+import { getLiveAgency } from '@/lib/agencies/provision'
+import { listDocuments } from '@/lib/agencies/documents'
+import { listCredentials } from '@/lib/agencies/credentials'
+
+export const dynamic = 'force-dynamic'
 
 const ZR = {
   black: '#111111', cream: '#F5F5F0', cream2: '#FFFFFF',
@@ -40,7 +46,13 @@ function Mono({ children, accent }: { children: React.ReactNode; accent?: boolea
 export default async function AgencyDetail({ params }: { params: Promise<{ agencySlug: string }> }) {
   const { agencySlug } = await params
   const agency = AGENCIES.find(a => a.slug === agencySlug)
-  if (!agency) notFound()
+  if (!agency) {
+    // No está en las demo: buscar agencia REAL (provisionada) y mostrar su ficha live.
+    const live = await getLiveAgency(agencySlug)
+    if (!live) notFound()
+    const [documents, credentials] = await Promise.all([listDocuments(live.id), listCredentials(live.id)])
+    return <AgencyDetailLive agency={live} documents={documents} credentials={credentials} />
+  }
 
   const status = STATUS_MAP[agency.plan_status as keyof typeof STATUS_MAP] ?? STATUS_MAP.active
   const isLopez = agencySlug === 'lopez-asociados'

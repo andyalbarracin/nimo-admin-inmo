@@ -1,6 +1,10 @@
 import { AGENCIES } from '@/lib/dummy'
 import AgenciasClient from '@/components/superadmin/agencias-client'
+import { listLiveAgencies } from '@/lib/agencies/provision'
 
-export default function AgenciasAdmin() {
-  return <AgenciasClient initialAgencies={AGENCIES} />
+export const dynamic = 'force-dynamic'
+
+export default async function AgenciasAdmin() {
+  const live = await listLiveAgencies()
+  return <AgenciasClient initialAgencies={AGENCIES} live={live} />
 }

@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import { uploadCrmFile } from '@/lib/crm/upload-action'
 import type { SalesLead, SalesFile } from '@/lib/sales-crm/server'
+import NewAgencyModal from './new-agency-modal'
 
 export type { SalesLead, SalesFile }
 
@@ -23,6 +24,7 @@ export default function SalesLeadDrawer({ lead, isNew, onSave, onDelete, onClose
 }) {
   const [form, setForm] = useState<SalesLead>(lead)
   const [uploading, setUploading] = useState(false)
+  const [provisionOpen, setProvisionOpen] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const set = <K extends keyof SalesLead>(k: K, v: SalesLead[K]) => setForm(f => ({ ...f, [k]: v }))
 
@@ -103,12 +105,19 @@ export default function SalesLeadDrawer({ lead, isNew, onSave, onDelete, onClose
           </div>
         </div>
 
-        <div style={{ padding: '14px 22px', borderTop: `2px solid ${ZR.black}`, background: ZR.white, display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div style={{ padding: '14px 22px', borderTop: `2px solid ${ZR.black}`, background: ZR.white, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           {!isNew && <button onClick={() => onDelete(form.id)} className="z-btn-bk" style={{ color: ZR.red, borderColor: ZR.red }}>ELIMINAR</button>}
+          {!isNew && form.column === 'client' && <button onClick={() => setProvisionOpen(true)} className="z-btn-bk" style={{ color: ZR.green, borderColor: ZR.green }}>PROVISIONAR</button>}
           <button onClick={onClose} className="z-btn-bk" style={{ marginLeft: 'auto' }}>CANCELAR</button>
           <button onClick={() => onSave(form)} disabled={!form.company.trim()} className="z-btn-bk is-orange">{isNew ? 'CREAR' : 'GUARDAR'}</button>
         </div>
       </div>
+
+      <NewAgencyModal
+        open={provisionOpen}
+        onClose={() => setProvisionOpen(false)}
+        prefill={{ name: form.company, email: form.email, crmLeadId: form.id }}
+      />
     </>
   )
 }
