@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import type { Agency } from '@/lib/dummy'
-import { uploadAgencyLogo, removeAgencyLogo } from '@/lib/agency/logo-action'
+import { saveAgencyLogoUrl, removeAgencyLogo } from '@/lib/agency/logo-action'
+import { uploadFile } from '@/lib/storage/upload-client'
 import ZaireCredit from '@/components/zaire-credit'
 
 /* Admin · Configuración — form funcional en sesión, themed. */
@@ -40,11 +41,17 @@ export default function ConfiguracionAdmin({ agency, initialLogo = '' }: { agenc
   const [logoErr, setLogoErr] = useState('')
   const onLogoFile = async (file: File | undefined) => {
     if (!file) return
+    if (!file.type.startsWith('image/')) { setLogoErr('El archivo debe ser una imagen'); return }
     setLogoBusy(true); setLogoErr('')
-    const fd = new FormData(); fd.append('file', file)
-    const res = await uploadAgencyLogo(slug, fd)
-    if (res.ok && res.url) setLogo(res.url)
-    else setLogoErr(res.error ?? 'No se pudo subir el logo')
+    // Subida DIRECTA del navegador a Supabase (evita el tope de Vercel).
+    const up = await uploadFile(slug, 'agency-assets', file)
+    if (up.url) {
+      const res = await saveAgencyLogoUrl(slug, up.url)
+      if (res.ok) setLogo(up.url)
+      else setLogoErr(res.error ?? 'No se pudo guardar el logo')
+    } else {
+      setLogoErr(up.error ?? 'No se pudo subir el logo')
+    }
     setLogoBusy(false)
   }
   const clearLogo = async () => { setLogo(''); await removeAgencyLogo(slug) }

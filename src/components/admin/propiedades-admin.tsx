@@ -6,7 +6,7 @@ import Link from 'next/link'
 import type { Property, TeamMember } from '@/lib/dummy'
 import type { PropertyInput } from '@/lib/properties/server'
 import { createProperty, updateProperty, deleteProperty } from '@/lib/properties/actions'
-import { uploadPropertyImage } from '@/lib/properties/upload-action'
+import { uploadFile } from '@/lib/storage/upload-client'
 
 /* ============================================================
  * Admin · Propiedades — CRUD con persistencia real (Supabase).
@@ -180,10 +180,12 @@ function PropertyDrawer({ property, team, slug, isNew, saving, onSave, onDelete,
     setUploading(true); setUploadErr('')
     const urls: string[] = []
     for (const file of Array.from(files)) {
-      const fd = new FormData(); fd.append('file', file)
-      const res = await uploadPropertyImage(slug, fd)
-      if (res.ok && res.url) urls.push(res.url)
-      else setUploadErr(res.error ?? 'No se pudo subir una imagen')
+      if (!file.type.startsWith('image/')) { setUploadErr(`"${file.name}" no es una imagen`); continue }
+      if (file.size > 52428800) { setUploadErr(`"${file.name}" supera 50MB`); continue }
+      // Subida DIRECTA navegador → Supabase (evita el tope de Vercel; soporta 50MB).
+      const up = await uploadFile(slug, 'properties', file)
+      if (up.url) urls.push(up.url)
+      else setUploadErr(up.error ?? 'No se pudo subir una imagen')
     }
     if (urls.length) setForm(f => ({ ...f, images: [...f.images.filter(u => u && u !== DEFAULT_IMG), ...urls] }))
     setUploading(false)
