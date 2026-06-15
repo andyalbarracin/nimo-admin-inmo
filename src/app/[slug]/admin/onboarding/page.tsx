@@ -8,11 +8,13 @@
 import { redirect } from 'next/navigation'
 import { getOnboardingStatus, getOnboarding } from '@/lib/agencies/onboarding'
 import OnboardingWizard from '@/components/agency/onboarding-wizard'
+import { guardAgencyAccess } from '@/lib/auth/require-tenant'
 
 export const dynamic = 'force-dynamic'
 
 export default async function OnboardingPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+  await guardAgencyAccess(slug)
   const status = await getOnboardingStatus(slug)
   if (!status || !status.enabled || status.completed) redirect(`/${slug}/admin`)
   const data = await getOnboarding(status.id)

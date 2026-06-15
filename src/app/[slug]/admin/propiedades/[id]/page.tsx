@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PROPERTIES } from '@/lib/dummy'
+import { guardAgencyAccess } from '@/lib/auth/require-tenant'
 
 const ZR = {
   black: '#1A1A1A', cream: '#FAF7F2', white: '#FFFFFF',
@@ -26,6 +27,7 @@ const sectionStyle: React.CSSProperties = {
 
 export default async function EditProperty({ params }: { params: Promise<{ slug: string; id: string }> }) {
   const { slug, id } = await params
+  await guardAgencyAccess(slug)
   const prop = PROPERTIES.find(p => p.id === id)
   if (!prop) notFound()
 

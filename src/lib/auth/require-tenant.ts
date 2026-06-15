@@ -11,9 +11,83 @@
  */
 
 import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { esAlMenos } from './permissions'
 import type { Rol } from './permissions'
+
+/**
+ * Guard de aislamiento multi-tenant para las páginas de /[slug]/admin.
+ * Garantiza que un usuario SOLO pueda acceder al panel de la agencia a la que
+ * pertenece. El superadmin (auth por cookie o email) puede acceder a todas.
+ *
+ * Verifica la membresía con el admin client (service_role) para no depender de
+ * que el RLS de agency_members esté bien configurado: el chequeo es server-side
+ * y fiable. Llamar al inicio de CADA página admin (no en /login).
+ */
+export async function guardAgencyAccess(agencySlug: string): Promise<void> {
+  // Superadmin por cookie (su auth no es sesión de Supabase).
+  const cookieStore = await cookies()
+  if (cookieStore.get('nimo_demo_role')?.value === 'superadmin') return
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // Superadmin real por email configurado.
+  const superEmail = process.env.SUPER_ADMIN_EMAIL
+  if (user?.email && superEmail && user.email.toLowerCase() === superEmail.toLowerCase()) return
+
+  if (!user) redirect(`/${agencySlug}/admin/login`)
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const admin = createAdminClient() as any
+  const { data: ag } = await admin.from('agencies').select('id').eq('slug', agencySlug).maybeSingle()
+  if (!ag) redirect('/unauthorized')
+
+  const { data: member } = await admin
+    .from('agency_members')
+    .select('id')
+    .eq('agency_id', ag.id)
+    .eq('user_id', user.id)
+    .eq('is_active', true)
+    .maybeSingle()
+
+  if (!member) redirect('/unauthorized')
+}
+
+/**
+ * Igual que guardAgencyAccess pero NO redirige: devuelve true/false. Para usar
+ * dentro de Server Actions de escritura (createProperty, updateLead, etc.) y
+ * garantizar que el llamante pertenezca a la agencia del slug. Evita que alguien
+ * invoque una acción con el slug de OTRA agencia.
+ */
+export async function assertAgencyAccess(agencySlug: string): Promise<boolean> {
+  const cookieStore = await cookies()
+  if (cookieStore.get('nimo_demo_role')?.value === 'superadmin') return true
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const superEmail = process.env.SUPER_ADMIN_EMAIL
+  if (user?.email && superEmail && user.email.toLowerCase() === superEmail.toLowerCase()) return true
+  if (!user) return false
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const admin = createAdminClient() as any
+  const { data: ag } = await admin.from('agencies').select('id').eq('slug', agencySlug).maybeSingle()
+  if (!ag) return false
+
+  const { data: member } = await admin
+    .from('agency_members')
+    .select('id')
+    .eq('agency_id', ag.id)
+    .eq('user_id', user.id)
+    .eq('is_active', true)
+    .maybeSingle()
+
+  return !!member
+}
 
 interface TenantSession {
   user: { id: string; email: string }

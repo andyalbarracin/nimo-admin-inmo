@@ -11,6 +11,9 @@ import { nanoid } from 'nanoid'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getAgencyIdBySlug, toDbWrite, type PropertyInput } from './server'
 import { canCreateProperty } from '@/lib/agencies/status'
+import { assertAgencyAccess } from '@/lib/auth/require-tenant'
+
+const DENY = { ok: false as const, error: 'No autorizado.' }
 
 type Result = { ok: boolean; id?: string; error?: string }
 
@@ -48,6 +51,7 @@ async function syncImages(propertyId: string, agencyId: string, images?: string[
 
 export async function createProperty(slug: string, input: PropertyInput): Promise<Result> {
   try {
+    if (!(await assertAgencyAccess(slug))) return DENY
     const agencyId = await getAgencyIdBySlug(slug)
     if (!agencyId) return { ok: false, error: 'Agencia no encontrada' }
 
@@ -74,6 +78,7 @@ export async function createProperty(slug: string, input: PropertyInput): Promis
 
 export async function updateProperty(slug: string, id: string, input: PropertyInput): Promise<Result> {
   try {
+    if (!(await assertAgencyAccess(slug))) return DENY
     const agencyId = await getAgencyIdBySlug(slug)
     if (!agencyId) return { ok: false, error: 'Agencia no encontrada' }
 
@@ -97,6 +102,7 @@ export async function updateProperty(slug: string, id: string, input: PropertyIn
 
 export async function deleteProperty(slug: string, id: string): Promise<Result> {
   try {
+    if (!(await assertAgencyAccess(slug))) return DENY
     const agencyId = await getAgencyIdBySlug(slug)
     if (!agencyId) return { ok: false, error: 'Agencia no encontrada' }
 

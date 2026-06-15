@@ -8,6 +8,7 @@ import { listPropertiesForAgency } from '@/lib/properties/server'
 import { listLeadsForAgency } from '@/lib/leads/server'
 import { listAgencyMembers } from '@/lib/agencies/members'
 import AgencyDashboardLive from '@/components/agency/agency-dashboard-live'
+import { guardAgencyAccess } from '@/lib/auth/require-tenant'
 
 export const dynamic = 'force-dynamic'
 
@@ -45,6 +46,7 @@ const PLAN_USERS: Record<string, number> = { esencial: 2, profesional: 6, a_medi
 
 export default async function AdminDashboard({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+  await guardAgencyAccess(slug)
 
   // Onboarding: si está activado y sin completar, el owner va primero al wizard.
   // (Solo aplica a agencias reales con la fila en DB; las demo no tienen registro.)

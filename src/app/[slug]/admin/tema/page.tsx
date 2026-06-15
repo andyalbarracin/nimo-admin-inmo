@@ -1,4 +1,7 @@
 import { AGENCIES } from '@/lib/dummy'
+import { guardAgencyAccess } from '@/lib/auth/require-tenant'
+
+export const dynamic = 'force-dynamic'
 
 const LA = {
   bg: '#FAF7F2', white: '#FFFFFF', border: '#EDEBE6',
@@ -143,6 +146,7 @@ const THEMES = [
 
 export default async function TemaAdmin({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+  await guardAgencyAccess(slug)
   const agency = AGENCIES.find(a => a.slug === slug)
   const currentTheme = agency?.theme ?? 'editorial'
 

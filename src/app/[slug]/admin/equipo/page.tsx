@@ -2,6 +2,7 @@ import { TEAM, AGENCIES } from '@/lib/dummy'
 import EquipoAdmin from '@/components/admin/equipo-admin'
 import { listAgencyMembers } from '@/lib/agencies/members'
 import { getLiveAgency } from '@/lib/agencies/provision'
+import { guardAgencyAccess } from '@/lib/auth/require-tenant'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,6 +10,7 @@ const PLAN_USERS: Record<string, number> = { esencial: 2, profesional: 6, a_medi
 
 export default async function EquipoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+  await guardAgencyAccess(slug)
 
   // Coexistencia: agencia DEMO → equipo de muestra; agencia REAL → sus miembros.
   const isDemo = AGENCIES.some(a => a.slug === slug)

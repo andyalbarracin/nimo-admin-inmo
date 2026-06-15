@@ -8,8 +8,10 @@ import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getAgencyIdBySlug, toDbWrite, stageToDb, type LeadInput } from './server'
 import type { LeadStage } from '@/lib/dummy'
+import { assertAgencyAccess } from '@/lib/auth/require-tenant'
 
 type Result = { ok: boolean; id?: string; error?: string }
+const DENY: Result = { ok: false, error: 'No autorizado.' }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function sb(): any {
@@ -31,6 +33,7 @@ export async function createLead(slug: string, input: LeadInput): Promise<Result
 
 export async function updateLead(slug: string, id: string, input: LeadInput): Promise<Result> {
   try {
+    if (!(await assertAgencyAccess(slug))) return DENY
     const agencyId = await getAgencyIdBySlug(slug)
     if (!agencyId) return { ok: false, error: 'Agencia no encontrada' }
     const { error } = await sb().from('leads').update(toDbWrite(input, agencyId)).eq('id', id).eq('agency_id', agencyId)
@@ -44,6 +47,7 @@ export async function updateLead(slug: string, id: string, input: LeadInput): Pr
 
 export async function moveLeadStage(slug: string, id: string, stage: LeadStage): Promise<Result> {
   try {
+    if (!(await assertAgencyAccess(slug))) return DENY
     const agencyId = await getAgencyIdBySlug(slug)
     if (!agencyId) return { ok: false, error: 'Agencia no encontrada' }
     const { error } = await sb().from('leads').update({ status: stageToDb(stage) }).eq('id', id).eq('agency_id', agencyId)
@@ -57,6 +61,7 @@ export async function moveLeadStage(slug: string, id: string, stage: LeadStage):
 
 export async function deleteLead(slug: string, id: string): Promise<Result> {
   try {
+    if (!(await assertAgencyAccess(slug))) return DENY
     const agencyId = await getAgencyIdBySlug(slug)
     if (!agencyId) return { ok: false, error: 'Agencia no encontrada' }
     const { error } = await sb().from('leads').delete().eq('id', id).eq('agency_id', agencyId)

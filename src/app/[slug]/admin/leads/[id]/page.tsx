@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { LEADS, PROPERTIES } from '@/lib/dummy'
+import { guardAgencyAccess } from '@/lib/auth/require-tenant'
 
 const ZR = {
   black: '#111111', cream: '#F5F5F0', cream2: '#FFFFFF',
@@ -38,6 +39,7 @@ const labelStyle = {
 
 export default async function LeadDetail({ params }: { params: Promise<{ slug: string; id: string }> }) {
   const { slug, id } = await params
+  await guardAgencyAccess(slug)
   const lead = LEADS.find(l => l.id === id)
   if (!lead) notFound()
 
