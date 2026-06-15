@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { AGENCIES } from '@/lib/dummy'
 import { getPublicProperties } from '@/lib/properties/public'
+import { getPublicAgency } from '@/lib/agencies/public'
 import EditorialDetail from '@/components/site/themes/editorial-detail'
 import SpatialDetail from '@/components/site/themes/spatial-detail'
 import AtelierDetail from '@/components/site/themes/atelier-detail'
@@ -13,7 +14,8 @@ export default async function PropertyDetail({
   params: Promise<{ slug: string; id: string }>
 }) {
   const { slug, id } = await params
-  const agency = AGENCIES.find(a => a.slug === slug)
+  const isDemo = AGENCIES.some(a => a.slug === slug)
+  const agency = isDemo ? AGENCIES.find(a => a.slug === slug) : await getPublicAgency(slug)
   const all = await getPublicProperties(slug)
   const prop = all.find(p => p.id === id)
   if (!prop || !agency) notFound()

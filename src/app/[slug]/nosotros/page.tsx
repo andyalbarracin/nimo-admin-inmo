@@ -3,17 +3,27 @@ import Link from 'next/link'
 import { AGENCIES, TEAM, AGENCY_STATS } from '@/lib/dummy'
 import { THEMES, type ThemeId } from '@/lib/themes'
 import ThemedNav from '@/components/site/themed-nav'
+import { getPublicAgency } from '@/lib/agencies/public'
+import { listAgencyMembers } from '@/lib/agencies/members'
+
+export const dynamic = 'force-dynamic'
 
 const TITLE: Record<ThemeId, string> = { editorial: 'Quiénes somos', spatial: 'QUIÉNES SOMOS', atelier: 'Nuestro estudio' }
 
 export default async function NosotrosPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const agency = AGENCIES.find(a => a.slug === slug)
+  const isDemo = AGENCIES.some(a => a.slug === slug)
+  let agency = AGENCIES.find(a => a.slug === slug)
+  if (!isDemo) {
+    const real = await getPublicAgency(slug)
+    if (!real) notFound()
+    agency = real
+  }
   if (!agency) notFound()
   const themeId = agency.theme as ThemeId
   const T = THEMES[themeId]
   const r = T.radius
-  const team = TEAM
+  const team = isDemo ? TEAM : await listAgencyMembers(slug)
   const upper = themeId === 'spatial'
   const centered = themeId === 'atelier'
 

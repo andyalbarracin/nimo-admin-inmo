@@ -1,6 +1,7 @@
 import { AGENCIES } from '@/lib/dummy'
 import { AR_CITIES } from '@/lib/constants/ar-cities'
 import { getPublicProperties } from '@/lib/properties/public'
+import { getPublicAgency } from '@/lib/agencies/public'
 import PropiedadesClient from '@/components/site/PropiedadesClient'
 import SpatialListado from '@/components/site/themes/spatial-listado'
 
@@ -16,7 +17,8 @@ export default async function PropiedadesPage({
   const { slug } = await params
   const { op, tipo, barrio, prov, cp } = await searchParams
 
-  const agency = AGENCIES.find(a => a.slug === slug)
+  const isDemo = AGENCIES.some(a => a.slug === slug)
+  const agency = isDemo ? AGENCIES.find(a => a.slug === slug)! : await getPublicAgency(slug)
   if (!agency) return <div>Agencia no encontrada</div>
 
   let props = await getPublicProperties(slug)

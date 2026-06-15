@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { AGENCIES, AGENCY_STATS, TEAM } from '@/lib/dummy'
 import { getPublicProperties } from '@/lib/properties/public'
+import { getPublicAgency } from '@/lib/agencies/public'
+import { listAgencyMembers } from '@/lib/agencies/members'
 import type { ThemeId } from '@/lib/themes'
 import EditorialHome from '@/components/site/themes/editorial-home'
 import SpatialHome from '@/components/site/themes/spatial-home'
@@ -22,7 +24,13 @@ export default async function AgencyHome({
   const { slug } = await params
   const { preview } = await searchParams
 
-  const agency = AGENCIES.find(a => a.slug === slug)
+  const isDemo = AGENCIES.some(a => a.slug === slug)
+  let agency = AGENCIES.find(a => a.slug === slug)
+  if (!isDemo) {
+    const real = await getPublicAgency(slug)
+    if (!real) notFound()
+    agency = real
+  }
   if (!agency) notFound()
 
   // Modo vista previa: render de otro theme sin alterar datos (solo presentación).
@@ -33,7 +41,7 @@ export default async function AgencyHome({
   const featured = available.filter(p => p.is_featured).slice(0, 6)
   const opportunity = available.find(p => p.is_opportunity) ?? null
   const stats = AGENCY_STATS
-  const team = TEAM
+  const team = isDemo ? TEAM : await listAgencyMembers(slug)
 
   // `properties` = catálogo disponible completo, para que cada theme llene sus grillas
   // y nunca queden filas a medias (objetivo comercial: siempre proponer propiedades).
