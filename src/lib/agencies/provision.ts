@@ -103,6 +103,7 @@ export async function createAgency(input: NewAgencyInput): Promise<Result> {
 /** Agencias REALES (de la DB), para mergear con las dummy en la lista. */
 export async function listLiveAgencies(): Promise<LiveAgency[]> {
   try {
+    if (!(await assertSuperAdmin())) return []
     const { data, error } = await sb()
       .from('agencies')
       .select('id, slug, name, plan_status, email_contact, created_at, plan:platform_plans(code)')
