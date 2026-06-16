@@ -51,7 +51,7 @@ const TABS: { id: Tab; label: string }[] = [
 ]
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function AgencyDetailLive({ agency, documents, credentials }: { agency: any; documents: AgencyDocument[]; credentials: AgencyCredential[] }) {
+export default function AgencyDetailLive({ agency, documents, credentials, isDemo = false }: { agency: any; documents: AgencyDocument[]; credentials: AgencyCredential[]; isDemo?: boolean }) {
   const router = useRouter()
   const [tab, setTab] = useState<Tab>('general')
 
@@ -62,7 +62,7 @@ export default function AgencyDetailLive({ agency, documents, credentials }: { a
         <Link href="/superadmin/agencias" style={{ fontFamily: ZR.mono, fontSize: 9, color: ZR.orange, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '.1em' }}>← AGENCIAS</Link>
         <span style={{ color: ZR.border }}>/</span>
         <h1 style={{ fontFamily: ZR.display, fontSize: 22, margin: 0, textTransform: 'uppercase', letterSpacing: '-.01em' }}>{agency.name}</h1>
-        <span style={{ fontFamily: ZR.mono, fontSize: 8, fontWeight: 700, letterSpacing: '.1em', background: ZR.green, color: ZR.white, padding: '2px 6px' }}>LIVE</span>
+        <span style={{ fontFamily: ZR.mono, fontSize: 8, fontWeight: 700, letterSpacing: '.1em', background: isDemo ? ZR.ink3 : ZR.green, color: ZR.white, padding: '2px 6px' }}>{isDemo ? 'DEMO' : 'LIVE'}</span>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
           <Link href={`/${agency.slug}`} target="_blank" style={{ fontSize: 12, color: ZR.ink2, textDecoration: 'none', padding: '8px 14px', background: ZR.white, border: `1px solid ${ZR.border}`, borderRadius: 4 }}>Ver sitio →</Link>
           <Link href={`/${agency.slug}/admin`} target="_blank" style={{ fontFamily: ZR.display, fontSize: 11, color: ZR.cream, textDecoration: 'none', padding: '8px 16px', background: ZR.orange, borderRadius: 4, letterSpacing: '.04em', textTransform: 'uppercase' }}>Ingresar como agencia</Link>
@@ -77,17 +77,26 @@ export default function AgencyDetailLive({ agency, documents, credentials }: { a
         ))}
       </div>
 
-      {tab === 'general' && <GeneralTab agency={agency} />}
-      {tab === 'fiscal' && <FiscalTab agency={agency} onSaved={() => router.refresh()} />}
-      {tab === 'docs' && <DocsTab agencyId={agency.id} documents={documents} onChange={() => router.refresh()} />}
-      {tab === 'creds' && <CredsTab agencyId={agency.id} credentials={credentials} onChange={() => router.refresh()} />}
+      {tab === 'general' && <GeneralTab agency={agency} isDemo={isDemo} />}
+      {tab === 'fiscal' && <FiscalTab agency={agency} isDemo={isDemo} onSaved={() => router.refresh()} />}
+      {tab === 'docs' && (isDemo ? <DemoNotice /> : <DocsTab agencyId={agency.id} documents={documents} onChange={() => router.refresh()} />)}
+      {tab === 'creds' && (isDemo ? <DemoNotice /> : <CredsTab agencyId={agency.id} credentials={credentials} onChange={() => router.refresh()} />)}
       {tab === 'users' && <UsersTab agency={agency} />}
     </div>
   )
 }
 
+function DemoNotice() {
+  return (
+    <div style={{ ...card, textAlign: 'center', color: ZR.ink3 }}>
+      <div style={{ fontFamily: ZR.mono, fontSize: 9, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 8 }}>// AGENCIA DE DEMOSTRACIÓN</div>
+      <div style={{ fontSize: 13 }}>Esta sección se habilita cuando la agencia se provisiona como cliente real. Las agencias demo son solo vitrina.</div>
+    </div>
+  )
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function GeneralTab({ agency }: { agency: any }) {
+function GeneralTab({ agency, isDemo }: { agency: any; isDemo?: boolean }) {
   const router = useRouter()
   const [pending, start] = useTransition()
   const enabled = !!agency.onboarding_enabled
@@ -122,6 +131,7 @@ function GeneralTab({ agency }: { agency: any }) {
         </div>
       </div>
 
+      {!isDemo && (<>
       <div style={card}>
         <div style={{ fontFamily: ZR.mono, fontSize: 9, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 4 }}>// ONBOARDING</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
@@ -152,12 +162,13 @@ function GeneralTab({ agency }: { agency: any }) {
           </div>
         </div>
       </div>
+      </>)}
     </div>
   )
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function FiscalTab({ agency, onSaved }: { agency: any; onSaved: () => void }) {
+function FiscalTab({ agency, isDemo, onSaved }: { agency: any; isDemo?: boolean; onSaved: () => void }) {
   const [pending, start] = useTransition()
   const [msg, setMsg] = useState<string | null>(null)
   const [f, setF] = useState({
@@ -200,7 +211,8 @@ function FiscalTab({ agency, onSaved }: { agency: any; onSaved: () => void }) {
         <textarea rows={3} style={{ ...inp, resize: 'vertical' }} value={f.notes_internal} onChange={e => set('notes_internal', e.target.value)} />
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <button onClick={save} disabled={pending} className="z-btn-bk is-orange" style={{ cursor: pending ? 'default' : 'pointer', opacity: pending ? .6 : 1 }}>{pending ? 'GUARDANDO…' : '[ GUARDAR ]'}</button>
+        <button onClick={save} disabled={pending || isDemo} className="z-btn-bk is-orange" style={{ cursor: pending || isDemo ? 'default' : 'pointer', opacity: pending || isDemo ? .6 : 1 }}>{pending ? 'GUARDANDO…' : '[ GUARDAR ]'}</button>
+        {isDemo && <span style={{ fontSize: 12, color: ZR.ink3 }}>Solo lectura · agencia de demostración</span>}
         {msg && <span style={{ fontSize: 12.5, color: msg.includes('✓') ? ZR.green : ZR.red }}>{msg}</span>}
       </div>
     </div>
