@@ -17,9 +17,9 @@ export default async function EquipoPage({ params }: { params: Promise<{ slug: s
   if (!isDemo) {
     const [members, live] = await Promise.all([listAgencyMembers(slug), getLiveAgency(slug)])
     const planLimit = PLAN_USERS[live?.plan?.code ?? 'profesional'] ?? 6
-    return <EquipoAdmin initialTeam={members} planLimit={planLimit} />
+    return <EquipoAdmin initialTeam={members} planLimit={planLimit} slug={slug} isReal />
   }
 
   const agency = AGENCIES.find(a => a.slug === slug)
-  return <EquipoAdmin initialTeam={TEAM} planLimit={PLAN_USERS[agency?.plan ?? 'profesional'] ?? 6} />
+  return <EquipoAdmin initialTeam={TEAM} planLimit={PLAN_USERS[agency?.plan ?? 'profesional'] ?? 6} slug={slug} isReal={false} />
 }

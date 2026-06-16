@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import type { TeamMember } from '@/lib/dummy'
+import { inviteAgencyMember, removeAgencyMember, updateMemberRole } from '@/lib/agencies/members-actions'
 
 /* Admin · Equipo — funcional en sesión, themed con --admin-accent. */
 
@@ -24,21 +26,42 @@ const roleMeta = (r: string) => ROLES.find(x => x.id === r) ?? ROLES[3]!
 
 interface Member extends TeamMember { status?: 'active' | 'invited' }
 
-export default function EquipoAdmin({ initialTeam, planLimit = 10 }: { initialTeam: TeamMember[]; planLimit?: number }) {
+export default function EquipoAdmin({ initialTeam, planLimit = 10, slug = '', isReal = false }: { initialTeam: TeamMember[]; planLimit?: number; slug?: string; isReal?: boolean }) {
+  const router = useRouter()
+  const [pending, start] = useTransition()
   const [members, setMembers] = useState<Member[]>(initialTeam.map(m => ({ ...m, status: 'active' })))
   const [inviting, setInviting] = useState(false)
-  const [invite, setInvite] = useState({ name: '', email: '', role: 'agent' as Role })
+  const [invite, setInvite] = useState({ name: '', email: '', role: 'agent' as Role, password: '' })
+  const [err, setErr] = useState<string | null>(null)
 
-  const setRole = (id: string, role: Role) => setMembers(prev => prev.map(m => m.id === id ? { ...m, role } : m))
-  const remove = (id: string) => setMembers(prev => prev.filter(m => m.id !== id))
+  const atLimit = members.length >= planLimit
+
+  const setRole = (id: string, role: Role) => {
+    if (isReal) { start(async () => { const r = await updateMemberRole(slug, id, role); if (r.ok) router.refresh(); else setErr(r.error ?? 'Error') }); return }
+    setMembers(prev => prev.map(m => m.id === id ? { ...m, role } : m))
+  }
+  const remove = (id: string) => {
+    if (isReal) { if (!confirm('¿Quitar este usuario?')) return; start(async () => { const r = await removeAgencyMember(slug, id); if (r.ok) router.refresh(); else setErr(r.error ?? 'Error') }); return }
+    setMembers(prev => prev.filter(m => m.id !== id))
+  }
+  const genPassword = () => setInvite(v => ({ ...v, password: Array.from({ length: 12 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$'[Math.floor(Math.random() * 58)]).join('') }))
   const sendInvite = () => {
+    setErr(null)
     if (!invite.name.trim() || !invite.email.trim()) return
+    if (isReal) {
+      start(async () => {
+        const r = await inviteAgencyMember(slug, { name: invite.name.trim(), email: invite.email.trim(), role: invite.role, password: invite.password })
+        if (!r.ok) { setErr(r.error ?? 'Error'); return }
+        setInvite({ name: '', email: '', role: 'agent', password: '' }); setInviting(false); router.refresh()
+      })
+      return
+    }
     setMembers(prev => [...prev, {
       id: `member-${Date.now()}`, name: invite.name.trim(), email: invite.email.trim(), role: invite.role,
       avatar: invite.name.trim().split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase(), phone: '',
       properties_count: 0, leads_count: 0, status: 'invited',
     }])
-    setInvite({ name: '', email: '', role: 'agent' })
+    setInvite({ name: '', email: '', role: 'agent', password: '' })
     setInviting(false)
   }
 
@@ -52,7 +75,7 @@ export default function EquipoAdmin({ initialTeam, planLimit = 10 }: { initialTe
           <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-.02em', margin: 0 }}>Equipo</h1>
           <p style={{ fontSize: 13, color: LA.ink2, margin: '4px 0 0' }}>{members.length} / {planLimit} usuarios del plan</p>
         </div>
-        <button onClick={() => setInviting(true)} style={{ background: LA.accent, color: LA.white, padding: '11px 22px', borderRadius: 12, fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer' }}>+ Invitar miembro</button>
+        <button onClick={() => { setErr(null); setInviting(true) }} disabled={atLimit} title={atLimit ? 'Llegaste al límite de usuarios del plan' : undefined} style={{ background: atLimit ? LA.border : LA.accent, color: atLimit ? LA.ink3 : LA.white, padding: '11px 22px', borderRadius: 12, fontSize: 13, fontWeight: 700, border: 'none', cursor: atLimit ? 'not-allowed' : 'pointer' }}>+ Invitar miembro</button>
       </header>
 
       <div className="rwd-pad" style={{ padding: '24px 40px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
@@ -123,10 +146,28 @@ export default function EquipoAdmin({ initialTeam, planLimit = 10 }: { initialTe
                   {ROLES.filter(r => r.id !== 'owner').map(r => <option key={r.id} value={r.id}>{r.label} — {r.desc}</option>)}
                 </select>
               </div>
+              {isReal && (
+                <div>
+                  <label style={{ fontFamily: LA.mono, fontSize: 9.5, color: LA.ink3, textTransform: 'uppercase', letterSpacing: '.08em', display: 'block', marginBottom: 6 }}>Contraseña inicial</label>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input style={field} value={invite.password} onChange={e => setInvite({ ...invite, password: e.target.value })} placeholder="mín. 8 caracteres" />
+                    <button type="button" onClick={genPassword} style={{ flexShrink: 0, background: LA.white, border: `1px solid ${LA.border}`, borderRadius: 10, padding: '0 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', color: LA.ink2 }}>Generar</button>
+                  </div>
+                  <div style={{ fontSize: 11, color: LA.ink3, marginTop: 4 }}>Se la pasás al usuario (todavía no hay invitación por email).</div>
+                </div>
+              )}
+              {err && <div style={{ background: '#FBEAE8', border: `1px solid ${LA.danger}`, color: LA.danger, borderRadius: 8, padding: '9px 11px', fontSize: 12.5 }}>{err}</div>}
             </div>
             <div style={{ padding: '16px 24px', borderTop: `1px solid ${LA.border}`, background: LA.white, display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-              <button onClick={() => setInviting(false)} style={{ background: LA.white, border: `1px solid ${LA.border}`, color: LA.ink2, padding: '11px 18px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Cancelar</button>
-              <button onClick={sendInvite} disabled={!invite.name.trim() || !invite.email.trim()} style={{ background: invite.name.trim() && invite.email.trim() ? LA.accent : LA.border, color: invite.name.trim() && invite.email.trim() ? LA.white : LA.ink3, border: 'none', padding: '11px 22px', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: invite.name.trim() && invite.email.trim() ? 'pointer' : 'not-allowed', fontFamily: 'inherit' }}>Enviar invitación</button>
+              {(() => {
+                const canSend = !!invite.name.trim() && !!invite.email.trim() && (!isReal || invite.password.length >= 8) && !pending
+                return (
+                  <>
+                    <button onClick={() => setInviting(false)} style={{ background: LA.white, border: `1px solid ${LA.border}`, color: LA.ink2, padding: '11px 18px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>Cancelar</button>
+                    <button onClick={sendInvite} disabled={!canSend} style={{ background: canSend ? LA.accent : LA.border, color: canSend ? LA.white : LA.ink3, border: 'none', padding: '11px 22px', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: canSend ? 'pointer' : 'not-allowed', fontFamily: 'inherit' }}>{pending ? 'Creando…' : isReal ? 'Crear usuario' : 'Enviar invitación'}</button>
+                  </>
+                )
+              })()}
             </div>
           </div>
         </>
