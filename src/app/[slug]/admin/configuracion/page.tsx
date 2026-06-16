@@ -27,10 +27,19 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
   // Coexistencia: agencia DEMO → datos de muestra; agencia REAL → su registro de DB.
   const isDemo = AGENCIES.some(a => a.slug === slug)
   let agency = AGENCIES.find(a => a.slug === slug)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let initial: Record<string, any> | undefined
   if (!isDemo) {
     const live = await getLiveAgency(slug)
     if (!live) notFound()
     agency = liveToAgency(live)
+    initial = {
+      name: live.name, tagline: live.tagline ?? '', address: live.address ?? '', phone: live.phone ?? '',
+      email: live.email_contact ?? '', instagram: live.instagram ?? '',
+      hours: live.business_hours ?? 'Lun a Vie 9 a 18 h · Sáb 10 a 13 h',
+      whatsapp_auto: live.whatsapp_auto ?? true,
+      seo_title: live.seo_title ?? `${live.name} — Propiedades`, seo_description: live.seo_description ?? '',
+    }
   }
   if (!agency) notFound()
 
@@ -45,5 +54,5 @@ export default async function ConfiguracionPage({ params }: { params: Promise<{ 
     // sin DB → sin logo persistido
   }
 
-  return <ConfiguracionAdmin agency={agency} initialLogo={initialLogo} />
+  return <ConfiguracionAdmin agency={agency} initialLogo={initialLogo} initial={initial} isReal={!isDemo} />
 }

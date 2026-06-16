@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { useParams } from 'next/navigation'
 import type { Agency } from '@/lib/dummy'
 import { saveAgencyLogoUrl, removeAgencyLogo } from '@/lib/agency/logo-action'
+import { saveAgencySettings } from '@/lib/agencies/settings'
 import { uploadFile } from '@/lib/storage/upload-client'
 import ZaireCredit from '@/components/zaire-credit'
 
@@ -22,16 +23,30 @@ interface Settings {
   hours: string; whatsapp_auto: boolean; seo_title: string; seo_description: string
 }
 
-export default function ConfiguracionAdmin({ agency, initialLogo = '' }: { agency: Agency; initialLogo?: string }) {
+export default function ConfiguracionAdmin({ agency, initialLogo = '', initial, isReal = false }: { agency: Agency; initialLogo?: string; initial?: Partial<Settings>; isReal?: boolean }) {
   const [form, setForm] = useState<Settings>({
     name: agency.name, tagline: agency.tagline ?? '', address: agency.address ?? '',
     phone: agency.phone ?? '', email: agency.email ?? '', instagram: agency.instagram ?? '',
     hours: 'Lun a Vie 9 a 18 h · Sáb 10 a 13 h', whatsapp_auto: true,
     seo_title: `${agency.name} — Propiedades`, seo_description: agency.tagline ?? '',
+    ...(initial ?? {}),
   })
   const [saved, setSaved] = useState(false)
+  const [err, setErr] = useState<string | null>(null)
+  const [pending, start] = useTransition()
   const set = <K extends keyof Settings>(k: K, v: Settings[K]) => { setForm(f => ({ ...f, [k]: v })); setSaved(false) }
-  const save = () => { setSaved(true); setTimeout(() => setSaved(false), 2500) }
+  const save = () => {
+    setErr(null)
+    if (!isReal) { setSaved(true); setTimeout(() => setSaved(false), 2500); return }
+    start(async () => {
+      const res = await saveAgencySettings(slug, {
+        name: form.name, tagline: form.tagline, address: form.address, phone: form.phone,
+        email_contact: form.email, instagram: form.instagram, business_hours: form.hours,
+        whatsapp_auto: form.whatsapp_auto, seo_title: form.seo_title, seo_description: form.seo_description,
+      })
+      if (res.ok) { setSaved(true); setTimeout(() => setSaved(false), 2500) } else setErr(res.error ?? 'No se pudo guardar')
+    })
+  }
 
   // Logo (persiste en la DB al subir)
   const params = useParams()
@@ -78,7 +93,8 @@ export default function ConfiguracionAdmin({ agency, initialLogo = '' }: { agenc
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           {saved && <span style={{ fontSize: 13, color: LA.green, fontWeight: 600 }}>✓ Cambios guardados</span>}
-          <button onClick={save} style={{ background: LA.accent, color: LA.white, padding: '11px 24px', borderRadius: 12, fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer' }}>Guardar cambios</button>
+          {err && <span style={{ fontSize: 13, color: '#C0392B', fontWeight: 600 }}>{err}</span>}
+          <button onClick={save} disabled={pending} style={{ background: LA.accent, color: LA.white, padding: '11px 24px', borderRadius: 12, fontSize: 13, fontWeight: 700, border: 'none', cursor: pending ? 'default' : 'pointer', opacity: pending ? .6 : 1 }}>{pending ? 'Guardando…' : 'Guardar cambios'}</button>
         </div>
       </header>
 

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import type { Agency, LeadStage } from '@/lib/dummy'
 import { THEMES, type ThemeId } from '@/lib/themes'
-import { createLead } from '@/lib/leads/actions'
+import { submitPublicLead } from '@/lib/leads/actions'
 import ThemedNav from '@/components/site/themed-nav'
 
 const TIPOS = ['Departamento', 'Casa', 'PH', 'Local', 'Terreno', 'Oficina']
@@ -17,6 +17,7 @@ export default function TasacionContent({ slug, agency }: { slug: string; agency
   const centered = themeId === 'atelier'
 
   const [form, setForm] = useState({ name: '', email: '', phone: '', tipo: '', address: '', neighborhood: '', rooms: '', area: '', message: '' })
+  const [hp, setHp] = useState('') // honeypot anti-bot
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const set = (k: keyof typeof form, v: string) => setForm(f => ({ ...f, [k]: v }))
 
@@ -25,12 +26,12 @@ export default function TasacionContent({ slug, agency }: { slug: string; agency
     if (!form.name || !form.email || !form.tipo) return
     setStatus('loading')
     const detalle = [form.address, form.neighborhood, form.rooms && `${form.rooms} amb`, form.area && `${form.area} m²`, form.message].filter(Boolean).join(' · ')
-    const res = await createLead(slug, {
+    const res = await submitPublicLead(slug, {
       name: form.name, email: form.email, phone: form.phone,
       stage: 'new' as LeadStage, source: 'Tasación',
       property_interest: `Tasación: ${form.tipo}${form.neighborhood ? ` en ${form.neighborhood}` : ''}`,
       budget: '', notes: detalle, client_type: 'propietario', operation_interest: 'venta',
-    })
+    }, hp)
     const ok = res.ok || (res.error ?? '').toLowerCase().includes('no encontrada')
     setStatus(ok ? 'success' : 'error')
   }
@@ -61,6 +62,8 @@ export default function TasacionContent({ slug, agency }: { slug: string; agency
             </div>
           ) : (
             <form onSubmit={submit}>
+              {/* Honeypot anti-bot */}
+              <input type="text" name="company_extra" value={hp} onChange={e => setHp(e.target.value)} tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, opacity: 0 }} />
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                   <div><label style={label}>Nombre *</label><input required value={form.name} onChange={e => set('name', e.target.value)} placeholder="Tu nombre" style={input} /></div>

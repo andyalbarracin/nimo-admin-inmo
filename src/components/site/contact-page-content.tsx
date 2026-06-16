@@ -5,7 +5,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import type { Agency, ClientType, LeadStage } from '@/lib/dummy'
 import { THEMES, type ThemeId } from '@/lib/themes'
-import { createLead } from '@/lib/leads/actions'
+import { submitPublicLead } from '@/lib/leads/actions'
 
 const SiteMap = dynamic(() => import('@/components/site/primitives/SiteMap'), { ssr: false })
 
@@ -26,6 +26,7 @@ export default function ContactPageContent({ slug, agency, agents }: Props) {
   const r = T.radius // editorial 4px · spatial 8px · atelier 2px
 
   const [form, setForm] = useState({ name: '', email: '', phone: '', topic: '', message: '' })
+  const [hp, setHp] = useState('') // honeypot anti-bot
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,12 +34,12 @@ export default function ContactPageContent({ slug, agency, agents }: Props) {
     if (!form.name || !form.email) return
     setStatus('loading')
     const t = TOPIC_MAP[form.topic] ?? {}
-    const res = await createLead(slug, {
+    const res = await submitPublicLead(slug, {
       name: form.name, email: form.email, phone: form.phone,
       stage: 'new' as LeadStage, source: 'Formulario web',
       property_interest: form.topic ? form.topic : '', budget: '', notes: form.message,
       client_type: t.ct, operation_interest: t.op,
-    })
+    }, hp)
     // Agencias del demo que solo viven en dummy no tienen CRM en DB → éxito de demo igual.
     const ok = res.ok || (res.error ?? '').toLowerCase().includes('no encontrada')
     setStatus(ok ? 'success' : 'error')
@@ -131,6 +132,8 @@ export default function ContactPageContent({ slug, agency, agents }: Props) {
               </div>
             ) : (
               <form onSubmit={handleSubmit}>
+                {/* Honeypot anti-bot: invisible para humanos, los bots lo completan. */}
+                <input type="text" name="company_extra" value={hp} onChange={e => setHp(e.target.value)} tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, opacity: 0 }} />
                 <h2 style={{ fontFamily: T.fontDisplay, fontSize: 22, color: T.ink, margin: '0 0 24px', fontWeight: themeId === 'atelier' ? 400 : themeId === 'spatial' ? 800 : 400, textTransform: themeId === 'spatial' ? 'uppercase' : 'none' }}>Envianos un mensaje</h2>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   <div className="rwd-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>

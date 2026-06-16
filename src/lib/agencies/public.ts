@@ -18,7 +18,7 @@ export async function getPublicAgency(slug: string): Promise<Agency | null> {
   try {
     const { data } = await sb()
       .from('agencies')
-      .select('id,name,slug,plan_status,email_contact,phone,address,plan:platform_plans(code), onboarding:agency_onboarding(tagline,description), theme:agency_theme(site_theme)')
+      .select('id,name,slug,plan_status,email_contact,phone,address,tagline,instagram,business_hours,plan:platform_plans(code), onboarding:agency_onboarding(tagline,description), theme:agency_theme(site_theme)')
       .eq('slug', slug)
       .maybeSingle()
     if (!data) return null
@@ -40,7 +40,7 @@ export async function getPublicAgency(slug: string): Promise<Agency | null> {
       owner_email: data.email_contact ?? '',
       created_at: '',
       theme: themeId,
-      tagline: ob?.tagline ?? '',
+      tagline: data.tagline ?? ob?.tagline ?? '',
       address: data.address ?? '',
       phone: data.phone ?? '',
     } as Agency
