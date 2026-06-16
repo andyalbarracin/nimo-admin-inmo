@@ -1,12 +1,17 @@
+'use client'
+
 /*
  * Archivo: page.tsx
  * Ruta: src/app/unauthorized/page.tsx
- * Creado: 2026-06-06
+ * Modif.: 2026-06-15
  * Descripción: Página de acceso denegado. Se muestra cuando un usuario autenticado
- *              intenta acceder a un recurso sin el rol suficiente.
+ *              intenta acceder a una agencia a la que no pertenece.
  */
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function UnauthorizedPage() {
+  const router = useRouter()
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-6">
       <div className="text-center space-y-6 max-w-md">
@@ -21,18 +26,19 @@ export default function UnauthorizedPage() {
           </p>
         </div>
         <div className="flex gap-3 justify-center">
-          <a
+          <Link
             href="/"
             className="inline-flex items-center h-10 px-5 rounded-full border border-border text-sm hover:bg-accent transition-colors"
           >
             ← Ir al inicio
-          </a>
-          <a
-            href="javascript:history.back()"
+          </Link>
+          <button
+            type="button"
+            onClick={() => router.back()}
             className="inline-flex items-center h-10 px-5 rounded-full bg-primary text-primary-foreground text-sm hover:opacity-90 transition-opacity"
           >
             Volver
-          </a>
+          </button>
         </div>
       </div>
     </main>

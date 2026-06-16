@@ -14,8 +14,13 @@ import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { AGENCIES } from '@/lib/dummy'
 import { esAlMenos } from './permissions'
 import type { Rol } from './permissions'
+
+/** Las agencias DEMO (vitrina para prospectos) no son tenants reales: no se les
+ *  aplica aislamiento por membresía. El aislamiento importa entre agencias REALES. */
+const isDemoAgency = (slug: string) => AGENCIES.some(a => a.slug === slug)
 
 /**
  * Guard de aislamiento multi-tenant para las páginas de /[slug]/admin.
@@ -30,6 +35,9 @@ export async function guardAgencyAccess(agencySlug: string): Promise<void> {
   // Superadmin por cookie (su auth no es sesión de Supabase).
   const cookieStore = await cookies()
   if (cookieStore.get('nimo_demo_role')?.value === 'superadmin') return
+
+  // Agencias demo: vitrina, no tenant real → no se exige membresía.
+  if (isDemoAgency(agencySlug)) return
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -65,6 +73,9 @@ export async function guardAgencyAccess(agencySlug: string): Promise<void> {
 export async function assertAgencyAccess(agencySlug: string): Promise<boolean> {
   const cookieStore = await cookies()
   if (cookieStore.get('nimo_demo_role')?.value === 'superadmin') return true
+
+  // Agencias demo: vitrina, no tenant real → no se exige membresía.
+  if (isDemoAgency(agencySlug)) return true
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
