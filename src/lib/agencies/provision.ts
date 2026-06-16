@@ -12,6 +12,7 @@
 import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { slugify, esSlugValido } from '@/lib/utils/slug'
+import { assertAgencyAccess } from '@/lib/auth/require-tenant'
 import type { PlanId } from '@/lib/plans/server'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -121,11 +122,27 @@ export async function getLiveAgency(slug: string): Promise<any | null> {
   try {
     const { data } = await sb()
       .from('agencies')
-      .select('*, plan:platform_plans(code,name)')
+      .select('*, plan:platform_plans(code,name), theme:agency_theme(site_theme)')
       .eq('slug', slug)
       .maybeSingle()
     return data ?? null
   } catch { return null }
+}
+
+/** Cambia el tema del sitio público de la agencia (editorial/spatial/atelier). */
+export async function setAgencyTheme(slug: string, theme: string): Promise<{ ok: boolean; error?: string }> {
+  try {
+    if (!(await assertAgencyAccess(slug))) return { ok: false, error: 'No autorizado.' }
+    if (!['editorial', 'spatial', 'atelier'].includes(theme)) return { ok: false, error: 'Tema inválido.' }
+    const admin = sb()
+    const { data: ag } = await admin.from('agencies').select('id').eq('slug', slug).maybeSingle()
+    if (!ag) return { ok: false, error: 'Agencia no encontrada.' }
+    const { error } = await admin.from('agency_theme').update({ site_theme: theme }).eq('agency_id', ag.id)
+    if (error) return { ok: false, error: error.message }
+    revalidatePath(`/${slug}`)
+    revalidatePath('/superadmin/agencias', 'layout')
+    return { ok: true }
+  } catch (e) { return { ok: false, error: (e as Error).message } }
 }
 
 /** Actualiza datos comerciales/fiscales de una agencia real. */

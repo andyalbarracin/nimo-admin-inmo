@@ -11,7 +11,7 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { updateAgencyFiscal } from '@/lib/agencies/provision'
+import { updateAgencyFiscal, setAgencyTheme } from '@/lib/agencies/provision'
 import { uploadDocument, getDocumentUrl, deleteDocument, type AgencyDocument } from '@/lib/agencies/documents'
 import { addCredential, revealCredential, deleteCredential, type AgencyCredential } from '@/lib/agencies/credentials'
 import { setOnboardingEnabled } from '@/lib/agencies/onboarding'
@@ -44,16 +44,24 @@ const CRED_KINDS = [
   { v: 'token', l: 'Token' }, { v: 'url', l: 'URL' }, { v: 'other', l: 'Otro' },
 ]
 
-type Tab = 'general' | 'fiscal' | 'docs' | 'creds' | 'users'
+type Tab = 'general' | 'fiscal' | 'tema' | 'docs' | 'creds' | 'users'
 const TABS: { id: Tab; label: string }[] = [
   { id: 'general', label: 'General' }, { id: 'fiscal', label: 'Comercial / Fiscal' },
+  { id: 'tema', label: 'Tema' },
   { id: 'docs', label: 'Documentos' }, { id: 'creds', label: 'Credenciales' }, { id: 'users', label: 'Usuarios' },
+]
+
+const SITE_THEMES = [
+  { id: 'editorial', label: 'Editorial', colors: ['#FAF7F0', '#B25431', '#1A1614'] },
+  { id: 'spatial', label: 'Spatial', colors: ['#FFFFFF', '#1F4DD6', '#0A0A0A'] },
+  { id: 'atelier', label: 'Atelier', colors: ['#F5F1EC', '#7A8264', '#2E2620'] },
 ]
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function AgencyDetailLive({ agency, documents, credentials, isDemo = false }: { agency: any; documents: AgencyDocument[]; credentials: AgencyCredential[]; isDemo?: boolean }) {
   const router = useRouter()
   const [tab, setTab] = useState<Tab>('general')
+  const currentTheme = (Array.isArray(agency.theme) ? agency.theme[0] : agency.theme)?.site_theme ?? 'editorial'
 
   return (
     <div style={{ padding: '36px 48px', minHeight: '100vh', background: ZR.cream, color: ZR.black, fontFamily: ZR.body }}>
@@ -79,6 +87,7 @@ export default function AgencyDetailLive({ agency, documents, credentials, isDem
 
       {tab === 'general' && <GeneralTab agency={agency} isDemo={isDemo} />}
       {tab === 'fiscal' && <FiscalTab agency={agency} isDemo={isDemo} onSaved={() => router.refresh()} />}
+      {tab === 'tema' && (isDemo ? <DemoNotice /> : <ThemeTab slug={agency.slug} current={currentTheme} onSaved={() => router.refresh()} />)}
       {tab === 'docs' && (isDemo ? <DemoNotice /> : <DocsTab agencyId={agency.id} documents={documents} onChange={() => router.refresh()} />)}
       {tab === 'creds' && (isDemo ? <DemoNotice /> : <CredsTab agencyId={agency.id} credentials={credentials} onChange={() => router.refresh()} />)}
       {tab === 'users' && <UsersTab agency={agency} />}
@@ -91,6 +100,36 @@ function DemoNotice() {
     <div style={{ ...card, textAlign: 'center', color: ZR.ink3 }}>
       <div style={{ fontFamily: ZR.mono, fontSize: 9, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 8 }}>// AGENCIA DE DEMOSTRACIÓN</div>
       <div style={{ fontSize: 13 }}>Esta sección se habilita cuando la agencia se provisiona como cliente real. Las agencias demo son solo vitrina.</div>
+    </div>
+  )
+}
+
+function ThemeTab({ slug, current, onSaved }: { slug: string; current: string; onSaved: () => void }) {
+  const [pending, start] = useTransition()
+  const [sel, setSel] = useState(current)
+  const [msg, setMsg] = useState<string | null>(null)
+  const save = () => { setMsg(null); start(async () => { const r = await setAgencyTheme(slug, sel); setMsg(r.ok ? 'Tema aplicado ✓' : (r.error ?? 'Error')); if (r.ok) onSaved() }) }
+  return (
+    <div style={card}>
+      <div style={{ fontFamily: ZR.mono, fontSize: 9, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 4 }}>// TEMA DEL SITIO PÚBLICO</div>
+      <div style={{ fontFamily: ZR.display, fontSize: 14, marginBottom: 2 }}>Elegí el diseño del sitio</div>
+      <div style={{ fontSize: 12.5, color: ZR.ink3, marginBottom: 18 }}>Tema activo: <strong style={{ color: ZR.black }}>{current}</strong></div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 18 }}>
+        {SITE_THEMES.map(t => {
+          const active = sel === t.id
+          return (
+            <button key={t.id} onClick={() => setSel(t.id)} style={{ textAlign: 'left', cursor: 'pointer', background: ZR.white, border: `2px solid ${active ? ZR.black : ZR.border}`, borderRadius: 8, padding: 14 }}>
+              <div style={{ display: 'flex', gap: 4, marginBottom: 10 }}>{t.colors.map((c, i) => <span key={i} style={{ flex: 1, height: 30, borderRadius: 4, background: c, border: `1px solid ${ZR.border}` }} />)}</div>
+              <div style={{ fontWeight: 700, fontSize: 13 }}>{t.label}{t.id === current ? ' · activo' : active ? ' ✓' : ''}</div>
+            </button>
+          )
+        })}
+      </div>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+        <a href={`/${slug}?preview=${sel}`} target="_blank" rel="noreferrer" style={{ fontFamily: ZR.mono, fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', color: ZR.black, background: ZR.white, border: `2px solid ${ZR.black}`, padding: '9px 14px', textDecoration: 'none' }}>Preview en vivo →</a>
+        <button onClick={save} disabled={pending || sel === current} className="z-btn-bk is-orange" style={{ cursor: pending || sel === current ? 'default' : 'pointer', opacity: pending || sel === current ? .6 : 1 }}>{pending ? 'APLICANDO…' : '[ APLICAR TEMA ]'}</button>
+        {msg && <span style={{ fontSize: 12.5, color: msg.includes('✓') ? ZR.green : ZR.red }}>{msg}</span>}
+      </div>
     </div>
   )
 }

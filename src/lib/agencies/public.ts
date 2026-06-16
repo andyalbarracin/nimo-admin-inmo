@@ -18,12 +18,14 @@ export async function getPublicAgency(slug: string): Promise<Agency | null> {
   try {
     const { data } = await sb()
       .from('agencies')
-      .select('id,name,slug,plan_status,email_contact,phone,address,plan:platform_plans(code), onboarding:agency_onboarding(tagline,description)')
+      .select('id,name,slug,plan_status,email_contact,phone,address,plan:platform_plans(code), onboarding:agency_onboarding(tagline,description), theme:agency_theme(site_theme)')
       .eq('slug', slug)
       .maybeSingle()
     if (!data) return null
     const planCode = one(data.plan)?.code
     const plan = (['esencial', 'profesional', 'a_medida'].includes(planCode) ? planCode : 'esencial') as Agency['plan']
+    const siteTheme = one(data.theme)?.site_theme
+    const themeId = (['editorial', 'spatial', 'atelier'].includes(siteTheme) ? siteTheme : 'editorial') as Agency['theme']
     const ob = one(data.onboarding)
     return {
       id: data.id,
@@ -37,7 +39,7 @@ export async function getPublicAgency(slug: string): Promise<Agency | null> {
       mrr: 0,
       owner_email: data.email_contact ?? '',
       created_at: '',
-      theme: 'editorial',
+      theme: themeId,
       tagline: ob?.tagline ?? '',
       address: data.address ?? '',
       phone: data.phone ?? '',
