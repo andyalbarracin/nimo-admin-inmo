@@ -13,6 +13,7 @@
 import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { PALETTES } from '@/lib/constants/palettes'
+import { assertSuperAdmin, assertAgencyAccessById } from '@/lib/auth/require-tenant'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function sb(): any { return createAdminClient() }
@@ -53,6 +54,7 @@ function toRow(agencyId: string, d: Partial<OnboardingData>) {
 /** Guarda el progreso parcial del wizard. */
 export async function saveOnboarding(agencyId: string, data: Partial<OnboardingData>, step: number): Promise<{ ok: boolean; error?: string }> {
   try {
+    if (!(await assertAgencyAccessById(agencyId))) return { ok: false, error: 'No autorizado.' }
     const admin = sb()
     const { error } = await admin.from('agency_onboarding').upsert(toRow(agencyId, data), { onConflict: 'agency_id' })
     if (error) return { ok: false, error: error.message }
@@ -64,6 +66,7 @@ export async function saveOnboarding(agencyId: string, data: Partial<OnboardingD
 /** Completa el onboarding: persiste, vuelca la paleta al theme y marca completado. */
 export async function completeOnboarding(agencyId: string, data: OnboardingData): Promise<{ ok: boolean; error?: string }> {
   try {
+    if (!(await assertAgencyAccessById(agencyId))) return { ok: false, error: 'No autorizado.' }
     const admin = sb()
     const { error } = await admin.from('agency_onboarding').upsert(toRow(agencyId, data), { onConflict: 'agency_id' })
     if (error) return { ok: false, error: error.message }
@@ -82,6 +85,7 @@ export async function completeOnboarding(agencyId: string, data: OnboardingData)
 /** Activa/desactiva el onboarding (superadmin). */
 export async function setOnboardingEnabled(agencyId: string, enabled: boolean): Promise<{ ok: boolean; error?: string }> {
   try {
+    if (!(await assertSuperAdmin())) return { ok: false, error: 'No autorizado.' }
     const { error } = await sb().from('agencies').update({ onboarding_enabled: enabled }).eq('id', agencyId)
     if (error) return { ok: false, error: error.message }
     revalidatePath('/superadmin/agencias', 'layout')

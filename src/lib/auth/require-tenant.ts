@@ -64,6 +64,34 @@ export async function guardAgencyAccess(agencySlug: string): Promise<void> {
   if (!member) redirect('/unauthorized')
 }
 
+/** ¿El llamante es el superadmin de la plataforma? (cookie o email). Para acciones
+ *  de superadmin (provisioning, credenciales, suspensión, CRM de plataforma). */
+export async function assertSuperAdmin(): Promise<boolean> {
+  const cookieStore = await cookies()
+  if (cookieStore.get('nimo_demo_role')?.value === 'superadmin') return true
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const superEmail = process.env.SUPER_ADMIN_EMAIL
+  return !!(user?.email && superEmail && user.email.toLowerCase() === superEmail.toLowerCase())
+}
+
+/** Como assertAgencyAccess pero por agency_id (cuando la acción no tiene el slug). */
+export async function assertAgencyAccessById(agencyId: string): Promise<boolean> {
+  const cookieStore = await cookies()
+  if (cookieStore.get('nimo_demo_role')?.value === 'superadmin') return true
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const superEmail = process.env.SUPER_ADMIN_EMAIL
+  if (user?.email && superEmail && user.email.toLowerCase() === superEmail.toLowerCase()) return true
+  if (!user) return false
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const admin = createAdminClient() as any
+  const { data: member } = await admin
+    .from('agency_members').select('id')
+    .eq('agency_id', agencyId).eq('user_id', user.id).eq('is_active', true).maybeSingle()
+  return !!member
+}
+
 /**
  * Igual que guardAgencyAccess pero NO redirige: devuelve true/false. Para usar
  * dentro de Server Actions de escritura (createProperty, updateLead, etc.) y

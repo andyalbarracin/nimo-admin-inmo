@@ -11,6 +11,7 @@
 import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { encryptSecret, decryptSecret } from '@/lib/crypto/secrets'
+import { assertSuperAdmin } from '@/lib/auth/require-tenant'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function sb(): any { return createAdminClient() }
@@ -28,6 +29,7 @@ export interface AgencyCredential {
 
 export async function listCredentials(agencyId: string): Promise<AgencyCredential[]> {
   try {
+    if (!(await assertSuperAdmin())) return []
     const { data } = await sb()
       .from('agency_credentials')
       .select('id,label,kind,url,username,secret_ciphertext,created_at')
@@ -45,6 +47,7 @@ export async function addCredential(input: {
   agency_id: string; label: string; kind: string; url?: string; username?: string; secret?: string
 }): Promise<{ ok: boolean; error?: string }> {
   try {
+    if (!(await assertSuperAdmin())) return { ok: false, error: 'No autorizado.' }
     if (!input.agency_id || !input.label?.trim()) return { ok: false, error: 'Falta el label.' }
     const row = {
       agency_id: input.agency_id,
@@ -63,6 +66,7 @@ export async function addCredential(input: {
 /** Descifra y devuelve el secreto (botón "ojo"). */
 export async function revealCredential(id: string): Promise<{ ok: boolean; secret?: string; error?: string }> {
   try {
+    if (!(await assertSuperAdmin())) return { ok: false, error: 'No autorizado.' }
     const { data } = await sb().from('agency_credentials').select('secret_ciphertext').eq('id', id).maybeSingle()
     if (!data?.secret_ciphertext) return { ok: true, secret: '' }
     return { ok: true, secret: decryptSecret(data.secret_ciphertext) }
@@ -71,6 +75,7 @@ export async function revealCredential(id: string): Promise<{ ok: boolean; secre
 
 export async function deleteCredential(id: string): Promise<{ ok: boolean; error?: string }> {
   try {
+    if (!(await assertSuperAdmin())) return { ok: false, error: 'No autorizado.' }
     const { error } = await sb().from('agency_credentials').delete().eq('id', id)
     if (error) return { ok: false, error: error.message }
     rev(); return { ok: true }

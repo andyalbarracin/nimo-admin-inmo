@@ -12,7 +12,7 @@
 import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { slugify, esSlugValido } from '@/lib/utils/slug'
-import { assertAgencyAccess } from '@/lib/auth/require-tenant'
+import { assertAgencyAccess, assertSuperAdmin } from '@/lib/auth/require-tenant'
 import type { PlanId } from '@/lib/plans/server'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,6 +41,7 @@ type Result = { ok: boolean; slug?: string; error?: string }
 
 export async function createAgency(input: NewAgencyInput): Promise<Result> {
   try {
+    if (!(await assertSuperAdmin())) return { ok: false, error: 'No autorizado.' }
     const name = input.name?.trim()
     const slug = slugify(input.slug || input.name || '')
     const email = input.ownerEmail?.trim().toLowerCase()
@@ -152,6 +153,7 @@ export async function updateAgencyFiscal(
   fields: Record<string, any>,
 ): Promise<{ ok: boolean; error?: string }> {
   try {
+    if (!(await assertSuperAdmin())) return { ok: false, error: 'No autorizado.' }
     const allowed = ['business_name', 'legal_id', 'cucicba_id', 'tax_condition', 'billing_email', 'billing_address', 'phone', 'whatsapp_number', 'address', 'city', 'province', 'notes_internal']
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const clean: Record<string, any> = {}

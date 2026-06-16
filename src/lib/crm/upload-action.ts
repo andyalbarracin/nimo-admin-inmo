@@ -6,11 +6,13 @@
  * Requiere el bucket creado (ver 0006_crm_storage.sql).
  */
 import { createAdminClient } from '@/lib/supabase/admin'
+import { assertSuperAdmin } from '@/lib/auth/require-tenant'
 
 type Result = { ok: boolean; url?: string; name?: string; error?: string }
 
 export async function uploadCrmFile(formData: FormData): Promise<Result> {
   try {
+    if (!(await assertSuperAdmin())) return { ok: false, error: 'No autorizado.' }
     const file = formData.get('file') as File | null
     if (!file || file.size === 0) return { ok: false, error: 'Sin archivo' }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

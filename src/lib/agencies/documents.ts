@@ -11,6 +11,7 @@
 import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { nanoid } from 'nanoid'
+import { assertSuperAdmin } from '@/lib/auth/require-tenant'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function sb(): any { return createAdminClient() }
@@ -28,6 +29,7 @@ export interface AgencyDocument {
 
 export async function listDocuments(agencyId: string): Promise<AgencyDocument[]> {
   try {
+    if (!(await assertSuperAdmin())) return []
     const { data } = await sb().from('agency_documents').select('*').eq('agency_id', agencyId).order('created_at', { ascending: false })
     return (data ?? []) as AgencyDocument[]
   } catch { return [] }
@@ -35,6 +37,7 @@ export async function listDocuments(agencyId: string): Promise<AgencyDocument[]>
 
 export async function uploadDocument(formData: FormData): Promise<{ ok: boolean; error?: string }> {
   try {
+    if (!(await assertSuperAdmin())) return { ok: false, error: 'No autorizado.' }
     const agencyId = String(formData.get('agency_id') || '')
     const title = String(formData.get('title') || '').trim()
     const kind = String(formData.get('kind') || 'other')
@@ -62,6 +65,7 @@ export async function uploadDocument(formData: FormData): Promise<{ ok: boolean;
 /** Signed URL temporal (5 min) para descargar/ver un documento. */
 export async function getDocumentUrl(filePath: string): Promise<string | null> {
   try {
+    if (!(await assertSuperAdmin())) return null
     const { data } = await sb().storage.from('agency-docs').createSignedUrl(filePath, 60 * 5)
     return data?.signedUrl ?? null
   } catch { return null }
@@ -69,6 +73,7 @@ export async function getDocumentUrl(filePath: string): Promise<string | null> {
 
 export async function deleteDocument(id: string, filePath: string): Promise<{ ok: boolean; error?: string }> {
   try {
+    if (!(await assertSuperAdmin())) return { ok: false, error: 'No autorizado.' }
     const admin = sb()
     await admin.storage.from('agency-docs').remove([filePath]).catch(() => {})
     const { error } = await admin.from('agency_documents').delete().eq('id', id)

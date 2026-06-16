@@ -13,6 +13,7 @@
  */
 import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { assertSuperAdmin } from '@/lib/auth/require-tenant'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function sb(): any { return createAdminClient() }
@@ -49,6 +50,7 @@ export async function canCreateProperty(agencyId: string): Promise<{ ok: boolean
 /** Suspender / reactivar / dar de baja una agencia (superadmin). */
 export async function setAgencyStatus(agencyId: string, status: AgencyStatus): Promise<{ ok: boolean; error?: string }> {
   try {
+    if (!(await assertSuperAdmin())) return { ok: false, error: 'No autorizado.' }
     const { error } = await sb().from('agencies').update({ plan_status: status }).eq('id', agencyId)
     if (error) return { ok: false, error: error.message }
     revalidatePath('/superadmin/agencias', 'layout')
