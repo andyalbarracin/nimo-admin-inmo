@@ -43,6 +43,8 @@ export async function getPublicAgency(slug: string): Promise<Agency | null> {
       tagline: data.tagline ?? ob?.tagline ?? '',
       address: data.address ?? '',
       phone: data.phone ?? '',
+      email: data.email_contact ?? '',
+      instagram: data.instagram ?? '',
     } as Agency
   } catch {
     return null

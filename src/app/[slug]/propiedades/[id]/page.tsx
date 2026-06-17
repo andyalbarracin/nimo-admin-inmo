@@ -5,6 +5,8 @@ import { getPublicAgency } from '@/lib/agencies/public'
 import EditorialDetail from '@/components/site/themes/editorial-detail'
 import SpatialDetail from '@/components/site/themes/spatial-detail'
 import AtelierDetail from '@/components/site/themes/atelier-detail'
+import SiteFooter from '@/components/site/primitives/SiteFooter'
+import { THEMES } from '@/lib/themes'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,7 +27,12 @@ export default async function PropertyDetail({
     .slice(0, 3)
 
   if (agency.theme === 'spatial') {
-    return <SpatialDetail slug={slug} agency={agency} prop={prop} related={related} />
+    // SpatialDetail no trae footer propio (editorial/atelier sí) → lo agregamos acá.
+    const T = THEMES.spatial
+    return <>
+      <SpatialDetail slug={slug} agency={agency} prop={prop} related={related} />
+      <SiteFooter slug={slug} agency={agency} bg={T.bg} rule={T.rule} ink={T.ink} ink2={T.ink2} ink3={T.ink3} accent={T.accent} fontDisplay={T.fontDisplay} />
+    </>
   }
   if (agency.theme === 'atelier') {
     return <AtelierDetail slug={slug} agency={agency} prop={prop} related={related} />

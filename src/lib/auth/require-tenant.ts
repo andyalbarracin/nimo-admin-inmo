@@ -69,10 +69,13 @@ export async function guardAgencyAccess(agencySlug: string): Promise<void> {
 export async function assertSuperAdmin(): Promise<boolean> {
   const cookieStore = await cookies()
   if (cookieStore.get('nimo_demo_role')?.value === 'superadmin') return true
+  // MISMA lógica que el proxy (src/proxy.ts) para no negar acceso a quien el proxy
+  // ya dejó entrar a /superadmin (si no, las agencias reales "desaparecían").
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return false
   const superEmail = process.env.SUPER_ADMIN_EMAIL
-  return !!(user?.email && superEmail && user.email.toLowerCase() === superEmail.toLowerCase())
+  return !superEmail || user.email?.toLowerCase() === superEmail.toLowerCase()
 }
 
 /** Como assertAgencyAccess pero por agency_id (cuando la acción no tiene el slug). */

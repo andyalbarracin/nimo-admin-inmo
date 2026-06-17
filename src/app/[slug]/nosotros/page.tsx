@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { AGENCIES, TEAM, AGENCY_STATS } from '@/lib/dummy'
 import { THEMES, type ThemeId } from '@/lib/themes'
 import ThemedNav from '@/components/site/themed-nav'
+import SiteFooter from '@/components/site/primitives/SiteFooter'
 import { getPublicAgency } from '@/lib/agencies/public'
 import { listAgencyMembers } from '@/lib/agencies/members'
 
@@ -89,6 +90,7 @@ export default async function NosotrosPage({ params }: { params: Promise<{ slug:
           <Link href={`/${slug}/tasacion`} style={{ fontFamily: T.fontMono, fontSize: 13, letterSpacing: '.08em', textTransform: 'uppercase', color: T.accentContrast, border: `1.5px solid ${T.accentContrast}`, padding: '13px 26px', borderRadius: r, textDecoration: 'none' }}>Tasar mi propiedad</Link>
         </div>
       </section>
+      <SiteFooter slug={slug} agency={agency} bg={T.bg} rule={T.rule} ink={T.ink} ink2={T.ink2} ink3={T.ink3} accent={T.accent} fontDisplay={T.fontDisplay} />
     </div>
   )
 }

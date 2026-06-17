@@ -4,6 +4,8 @@ import { getPublicProperties } from '@/lib/properties/public'
 import { getPublicAgency } from '@/lib/agencies/public'
 import PropiedadesClient from '@/components/site/PropiedadesClient'
 import SpatialListado from '@/components/site/themes/spatial-listado'
+import SiteFooter from '@/components/site/primitives/SiteFooter'
+import { THEMES, type ThemeId } from '@/lib/themes'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,17 +41,20 @@ export default async function PropiedadesPage({
     })
   }
 
+  const T = THEMES[agency.theme as ThemeId]
+  const footer = (
+    <SiteFooter slug={slug} agency={agency} bg={T.bg} rule={T.rule} ink={T.ink} ink2={T.ink2} ink3={T.ink3} accent={T.accent} fontDisplay={T.fontDisplay} />
+  )
+
   if (agency.theme === 'spatial') {
-    return <SpatialListado slug={slug} agency={agency} properties={props} op={op ?? ''} tipo={tipo ?? ''} />
+    return <>
+      <SpatialListado slug={slug} agency={agency} properties={props} op={op ?? ''} tipo={tipo ?? ''} />
+      {footer}
+    </>
   }
 
-  return (
-    <PropiedadesClient
-      slug={slug}
-      agency={agency}
-      properties={props}
-      op={op ?? ''}
-      tipo={tipo ?? ''}
-    />
-  )
+  return <>
+    <PropiedadesClient slug={slug} agency={agency} properties={props} op={op ?? ''} tipo={tipo ?? ''} />
+    {footer}
+  </>
 }
