@@ -4,6 +4,7 @@ import { useState, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { resolveAgencyHome } from '@/lib/auth/session-actions'
 import ZaireCredit from '@/components/zaire-credit'
 
 const ZR = {
@@ -90,8 +91,11 @@ export default function AgencyLoginClient({ slug, agencyName, redirectTo, showDe
         setError('Email o contraseña incorrectos.')
         return
       }
+      // Redirigir SIEMPRE al panel de la agencia del usuario (según su membresía),
+      // nunca al slug de la URL → evita caer en el panel de otra agencia.
+      const home = await resolveAgencyHome()
       router.refresh()
-      router.push(redirectTo)
+      router.push(home ?? redirectTo)
     })
   }
 

@@ -34,11 +34,12 @@ export async function proxy(request: NextRequest) {
   const demoRole = request.cookies.get('nimo_demo_role')?.value
   const isAuthenticated = !!user || !!demoRole
 
-  // Superadmin es MÁS estricto: solo el usuario real (email === SUPER_ADMIN_EMAIL)
-  // o la cookie demo específica 'superadmin'. Así una sesión demo de agencia
-  // (nimo_demo_role=owner/agent) NO abre el panel de plataforma.
+  // Superadmin ESTRICTO: cookie de /superadmin/login, o usuario real cuyo email
+  // coincide con SUPER_ADMIN_EMAIL. Sin email configurado y sin cookie → NO es
+  // superadmin (antes "cualquier usuario" entraba si el email no estaba seteado).
+  // Debe coincidir con assertSuperAdmin() de require-tenant.ts.
   const superEmail = process.env.SUPER_ADMIN_EMAIL
-  const isSuperAuthed = (!!user && (!superEmail || user.email === superEmail)) || demoRole === 'superadmin'
+  const isSuperAuthed = demoRole === 'superadmin' || (!!user && !!superEmail && user.email === superEmail)
 
   const isAdminRoute = /^\/[^/]+\/admin(\/|$)/.test(pathname)
   // La propia página de login NO debe redirigirse (si no: loop infinito → ERR_TOO_MANY_REDIRECTS).
