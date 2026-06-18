@@ -1,5 +1,6 @@
+import { redirect } from 'next/navigation'
 import { AGENCIES } from '@/lib/dummy'
-import { guardAgencyAccess } from '@/lib/auth/require-tenant'
+import { guardAgencyAccess, assertAgencyRole } from '@/lib/auth/require-tenant'
 
 export const dynamic = 'force-dynamic'
 
@@ -147,6 +148,7 @@ const THEMES = [
 export default async function TemaAdmin({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   await guardAgencyAccess(slug)
+  if (!(await assertAgencyRole(slug, 'admin'))) redirect(`/${slug}/admin`)
   const agency = AGENCIES.find(a => a.slug === slug)
   const currentTheme = agency?.theme ?? 'editorial'
 

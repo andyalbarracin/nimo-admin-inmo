@@ -1,9 +1,9 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { AGENCIES, type Agency } from '@/lib/dummy'
 import { createAdminClient } from '@/lib/supabase/admin'
 import ConfiguracionAdmin from '@/components/admin/configuracion-admin'
 import { getLiveAgency } from '@/lib/agencies/provision'
-import { guardAgencyAccess } from '@/lib/auth/require-tenant'
+import { guardAgencyAccess, assertAgencyRole } from '@/lib/auth/require-tenant'
 import type { PlanId } from '@/lib/plans/server'
 
 export const dynamic = 'force-dynamic'
@@ -23,6 +23,8 @@ function liveToAgency(live: any): Agency {
 export default async function ConfiguracionPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   await guardAgencyAccess(slug)
+  // Configuración: solo owner/admin (o superadmin).
+  if (!(await assertAgencyRole(slug, 'admin'))) redirect(`/${slug}/admin`)
 
   // Coexistencia: agencia DEMO → datos de muestra; agencia REAL → su registro de DB.
   const isDemo = AGENCIES.some(a => a.slug === slug)

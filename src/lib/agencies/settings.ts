@@ -9,7 +9,7 @@
  */
 import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { assertAgencyAccess } from '@/lib/auth/require-tenant'
+import { assertAgencyRole } from '@/lib/auth/require-tenant'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function sb(): any { return createAdminClient() }
@@ -20,7 +20,7 @@ export async function saveAgencySettings(
   fields: Record<string, any>,
 ): Promise<{ ok: boolean; error?: string }> {
   try {
-    if (!(await assertAgencyAccess(slug))) return { ok: false, error: 'No autorizado.' }
+    if (!(await assertAgencyRole(slug, 'admin'))) return { ok: false, error: 'Solo el owner o un admin pueden editar la configuración.' }
     const allowed = ['name', 'tagline', 'phone', 'whatsapp_number', 'address', 'email_contact', 'instagram', 'business_hours', 'seo_title', 'seo_description', 'whatsapp_auto']
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const clean: Record<string, any> = {}

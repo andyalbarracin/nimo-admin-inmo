@@ -71,6 +71,23 @@ export async function assertAgencyAccess(agencySlug: string): Promise<boolean> {
   return isMemberOfSlug(agencySlug, user.id)
 }
 
+/** ¿El usuario es miembro de la agencia con AL MENOS el rol indicado? El superadmin
+ *  siempre pasa. Para gatear Configuración / Tema / Equipo (solo owner/admin). */
+export async function assertAgencyRole(slug: string, minRole: Rol): Promise<boolean> {
+  if (await assertSuperAdmin()) return true
+  const user = await currentUser()
+  if (!user) return false
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const admin = createAdminClient() as any
+  const { data: ag } = await admin.from('agencies').select('id').eq('slug', slug).maybeSingle()
+  if (!ag) return false
+  const { data: m } = await admin
+    .from('agency_members').select('role')
+    .eq('agency_id', ag.id).eq('user_id', user.id).eq('is_active', true).maybeSingle()
+  if (!m) return false
+  return esAlMenos(m.role as Rol, minRole)
+}
+
 /** Igual que assertAgencyAccess pero por agency_id (cuando la acción no tiene slug). */
 export async function assertAgencyAccessById(agencyId: string): Promise<boolean> {
   if (await assertSuperAdmin()) return true

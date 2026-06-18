@@ -12,7 +12,7 @@
 import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { slugify, esSlugValido } from '@/lib/utils/slug'
-import { assertAgencyAccess, assertSuperAdmin } from '@/lib/auth/require-tenant'
+import { assertSuperAdmin, assertAgencyRole } from '@/lib/auth/require-tenant'
 import type { PlanId } from '@/lib/plans/server'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -134,7 +134,7 @@ export async function getLiveAgency(slug: string): Promise<any | null> {
 /** Cambia el tema del sitio público de la agencia (editorial/spatial/atelier). */
 export async function setAgencyTheme(slug: string, theme: string): Promise<{ ok: boolean; error?: string }> {
   try {
-    if (!(await assertAgencyAccess(slug))) return { ok: false, error: 'No autorizado.' }
+    if (!(await assertAgencyRole(slug, 'admin'))) return { ok: false, error: 'Solo el owner o un admin pueden cambiar el tema.' }
     if (!['editorial', 'spatial', 'atelier'].includes(theme)) return { ok: false, error: 'Tema inválido.' }
     const admin = sb()
     const { data: ag } = await admin.from('agencies').select('id').eq('slug', slug).maybeSingle()

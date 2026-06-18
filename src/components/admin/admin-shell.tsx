@@ -22,8 +22,10 @@ const LA = {
   bg: '#FAF7F2', white: '#FFFFFF', border: '#EDEBE6',
   ink: '#1A1A1A', ink2: '#4A4845', ink3: '#9A9590', danger: '#C0392B',
 }
+// Header oscuro (top bar del panel)
+const HD = { bg: '#1A1714', border: '#2E2A26', text: '#F5F1EC', muted: '#A39C92' }
 
-type NavItem = { href: string; label: string; icon: string }
+type NavItem = { href: string; label: string; icon: string; admin?: boolean }
 const SECTIONS: { title: string; items: NavItem[] }[] = [
   {
     title: 'Operación',
@@ -31,14 +33,14 @@ const SECTIONS: { title: string; items: NavItem[] }[] = [
       { href: '',             label: 'Dashboard',     icon: 'grid' },
       { href: '/propiedades', label: 'Propiedades',   icon: 'home' },
       { href: '/leads',       label: 'CRM / Leads',   icon: 'users' },
-      { href: '/equipo',      label: 'Equipo',        icon: 'user-plus' },
+      { href: '/equipo',      label: 'Equipo',        icon: 'user-plus', admin: true },
     ],
   },
   {
     title: 'Configuración',
     items: [
-      { href: '/configuracion', label: 'Configuración',  icon: 'settings' },
-      { href: '/tema',          label: 'Tema del sitio', icon: 'palette' },
+      { href: '/configuracion', label: 'Configuración',  icon: 'settings', admin: true },
+      { href: '/tema',          label: 'Tema del sitio', icon: 'palette', admin: true },
     ],
   },
 ]
@@ -66,6 +68,9 @@ export default function AdminShell({ children, agencyName, accent, user }: { chi
   if (pathname.endsWith('/login')) return <>{children}</>
 
   const initials = (user?.name ?? '?').trim().split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
+  // Solo owner/admin (o superadmin) ven Configuración / Tema / Equipo.
+  const canManage = !!user && (user.isSuperadmin || user.role === 'owner' || user.role === 'admin')
+  const sections = SECTIONS.map(s => ({ ...s, items: s.items.filter(i => !i.admin || canManage) })).filter(s => s.items.length > 0)
 
   // Acento de la agencia inyectado en las CSS vars del sidebar de shadcn.
   const themeVars = {
@@ -98,7 +103,7 @@ export default function AdminShell({ children, agencyName, accent, user }: { chi
         </SidebarHeader>
 
         <SidebarContent>
-          {SECTIONS.map(section => (
+          {sections.map(section => (
             <SidebarGroup key={section.title}>
               <SidebarGroupLabel>{section.title}</SidebarGroupLabel>
               <SidebarMenu>
@@ -136,18 +141,18 @@ export default function AdminShell({ children, agencyName, accent, user }: { chi
         <SidebarRail />
       </Sidebar>
 
-      <SidebarInset>
-        {/* Header con trigger del sidebar + menú de usuario */}
-        <header style={{ position: 'sticky', top: 0, zIndex: 100, height: 56, background: LA.white, borderBottom: `1px solid ${LA.border}`, display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px' }}>
-          <SidebarTrigger />
+      <SidebarInset className="min-w-0">
+        {/* Header con trigger del sidebar + menú de usuario (oscuro) */}
+        <header style={{ position: 'sticky', top: 0, zIndex: 100, height: 56, background: HD.bg, borderBottom: `1px solid ${HD.border}`, display: 'flex', alignItems: 'center', gap: 8, padding: '0 16px', color: HD.text }}>
+          <SidebarTrigger className="text-[#F5F5F0] hover:bg-white/10 hover:text-white" />
           <div style={{ marginLeft: 'auto', position: 'relative' }}>
             <button onClick={() => setMenuOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'none', border: 'none', cursor: 'pointer', padding: '6px 8px', borderRadius: 10, fontFamily: 'inherit' }}>
-              <div style={{ width: 34, height: 34, borderRadius: 99, background: accent, color: LA.white, display: 'grid', placeItems: 'center', fontWeight: 800, fontSize: 13, flexShrink: 0 }}>{initials}</div>
+              <div style={{ width: 34, height: 34, borderRadius: 99, background: accent, color: '#fff', display: 'grid', placeItems: 'center', fontWeight: 800, fontSize: 13, flexShrink: 0 }}>{initials}</div>
               <div style={{ textAlign: 'left', lineHeight: 1.2 }} className="rwd-hide-mobile">
-                <div style={{ fontSize: 13, fontWeight: 700, color: LA.ink, maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name ?? 'Usuario'}</div>
-                <div style={{ fontSize: 11, color: LA.ink3 }}>{ROLE_LABEL[user?.role ?? 'viewer'] ?? user?.role}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: HD.text, maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name ?? 'Usuario'}</div>
+                <div style={{ fontSize: 11, color: HD.muted }}>{ROLE_LABEL[user?.role ?? 'viewer'] ?? user?.role}</div>
               </div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={LA.ink3} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: menuOpen ? 'rotate(180deg)' : 'none' }}><polyline points="6 9 12 15 18 9" /></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={HD.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: menuOpen ? 'rotate(180deg)' : 'none' }}><polyline points="6 9 12 15 18 9" /></svg>
             </button>
             {menuOpen && (
               <>
@@ -175,7 +180,7 @@ export default function AdminShell({ children, agencyName, accent, user }: { chi
           </div>
         </header>
 
-        <div style={{ minHeight: 'calc(100vh - 56px)', background: LA.bg }}>
+        <div style={{ minWidth: 0, maxWidth: '100%', overflowX: 'auto', minHeight: 'calc(100vh - 56px)', background: LA.bg }}>
           {children}
         </div>
       </SidebarInset>

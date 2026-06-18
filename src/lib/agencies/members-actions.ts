@@ -11,7 +11,7 @@
  */
 import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { assertAgencyAccess } from '@/lib/auth/require-tenant'
+import { assertAgencyRole } from '@/lib/auth/require-tenant'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function sb(): any { return createAdminClient() }
@@ -25,7 +25,7 @@ export async function inviteAgencyMember(
   input: { name: string; email: string; role: string; password: string },
 ): Promise<Result> {
   try {
-    if (!(await assertAgencyAccess(slug))) return DENY
+    if (!(await assertAgencyRole(slug, 'admin'))) return DENY
     const email = input.email?.trim().toLowerCase()
     if (!input.name?.trim() || !email) return { ok: false, error: 'Faltan nombre y email.' }
     if (!input.password || input.password.length < 8) return { ok: false, error: 'La contraseña debe tener al menos 8 caracteres.' }
@@ -57,7 +57,7 @@ export async function inviteAgencyMember(
 
 export async function removeAgencyMember(slug: string, memberId: string): Promise<Result> {
   try {
-    if (!(await assertAgencyAccess(slug))) return DENY
+    if (!(await assertAgencyRole(slug, 'admin'))) return DENY
     const admin = sb()
     const { data: ag } = await admin.from('agencies').select('id').eq('slug', slug).maybeSingle()
     if (!ag) return { ok: false, error: 'Agencia no encontrada.' }
@@ -72,7 +72,7 @@ export async function removeAgencyMember(slug: string, memberId: string): Promis
 
 export async function updateMemberRole(slug: string, memberId: string, role: string): Promise<Result> {
   try {
-    if (!(await assertAgencyAccess(slug))) return DENY
+    if (!(await assertAgencyRole(slug, 'admin'))) return DENY
     if (!['admin', 'agent', 'viewer'].includes(role)) return { ok: false, error: 'Rol inválido.' }
     const admin = sb()
     const { data: ag } = await admin.from('agencies').select('id').eq('slug', slug).maybeSingle()
