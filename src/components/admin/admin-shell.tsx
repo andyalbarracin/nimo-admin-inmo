@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePathname, useParams } from 'next/navigation'
 import Link from 'next/link'
 
@@ -59,6 +59,10 @@ export default function AdminShell({ children, agencyName, accent, user }: { chi
   const slug = params?.slug as string ?? ''
   const [collapsed, setCollapsed] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+
+  // Persistencia del estado colapsado (recuerda la preferencia entre sesiones).
+  useEffect(() => { if (localStorage.getItem('nimo_sidebar_collapsed') === '1') setCollapsed(true) }, [])
+  const toggleCollapsed = () => setCollapsed(c => { const n = !c; try { localStorage.setItem('nimo_sidebar_collapsed', n ? '1' : '0') } catch {} return n })
 
   if (pathname.endsWith('/login')) return <>{children}</>
 
@@ -137,7 +141,7 @@ export default function AdminShell({ children, agencyName, accent, user }: { chi
           </form>
           {/* Toggle colapsar */}
           <button
-            onClick={() => setCollapsed(c => !c)}
+            onClick={toggleCollapsed}
             title={collapsed ? 'Expandir' : 'Colapsar'}
             style={{ background: LA.bg, border: `1px solid ${LA.border}`, borderRadius: 8, cursor: 'pointer', color: LA.ink2, padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontFamily: 'inherit', fontSize: 12, marginTop: 4 }}
           >

@@ -49,9 +49,12 @@ const SLIDES = [
   },
 ]
 
+// Accesos demo: 3 agencias reales, una por cada tema (para mostrar los diseños).
+// Al loguear, el usuario es redirigido al panel de SU agencia automáticamente.
 const DEMO_CREDS = [
-  { label: 'Martín López', role: 'Owner', email: 'owner@lopezasociados.com', password: 'Lopez2024!' },
-  { label: 'Carla Méndez', role: 'Agente', email: 'agente@lopezasociados.com', password: 'Lopez2024!' },
+  { label: 'López & Asociados', role: 'Tema Editorial', email: 'owner@lopezasociados.com', password: 'Lopez2024!' },
+  { label: 'Espacio Urbano', role: 'Tema Spatial', email: 'owner@espaciourbano.com', password: 'Demo2024!' },
+  { label: 'Atelier Norte', role: 'Tema Atelier', email: 'owner@atelierprop.com', password: 'Demo2024!' },
 ]
 
 interface Props {
