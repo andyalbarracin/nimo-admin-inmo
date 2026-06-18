@@ -51,17 +51,21 @@ function Icon({ name }: { name: string }) {
   return <span style={{ display: 'flex', flexShrink: 0 }}>{icons[name]}</span>
 }
 
-export default function AdminShell({ children, agencyName, accent }: { children: React.ReactNode; agencyName: string; accent: string }) {
+const ROLE_LABEL: Record<string, string> = { owner: 'Propietario', admin: 'Admin', agent: 'Agente', viewer: 'Visor', superadmin: 'Super Admin' }
+
+export default function AdminShell({ children, agencyName, accent, user }: { children: React.ReactNode; agencyName: string; accent: string; user: { name: string; email: string; role: string; isSuperadmin: boolean } | null }) {
   const pathname = usePathname()
   const params = useParams()
   const slug = params?.slug as string ?? ''
   const [collapsed, setCollapsed] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   if (pathname.endsWith('/login')) return <>{children}</>
 
   // El nombre y el acento llegan resueltos desde el layout server (agencia real o demo).
   const accentSoft = accent + '14'
   const W = collapsed ? 68 : 224
+  const initials = (user?.name ?? '?').trim().split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
 
   return (
     <div style={{ '--admin-accent': accent, display: 'flex', minHeight: '100vh', background: LA.bg, fontFamily: 'var(--font-sans)' } as React.CSSProperties}>
@@ -83,6 +87,16 @@ export default function AdminShell({ children, agencyName, accent }: { children:
             )}
           </Link>
         </div>
+
+        {/* Flecha de colapsar — sobre la línea del sidebar, debajo del logo */}
+        <button
+          onClick={() => setCollapsed(c => !c)}
+          title={collapsed ? 'Expandir menú' : 'Colapsar menú'}
+          aria-label={collapsed ? 'Expandir menú' : 'Colapsar menú'}
+          style={{ alignSelf: collapsed ? 'center' : 'flex-end', margin: collapsed ? '8px 0 0' : '8px 8px 0 0', background: LA.white, border: `1px solid ${LA.border}`, borderRadius: 8, width: 26, height: 26, display: 'grid', placeItems: 'center', cursor: 'pointer', color: LA.ink2, flexShrink: 0 }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: collapsed ? 'rotate(180deg)' : 'none' }}><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
 
         {/* Nav con secciones + divisores */}
         <nav style={{ flex: 1, padding: collapsed ? '10px 8px' : '10px 10px' }}>
@@ -145,6 +159,42 @@ export default function AdminShell({ children, agencyName, accent }: { children:
 
       {/* Main */}
       <main className="admin-main" style={{ flex: 1, minWidth: 0, overflowY: 'auto', background: LA.bg }}>
+        {/* Header con menú de usuario */}
+        <header style={{ position: 'sticky', top: 0, zIndex: 100, height: 56, background: LA.white, borderBottom: `1px solid ${LA.border}`, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 24px' }}>
+          <div style={{ position: 'relative' }}>
+            <button onClick={() => setMenuOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'none', border: 'none', cursor: 'pointer', padding: '6px 8px', borderRadius: 10, fontFamily: 'inherit' }}>
+              <div style={{ width: 34, height: 34, borderRadius: 99, background: accent, color: LA.white, display: 'grid', placeItems: 'center', fontWeight: 800, fontSize: 13, flexShrink: 0 }}>{initials}</div>
+              <div style={{ textAlign: 'left', lineHeight: 1.2 }} className="rwd-hide-mobile">
+                <div style={{ fontSize: 13, fontWeight: 700, color: LA.ink, maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name ?? 'Usuario'}</div>
+                <div style={{ fontSize: 11, color: LA.ink3 }}>{ROLE_LABEL[user?.role ?? 'viewer'] ?? user?.role}</div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={LA.ink3} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: menuOpen ? 'rotate(180deg)' : 'none' }}><polyline points="6 9 12 15 18 9" /></svg>
+            </button>
+            {menuOpen && (
+              <>
+                <div onClick={() => setMenuOpen(false)} style={{ position: 'fixed', inset: 0, zIndex: 90 }} />
+                <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 6px)', zIndex: 100, background: LA.white, border: `1px solid ${LA.border}`, borderRadius: 12, boxShadow: '0 8px 28px rgba(0,0,0,.12)', minWidth: 220, overflow: 'hidden' }}>
+                  <div style={{ padding: '12px 14px', borderBottom: `1px solid ${LA.border}` }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: LA.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name ?? 'Usuario'}</div>
+                    <div style={{ fontSize: 11.5, color: LA.ink3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</div>
+                  </div>
+                  {!user?.isSuperadmin && (
+                    <Link href={`/${slug}/admin/perfil`} onClick={() => setMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px', fontSize: 13, color: LA.ink2, textDecoration: 'none' }}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V12a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>
+                      Mi perfil y configuración
+                    </Link>
+                  )}
+                  <form action="/api/auth/signout" method="POST">
+                    <button type="submit" style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px', fontSize: 13, color: '#C0392B', background: 'none', border: 'none', borderTop: `1px solid ${LA.border}`, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
+                      Cerrar sesión
+                    </button>
+                  </form>
+                </div>
+              </>
+            )}
+          </div>
+        </header>
         {children}
       </main>
 

@@ -9,6 +9,7 @@
 import { AGENCIES } from '@/lib/dummy'
 import { THEMES, type ThemeId } from '@/lib/themes'
 import { getLiveAgency } from '@/lib/agencies/provision'
+import { getAdminUser } from '@/lib/auth/current-user'
 import AdminShell from '@/components/admin/admin-shell'
 
 export const dynamic = 'force-dynamic'
@@ -38,5 +39,7 @@ export default async function AdminLayout({
     }
   }
 
-  return <AdminShell agencyName={agencyName} accent={accent}>{children}</AdminShell>
+  const user = await getAdminUser(slug)
+
+  return <AdminShell agencyName={agencyName} accent={accent} user={user}>{children}</AdminShell>
 }
