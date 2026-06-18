@@ -52,9 +52,9 @@ const SLIDES = [
 // Accesos demo: 3 agencias reales, una por cada tema (para mostrar los diseños).
 // Al loguear, el usuario es redirigido al panel de SU agencia automáticamente.
 const DEMO_CREDS = [
-  { label: 'López & Asociados', role: 'Tema Editorial', email: 'owner@lopezasociados.com', password: 'Lopez2024!' },
-  { label: 'Espacio Urbano', role: 'Tema Spatial', email: 'owner@espaciourbano.com', password: 'Demo2024!' },
-  { label: 'Atelier Norte', role: 'Tema Atelier', email: 'owner@atelierprop.com', password: 'Demo2024!' },
+  { label: 'López & Asociados', role: 'Tema Editorial', email: 'owner@lopezasociados.com', password: 'Lopez2024!', slug: 'lopez-asociados' },
+  { label: 'Espacio Urbano', role: 'Tema Spatial', email: 'owner@espaciourbano.com', password: 'Demo2024!', slug: 'espacio-urbano' },
+  { label: 'Atelier Norte', role: 'Tema Atelier', email: 'owner@atelierprop.com', password: 'Demo2024!', slug: 'atelier-norte' },
 ]
 
 interface Props {
@@ -103,6 +103,11 @@ export default function AgencyLoginClient({ slug, agencyName, redirectTo, showDe
   }
 
   const current = SLIDES[slide]!
+  // Si el usuario eligió una credencial demo, los labels + el link al sitio reflejan
+  // ESA agencia (no la del slug de la URL). Si escribe una propia, vuelve al default.
+  const activeCred = showDemo ? DEMO_CREDS.find(c => c.email === email.trim().toLowerCase()) : undefined
+  const panelName = activeCred?.label ?? agencyName
+  const publicSlug = activeCred?.slug ?? slug
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', fontFamily: "'Archivo', system-ui, sans-serif" }}>
@@ -183,7 +188,7 @@ export default function AgencyLoginClient({ slug, agencyName, redirectTo, showDe
           <div style={{ textAlign: 'center', marginBottom: 36, width: '100%' }}>
             <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: ZR.orange, textTransform: 'uppercase', letterSpacing: '.16em', marginBottom: 8 }}>// ACCESO AL PANEL</div>
             <h1 style={{ fontFamily: "'Archivo Black', sans-serif", fontSize: 26, fontWeight: 900, color: ZR.black, margin: 0, lineHeight: 0.95, textTransform: 'uppercase', letterSpacing: '-.01em' }}>
-              {agencyName}
+              {panelName}
             </h1>
             <p style={{ fontSize: 13, color: ZR.ink3, marginTop: 8 }}>Ingresá con tu cuenta de inmobiliaria.</p>
           </div>
@@ -260,8 +265,8 @@ export default function AgencyLoginClient({ slug, agencyName, redirectTo, showDe
             </div>
           )}
 
-          <Link href={`/${slug}`} style={{ marginTop: 24, fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: ZR.ink3, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '.1em' }}>
-            ← VER SITIO PÚBLICO
+          <Link href={`/${publicSlug}`} style={{ marginTop: 24, fontFamily: "'JetBrains Mono', monospace", fontSize: 9, color: ZR.ink3, textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '.1em' }}>
+            ← VER SITIO PÚBLICO{activeCred ? ` (${activeCred.label})` : ''}
           </Link>
         </div>
 
