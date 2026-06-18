@@ -88,16 +88,6 @@ export default function AdminShell({ children, agencyName, accent, user }: { chi
           </Link>
         </div>
 
-        {/* Flecha de colapsar — sobre la línea del sidebar, debajo del logo */}
-        <button
-          onClick={() => setCollapsed(c => !c)}
-          title={collapsed ? 'Expandir menú' : 'Colapsar menú'}
-          aria-label={collapsed ? 'Expandir menú' : 'Colapsar menú'}
-          style={{ alignSelf: collapsed ? 'center' : 'flex-end', margin: collapsed ? '8px 0 0' : '8px 8px 0 0', background: LA.white, border: `1px solid ${LA.border}`, borderRadius: 8, width: 26, height: 26, display: 'grid', placeItems: 'center', cursor: 'pointer', color: LA.ink2, flexShrink: 0 }}
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: collapsed ? 'rotate(180deg)' : 'none' }}><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-
         {/* Nav con secciones + divisores */}
         <nav style={{ flex: 1, padding: collapsed ? '10px 8px' : '10px 10px' }}>
           {SECTIONS.map((section, si) => (
@@ -160,7 +150,7 @@ export default function AdminShell({ children, agencyName, accent, user }: { chi
       {/* Main */}
       <main className="admin-main" style={{ flex: 1, minWidth: 0, overflowY: 'auto', background: LA.bg }}>
         {/* Header con menú de usuario */}
-        <header style={{ position: 'sticky', top: 0, zIndex: 100, height: 56, background: LA.white, borderBottom: `1px solid ${LA.border}`, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 24px' }}>
+        <header style={{ position: 'sticky', top: 0, zIndex: 100, height: 69, background: LA.white, borderBottom: `1px solid ${LA.border}`, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 24px' }}>
           <div style={{ position: 'relative' }}>
             <button onClick={() => setMenuOpen(o => !o)} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'none', border: 'none', cursor: 'pointer', padding: '6px 8px', borderRadius: 10, fontFamily: 'inherit' }}>
               <div style={{ width: 34, height: 34, borderRadius: 99, background: accent, color: LA.white, display: 'grid', placeItems: 'center', fontWeight: 800, fontSize: 13, flexShrink: 0 }}>{initials}</div>
