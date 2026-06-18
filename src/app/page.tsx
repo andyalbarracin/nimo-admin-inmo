@@ -38,9 +38,9 @@ function CompareCell({ type, text, nimo }: { type: 'yes' | 'no' | 'mid'; text: s
 }
 
 const THEMES_DATA = [
-  { id: 'editorial', name: 'Editorial', desc: 'Magazine, serif Fraunces, terracota. Para inmobiliarias de trayectoria.', href: '/lopez-asociados', bg: '#FAF7F0', ink: '#1A1614', accent: '#B25431', line: '#DBD2C2', font: 'var(--font-fraunces), Georgia, serif', sample: 'Norte Propiedades', palette: ['#FAF7F0', '#B25431', '#1A1614'] },
-  { id: 'spatial', name: 'Spatial', desc: 'Swiss, map-forward, azul electric. Para boutiques tech-savvy.', href: '/norte-propiedades', bg: '#FFFFFF', ink: '#0A0A0A', accent: '#1F4DD6', line: '#D8D8D6', font: 'var(--font-inter-tight), Inter, sans-serif', sample: 'GRID PROPIEDADES', palette: ['#FFFFFF', '#1F4DD6', '#0A0A0A'] },
-  { id: 'atelier', name: 'Atelier', desc: 'Boutique de lujo, Cormorant, verde salvia. Para propiedades premium.', href: '/distrito-atelier', bg: '#F5F1EC', ink: '#2E2620', accent: '#7A8264', line: '#DDD5CA', font: 'var(--font-cormorant), Georgia, serif', sample: 'Plaza Mayor', palette: ['#F5F1EC', '#7A8264', '#2E2620'] },
+  { id: 'editorial', name: 'Editorial', desc: 'Magazine, serif Fraunces, terracota. Para inmobiliarias de trayectoria.', href: '/lopez-asociados', bg: '#FAF7F0', ink: '#1A1614', accent: '#B25431', line: '#DBD2C2', font: 'var(--font-fraunces), Georgia, serif', sample: 'López & Asociados', palette: ['#FAF7F0', '#B25431', '#1A1614'] },
+  { id: 'spatial', name: 'Spatial', desc: 'Swiss, map-forward, azul electric. Para boutiques tech-savvy.', href: '/espacio-urbano', bg: '#FFFFFF', ink: '#0A0A0A', accent: '#1F4DD6', line: '#D8D8D6', font: 'var(--font-inter-tight), Inter, sans-serif', sample: 'Espacio Urbano', palette: ['#FFFFFF', '#1F4DD6', '#0A0A0A'] },
+  { id: 'atelier', name: 'Atelier', desc: 'Boutique de lujo, Cormorant, verde salvia. Para propiedades premium.', href: '/atelier-norte', bg: '#F5F1EC', ink: '#2E2620', accent: '#7A8264', line: '#DDD5CA', font: 'var(--font-cormorant), Georgia, serif', sample: 'Atelier Norte', palette: ['#F5F1EC', '#7A8264', '#2E2620'] },
 ]
 
 export default async function LandingPage() {
@@ -355,11 +355,36 @@ export default async function LandingPage() {
               <a className="theme-card" href={t.href} target="_blank" rel="noreferrer" key={t.id}>
                 <div className="theme-prev" style={{ background: t.bg }}>
                   <div className="theme-prev-bar"><span /><span /><span /></div>
-                  <div className="theme-prev-body">
-                    <div className="theme-prev-h" style={{ fontFamily: t.font, color: t.ink }}>{t.sample}</div>
-                    <div className="theme-prev-accent" style={{ background: t.accent }} />
-                    <div className="theme-prev-cards">
-                      <span style={{ borderColor: t.line }} /><span style={{ borderColor: t.line }} /><span style={{ borderColor: t.line }} />
+                  {/* ── MOCKUP del tema (código). Para usar una CAPTURA real en su lugar:
+                       reemplazá TODO este <div style={{flex:1...}}>…</div> por:
+                       <img src={`/themes/${t.id}.png`} alt={t.name} style={{ flex: 1, width: '100%', objectFit: 'cover', borderRadius: 6 }} />
+                       y guardá las imágenes en app/public/themes/editorial.png, spatial.png, atelier.png ── */}
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8, minHeight: 0 }}>
+                    {/* nav */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontFamily: t.font, color: t.ink, fontSize: 13, fontWeight: 700, letterSpacing: '-.01em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.sample}</span>
+                      <span style={{ display: 'flex', gap: 5, alignItems: 'center', flexShrink: 0 }}>
+                        <i style={{ width: 16, height: 3, borderRadius: 2, background: t.ink, opacity: .25 }} />
+                        <i style={{ width: 16, height: 3, borderRadius: 2, background: t.ink, opacity: .25 }} />
+                        <i style={{ width: 26, height: 11, borderRadius: 3, background: t.accent }} />
+                      </span>
+                    </div>
+                    {/* hero */}
+                    <div>
+                      <div style={{ fontFamily: t.font, color: t.ink, fontSize: 21, fontWeight: 700, lineHeight: 1, letterSpacing: '-.02em' }}>Propiedades<br />de autor</div>
+                      <div style={{ height: 4, width: 44, borderRadius: 99, background: t.accent, marginTop: 7 }} />
+                    </div>
+                    {/* grilla de propiedades */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 7, marginTop: 'auto' }}>
+                      {[0, 1, 2].map(i => (
+                        <div key={i} style={{ border: `1px solid ${t.line}`, borderRadius: 6, overflow: 'hidden', background: '#fff' }}>
+                          <div style={{ height: 34, background: `linear-gradient(135deg, ${t.accent}30, ${t.accent}0d)` }} />
+                          <div style={{ padding: '5px 6px' }}>
+                            <div style={{ height: 4, width: '85%', borderRadius: 2, background: t.ink, opacity: .22, marginBottom: 4 }} />
+                            <div style={{ height: 5, width: '55%', borderRadius: 2, background: t.accent }} />
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
